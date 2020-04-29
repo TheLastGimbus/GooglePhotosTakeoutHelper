@@ -44,6 +44,12 @@ parser.add_argument(
     action='store_true',
     help="Don't copy files to target folder. I don't know why would you not want to do that, but ok"
 )
+parser.add_argument(
+    "--divide-to-dates",
+    action='store_true',
+    help="Create folders and subfolders based on the date the photos were taken"
+         "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
+)
 args = parser.parse_args()
 
 
@@ -81,8 +87,7 @@ def for_all_files_recursive(
   folder_function=lambda fo: True,
   filter_fun=lambda file: True
 ):
-    files = os.listdir(dir)
-    for file in files:
+    for file in os.listdir(dir):
         file = dir + '/' + file
         if os.path.isdir(file):
             folder_function(file)
@@ -277,6 +282,24 @@ def copy_to_target(dir, file):
     return True
 
 
+def copy_to_target_and_divide(dir, file):
+    if not (is_photo(file) or is_video(file)):
+        return True
+
+    try:
+        exif_dict = piexif.load(file)
+    except (piexif.InvalidImageDataError, ValueError):
+        print(f"Couldn't get date for {file}")
+    # creation date like 2019:01:01 23:59:59
+    creation_date = exif_dict['0th'][TAG_DATE_TIME]
+    date = datetime.strptime(creation_date.split()[0], "%Y:%m:%d")
+
+    os.makedirs(f"{FIXED_DIR}/{date.year}", exist_ok=True)
+    os.makedirs(f"{FIXED_DIR}/{date.year}/{date.month}", exist_ok=True)
+    shutil.copy2(file, f"{FIXED_DIR}/{date.year}/{date.month:02}")
+
+    return True
+
 if not args.keep_duplicates:
     print('=====================')
     print('Removing duplicates...')
@@ -294,7 +317,16 @@ if not args.dont_fix:
         file_function=fix_metadata,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
-if not args.dont_copy:
+if not args.dont_fix and not args.dont_copy and args.divide_to_dates:
+    print('=====================')
+    print('Creating subfolders and dividing files based on date...')
+    print('=====================')
+    for_all_files_recursive(
+        dir=PHOTOS_DIR,
+        file_function=copy_to_target_and_divide,
+        filter_fun=lambda f: (is_photo(f) or is_video(f))
+    )
+elif not args.dont_copy:
     print('=====================')
     print('Coping all files to one folder...')
     print('=====================')
@@ -303,6 +335,8 @@ if not args.dont_copy:
         file_function=copy_to_target,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
+
+
 print()
 print('DONE! FREEDOM!')
 print()
