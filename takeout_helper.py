@@ -286,13 +286,8 @@ def copy_to_target_and_divide(dir, file):
     if not (is_photo(file) or is_video(file)):
         return True
 
-    try:
-        exif_dict = piexif.load(file)
-    except (piexif.InvalidImageDataError, ValueError):
-        print(f"Couldn't get date for {file}")
-    # creation date like 2019:01:01 23:59:59
-    creation_date = exif_dict['0th'][TAG_DATE_TIME]
-    date = datetime.strptime(creation_date.split()[0], "%Y:%m:%d")
+    creation_date = os.path.getmtime(file)
+    date = datetime.fromtimestamp(creation_date)
 
     os.makedirs(f"{FIXED_DIR}/{date.year}", exist_ok=True)
     os.makedirs(f"{FIXED_DIR}/{date.year}/{date.month}", exist_ok=True)
