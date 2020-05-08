@@ -79,8 +79,8 @@ TAG_DATE_TIME_DIGITIZED = piexif.ExifIFD.DateTimeDigitized
 TAG_DATE_TIME = 306
 TAG_PREVIEW_DATE_TIME = 50971
 
-photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff']
-video_formats = ['.mp4', '.gif', '.mov', '.webm']
+photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
+video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
 
 os.makedirs(FIXED_DIR, exist_ok=True)
 
