@@ -283,9 +283,6 @@ def copy_to_target(dir, file):
 
 
 def copy_to_target_and_divide(dir, file):
-    if not (is_photo(file) or is_video(file)):
-        return True
-
     creation_date = os.path.getmtime(file)
     date = datetime.fromtimestamp(creation_date)
 
