@@ -44,8 +44,13 @@ parser.add_argument(
     action='store_true',
     help="Don't copy files to target folder. I don't know why would you not want to do that, but ok"
 )
+parser.add_argument(
+    "--divide-to-dates",
+    action='store_true',
+    help="Create folders and subfolders based on the date the photos were taken"
+         "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
+)
 args = parser.parse_args()
-
 
 print('DISCLAIMER!')
 print("Before running this script, you need to cut out all folders that aren't dates")
@@ -81,8 +86,7 @@ def for_all_files_recursive(
   folder_function=lambda fo: True,
   filter_fun=lambda file: True
 ):
-    files = os.listdir(dir)
-    for file in files:
+    for file in os.listdir(dir):
         file = dir + '/' + file
         if os.path.isdir(file):
             folder_function(file)
@@ -277,6 +281,16 @@ def copy_to_target(dir, file):
     return True
 
 
+def copy_to_target_and_divide(dir, file):
+    creation_date = os.path.getmtime(file)
+    date = datetime.fromtimestamp(creation_date)
+
+    new_path = f"{FIXED_DIR}/{date.year}/{date.month:02}/"
+    os.makedirs(new_path, exist_ok=True)
+    shutil.copy2(file, new_path)
+    return True
+
+
 if not args.keep_duplicates:
     print('=====================')
     print('Removing duplicates...')
@@ -294,7 +308,16 @@ if not args.dont_fix:
         file_function=fix_metadata,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
-if not args.dont_copy:
+if not args.dont_fix and not args.dont_copy and args.divide_to_dates:
+    print('=====================')
+    print('Creating subfolders and dividing files based on date...')
+    print('=====================')
+    for_all_files_recursive(
+        dir=PHOTOS_DIR,
+        file_function=copy_to_target_and_divide,
+        filter_fun=lambda f: (is_photo(f) or is_video(f))
+    )
+elif not args.dont_copy:
     print('=====================')
     print('Coping all files to one folder...')
     print('=====================')
@@ -303,6 +326,7 @@ if not args.dont_copy:
         file_function=copy_to_target,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
+
 print()
 print('DONE! FREEDOM!')
 print()
