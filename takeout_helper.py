@@ -286,7 +286,6 @@ def copy_to_target_and_divide(dir, file):
     creation_date = os.path.getmtime(file)
     date = datetime.fromtimestamp(creation_date)
 
-    os.makedirs(f"{FIXED_DIR}/{date.year}", exist_ok=True)
     os.makedirs(f"{FIXED_DIR}/{date.year}/{date.month}", exist_ok=True)
     shutil.copy2(file, f"{FIXED_DIR}/{date.year}/{date.month:02}")
 
