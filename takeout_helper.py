@@ -1,18 +1,23 @@
-import os
-import shutil
-import piexif
-import json
-import re
-from datetime import datetime
 import argparse
+import json
+import os
+import re
+import shutil
+from datetime import datetime
+
+import piexif
 
 parser = argparse.ArgumentParser(
     prog='Photos takeout helper',
     usage='python3 photos_helper.py -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
     description=
-    'This script takes all of your photos form Google Photos takeout, '
-    'fixes their exif DateTime data (when they were taken) and file creation date,'
-    'and then copies it all to one folder.'
+    """This script takes all of your photos form Google Photos takeout, 
+    fixes their exif DateTime data (when they were taken) and file creation date,
+    and then copies it all to one folder.
+    "Why do I need to delete album folders?"
+    -They mostly contain duplicates of same photos that are in corresponding "date folder" :/
+    You need to do this before running this.
+    """,
 )
 parser.add_argument(
     '-i', '--input-folder',
@@ -44,8 +49,13 @@ parser.add_argument(
     action='store_true',
     help="Don't copy files to target folder. I don't know why would you not want to do that, but ok"
 )
+parser.add_argument(
+    "--divide-to-dates",
+    action='store_true',
+    help="Create folders and subfolders based on the date the photos were taken"
+         "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
+)
 args = parser.parse_args()
-
 
 print('DISCLAIMER!')
 print("Before running this script, you need to cut out all folders that aren't dates")
@@ -54,7 +64,7 @@ print('2016-06-16 (or with "#", they are good)')
 print('See README.md or --help on why')
 print("(Don't worry, your photos from albums are already in some date folder)")
 print()
-print('Type "yes i did that" to comfirm:')
+print('Type "yes i did that" to confirm:')
 response = input()
 if response == 'yes i did that':
     print('Heeeere we go!')
@@ -81,8 +91,7 @@ def for_all_files_recursive(
   folder_function=lambda fo: True,
   filter_fun=lambda file: True
 ):
-    files = os.listdir(dir)
-    for file in files:
+    for file in os.listdir(dir):
         file = dir + '/' + file
         if os.path.isdir(file):
             folder_function(file)
@@ -277,6 +286,16 @@ def copy_to_target(dir, file):
     return True
 
 
+def copy_to_target_and_divide(dir, file):
+    creation_date = os.path.getmtime(file)
+    date = datetime.fromtimestamp(creation_date)
+
+    new_path = f"{FIXED_DIR}/{date.year}/{date.month:02}/"
+    os.makedirs(new_path, exist_ok=True)
+    shutil.copy2(file, new_path)
+    return True
+
+
 if not args.keep_duplicates:
     print('=====================')
     print('Removing duplicates...')
@@ -294,15 +313,27 @@ if not args.dont_fix:
         file_function=fix_metadata,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
-if not args.dont_copy:
+if not args.dont_fix and not args.dont_copy and args.divide_to_dates:
+    print('=====================')
+    print('Creating subfolders and dividing files based on date...')
+    print('=====================')
+    for_all_files_recursive(
+        dir=PHOTOS_DIR,
+        file_function=copy_to_target_and_divide,
+        filter_fun=lambda f: (is_photo(f) or is_video(f))
+    )
+elif not args.dont_copy:
     print('=====================')
     print('Coping all files to one folder...')
+    print('(If you want, you can get them organized in folders based on year and month.'
+          ' Run with --divide-to-dates to do this)')
     print('=====================')
     for_all_files_recursive(
         dir=PHOTOS_DIR,
         file_function=copy_to_target,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
+
 print()
 print('DONE! FREEDOM!')
 print()
