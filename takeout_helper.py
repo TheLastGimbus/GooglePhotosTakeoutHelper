@@ -52,7 +52,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-
 print('DISCLAIMER!')
 print("Before running this script, you need to cut out all folders that aren't dates")
 print("That is, all album folders, and everything that isn't named")
@@ -286,10 +285,11 @@ def copy_to_target_and_divide(dir, file):
     creation_date = os.path.getmtime(file)
     date = datetime.fromtimestamp(creation_date)
 
-    os.makedirs(f"{FIXED_DIR}/{date.year}/{date.month}", exist_ok=True)
-    shutil.copy2(file, f"{FIXED_DIR}/{date.year}/{date.month:02}")
-
+    new_path = f"{FIXED_DIR}/{date.year}/{date.month:02}/"
+    os.makedirs(new_path, exist_ok=True)
+    shutil.copy2(file, new_path)
     return True
+
 
 if not args.keep_duplicates:
     print('=====================')
@@ -326,7 +326,6 @@ elif not args.dont_copy:
         file_function=copy_to_target,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
-
 
 print()
 print('DONE! FREEDOM!')
