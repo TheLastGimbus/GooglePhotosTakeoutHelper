@@ -280,9 +280,23 @@ def fix_metadata(dir, file):
 
 # PART 3: Copy all photos and videos to target folder
 
+# Makes a new name like 'photo(1).jpg'
+def new_name_if_exists(file_name):
+    split = os.path.splitext(file_name)
+    new_name = split[0] + split[1]
+    i = 1
+    while True:
+        if os.path.isfile(new_name):
+            new_name = split[0] + '(' + str(i) + ')' + split[1]
+            i += 1
+        else:
+            return new_name
+
+
 def copy_to_target(dir, file):
     if is_photo(file) or is_video(file):
-        shutil.copy2(file, FIXED_DIR)
+        new_file = new_name_if_exists(FIXED_DIR + '/' + os.path.basename(file))
+        shutil.copy2(file, new_file)
     return True
 
 
@@ -292,7 +306,9 @@ def copy_to_target_and_divide(dir, file):
 
     new_path = f"{FIXED_DIR}/{date.year}/{date.month:02}/"
     os.makedirs(new_path, exist_ok=True)
-    shutil.copy2(file, new_path)
+
+    new_file = new_name_if_exists(new_path + os.path.basename(file))
+    shutil.copy2(file, new_file)
     return True
 
 
