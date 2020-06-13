@@ -197,10 +197,22 @@ def get_date_from_folder_name(dir):
 
 
 def set_creation_date_from_str(file, str_datetime):
-    timestamp = datetime.strptime(
-        str_datetime,
-        '%Y:%m:%d %H:%M:%S'
-    ).timestamp()
+    try:
+        timestamp = datetime.strptime(
+            str_datetime,
+            '%Y:%m:%d %H:%M:%S'
+        ).timestamp()
+    except Exception as e:
+        print()
+        print(e)
+        print()
+        print('==========!!!==========')
+        print("You probably forgot to remove 'album folders' from your takeout folder")
+        print("Please do that - see README.md or --help for why")
+        print()
+        print('Once you do this, just run it again :)')
+        print('==========!!!==========')
+        exit(-1)
     os.utime(file, (timestamp, timestamp))
 
 
@@ -357,3 +369,6 @@ elif not args.dont_copy:
 print()
 print('DONE! FREEDOM!')
 print()
+print()
+print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
+print('Have a nice day!')
