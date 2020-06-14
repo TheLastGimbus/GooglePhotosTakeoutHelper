@@ -29,9 +29,13 @@ Beware, that (99% of the times), if you move some files in Android, their creati
 
 https://github.com/SimpleMobileTools/Simple-Gallery
 
-I really recommend you using Syncthing for syncing your photos across devices - it preserves original file creation time (also replaces Google Photos!).
+## What to do when you got rid of Google Photos? What are the alternatives?
+I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local WiFi, so you're not dependend on any service or internet connection
 
-https://syncthing.net/
+If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but it's approach to photos is still not perfect.
+(And you need to set up your own server)
+
+Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 
 
