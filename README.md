@@ -37,6 +37,15 @@ https://github.com/SimpleMobileTools/Simple-Gallery
  - Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 
+#### Other Takeout projects
+I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
+
+https://github.com/vHanda/google-keep-exporter
+
+
+This one saves them in format ready for Evernote/ClintaNotes:
+
+https://github.com/HardFork/KeepToText
 
 
 ### TODO:
