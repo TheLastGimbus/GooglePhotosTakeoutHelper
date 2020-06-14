@@ -22,7 +22,7 @@ IF it can't find anything like that, it sets date from folder name.
 
 All of this is so that you can then safely store ALL of your photos in one folder, and they will all be in right order.
 
-##### Unless you move them around your Android phone. 
+#### Unless you move them around your Android phone. 
 Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reseted to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out:
@@ -30,12 +30,11 @@ Beware, that (99% of the times), if you move some files in Android, their creati
 https://github.com/SimpleMobileTools/Simple-Gallery
 
 ## What to do when you got rid of Google Photos? What are the alternatives?
-I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local WiFi, so you're not dependend on any service or internet connection
+ - I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local WiFi, so you're not dependend on any service or internet connection. It will also keep original file creation date and metadata, so it resolves Android issue that I mentioned before.
 
-If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but it's approach to photos is still not perfect.
-(And you need to set up your own server)
+ - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but it's approach to photos is still not perfect. (And you need to set up your own server)
 
-Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
+ - Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 
 
