@@ -3,7 +3,7 @@
 
 ## How to use:
 1. Clone/download this repo
-2. `pip install requirements.txt`
+2. `pip install -r requirements.txt`
 3. Cut out/remove all "album folders" that aren't named "2016-06-16" or something like that
 4. Run:
 
