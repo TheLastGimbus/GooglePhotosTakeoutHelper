@@ -244,7 +244,7 @@ def set_file_exif_date(file, creation_date):
 
     try:
         piexif.insert(piexif.dump(exif_dict), file)
-    except ValueError as e:
+    except Exception as e:
         print('Couldnt insert exif!')
         print(e)
 
