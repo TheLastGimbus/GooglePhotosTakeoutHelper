@@ -2,14 +2,16 @@
 #### Python scripts that helps you export your photos from Google Photos to one, nice folder
 
 ## How to use:
-1. Clone/download this repo
-2. `pip install -r requirements.txt`
+1. `pip3 install -U google-photos-takeout-helper`
+2. Extract all contents from your Google Takeout to one folder
 3. Cut out/remove all "album folders" that aren't named "2016-06-16" or something like that
-4. Run:
+4. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
-`python takeout_helper.py -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
 
-Input takeout folder is your folder with all stuff you got in all .zip's.
+<sup><sup>If you previously used this script in form where you 
+download and run it - don't worry! Downloading it with pip is even simpler, 
+and everything will work as previously :)</sup></sup>
 
 If, instead of one big folder, you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
