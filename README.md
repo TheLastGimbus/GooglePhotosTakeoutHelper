@@ -50,7 +50,7 @@ This one saves them in format ready for Evernote/ClintaNotes:
 https://github.com/HardFork/KeepToText
 
 
-### TODO:
+### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data
 - [ ] Gps data: from JSON to Exif
 - [ ] Some way to handle albums
