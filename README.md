@@ -1,5 +1,5 @@
 # Google Photos Takeout Helper
-#### Python scripts that helps you export your photos from Google Photos to one, nice folder
+#### Python script that helps you export your photos from Google Photos to one, nice folder with correct last-modified dates
 
 ## How to use:
 1. `pip3 install -U google-photos-takeout-helper`
