@@ -2,9 +2,10 @@
 #### Python script that helps you export your photos from Google Photos to one, nice folder with correct last-modified dates
 
 ## How to use:
+0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
 1. `pip3 install -U google-photos-takeout-helper`
 2. Extract all contents from your Google Takeout to one folder
-3. Cut out/remove all "album folders" that aren't named "2016-06-16" or something like that
+3. Cut out/remove all ["album folders"](#why-do-you-need-to-cut-out-albums) that aren't named "2016-06-16" or something like that
 4. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
