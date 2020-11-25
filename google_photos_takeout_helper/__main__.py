@@ -197,24 +197,25 @@ def main():
         return dir
 
 
-    def set_creation_date_from_str(file, str_datetime):
+    def set_creation_date_from_str(file, str_datetime, exit_on_error=False):
         try:
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
+            _os.utime(file, (timestamp, timestamp))
         except Exception as e:
             print()
             print(e)
-            print()
-            print('==========!!!==========')
-            print("You probably forgot to remove 'album folders' from your takeout folder")
-            print("Please do that - see README.md or --help for why")
-            print()
-            print('Once you do this, just run it again :)')
-            print('==========!!!==========')
-            exit(-1)
-        _os.utime(file, (timestamp, timestamp))
+            if exit_on_error:
+                print()
+                print('==========!!!==========')
+                print("You probably forgot to remove 'album folders' from your takeout folder")
+                print("Please do that - see README.md or --help for why")
+                print()
+                print('Once you do this, just run it again :)')
+                print('==========!!!==========')
+                exit(-1)
 
 
     def set_creation_date_from_exif(file):
@@ -286,7 +287,7 @@ def main():
         print('Last chance, coping folder name as date...')
         date = get_date_from_folder_name(dir)
         set_file_exif_date(file, date)
-        set_creation_date_from_str(file, date)
+        set_creation_date_from_str(file, date, exit_on_error=True)
         return True
 
 
