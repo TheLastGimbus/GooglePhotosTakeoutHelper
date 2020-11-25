@@ -85,12 +85,11 @@ def main():
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
-
     def for_all_files_recursive(
-      dir,
-      file_function=lambda fo, fi: True,
-      folder_function=lambda fo: True,
-      filter_fun=lambda file: True
+            dir,
+            file_function=lambda fo, fi: True,
+            folder_function=lambda fo: True,
+            filter_fun=lambda file: True
     ):
         for file in _os.listdir(dir):
             file = dir + '/' + file
@@ -104,20 +103,17 @@ def main():
                 print('Found something weird...')
                 print(file)
 
-
     def is_photo(file):
         what = _os.path.splitext(file.lower())[1]
         if what not in photo_formats:
             return False
         return True
 
-
     def is_video(file):
         what = _os.path.splitext(file.lower())[1]
         if what not in video_formats:
             return False
         return True
-
 
     # PART 1: removing duplicates
 
@@ -165,14 +161,12 @@ def main():
 
         return duplicates
 
-
     # Removes all duplicates in folder
     def remove_duplicates(dir):
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
             _os.remove(file)
         return True
-
 
     # PART 2: Fixing metadata and date-related stuff
 
@@ -189,13 +183,11 @@ def main():
         else:
             raise FileNotFoundError('Couldnt find json for file: ' + file)
 
-
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir):
         dir = _os.path.basename(_os.path.normpath(dir))
         dir = dir[:10].replace('-', ':') + ' 12:00:00'
         return dir
-
 
     def set_creation_date_from_str(file, str_datetime):
         try:
@@ -216,7 +208,6 @@ def main():
             exit(-1)
         _os.utime(file, (timestamp, timestamp))
 
-
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
@@ -230,7 +221,6 @@ def main():
         if datetime_str is None:
             raise IOError('No DateTime in given exif')
         set_creation_date_from_str(file, datetime_str)
-
 
     def set_file_exif_date(file, creation_date):
         try:
@@ -246,15 +236,37 @@ def main():
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
         except Exception as e:
-            print('Couldnt insert exif!')
+            print("Couldn't insert exif!")
             print(e)
-
 
     def get_date_str_from_json(json):
         return _datetime.fromtimestamp(
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
 
+    def set_file_geo_data(file, json):
+        print("\nSetting geo data \n\n\n")
+        exif_dict = _piexif.load(file)
+        print(f"Google JSON looks like this {json['geoDataExif']}")
+
+        # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
+        gps_ifd = {
+            _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
+            _piexif.GPSIFD.GPSAltitudeRef: 1,
+            _piexif.GPSIFD.GPSAltitude: json['geoDataExif']['altitude'],
+            _piexif.GPSIFD.GPSLatitudeRef: 'N',  # pretty sure it's always north...
+            _piexif.GPSIFD.GPSLatitude: json['geoDataExif']['latitude'],
+            _piexif.GPSIFD.GPSLongitudeRef: 'E',  # and I'm pretty sure it's always e
+            _piexif.GPSIFD.GPSLongitude: json['geoDataExif']['longitude'],
+        }
+
+        exif_dict['Exif']['GPS'] = gps_ifd
+
+        try:
+            _piexif.insert(_piexif.dump(exif_dict), file)
+        except Exception as e:
+            print("Couldn't insert geo exif!")
+            print(e)
 
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(dir, file):
@@ -275,6 +287,7 @@ def main():
             date = get_date_str_from_json(google_json)
             set_file_exif_date(file, date)
             set_creation_date_from_str(file, date)
+            set_file_geo_data(file, google_json)
             has_nice_date = True
             return
         except FileNotFoundError:
@@ -288,7 +301,6 @@ def main():
         set_file_exif_date(file, date)
         set_creation_date_from_str(file, date)
         return True
-
 
     # PART 3: Copy all photos and videos to target folder
 
@@ -307,14 +319,12 @@ def main():
                 new_name = split[0] + '(' + str(i) + ')' + split[1]
                 i += 1
 
-
     def copy_to_target(dir, file):
         if is_photo(file) or is_video(file):
             new_file = new_name_if_exists(FIXED_DIR + '/' + _os.path.basename(file),
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
         return True
-
 
     def copy_to_target_and_divide(dir, file):
         creation_date = _os.path.getmtime(file)
@@ -327,7 +337,6 @@ def main():
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
         return True
-
 
     if not args.keep_duplicates:
         print('=====================')
@@ -373,6 +382,7 @@ def main():
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
+
 
 if __name__ == '__main__':
     main()
