@@ -1,3 +1,5 @@
+![PyPI](https://img.shields.io/pypi/v/google-photos-takeout-helper)
+
 # Google Photos Takeout Helper
 #### Python script that helps you export your photos from Google Photos to one, nice folder with correct last-modified dates
 
