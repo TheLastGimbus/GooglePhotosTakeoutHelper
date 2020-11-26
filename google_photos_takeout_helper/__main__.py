@@ -7,6 +7,8 @@ def main():
     from datetime import datetime as _datetime
 
     import piexif as _piexif
+    from fractions import Fraction  # piexif requires some values to be stored as rationals
+    import math
 
     parser = _argparse.ArgumentParser(
         prog='Photos takeout helper',
@@ -244,28 +246,78 @@ def main():
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
 
+    def change_to_rational(number):
+        """convert a number to rantional
+        Keyword arguments: number
+        return: tuple like (1, 2), (numerator, denominator)
+        """
+        f = Fraction(str(number))
+        return f.numerator, f.denominator
+
+    # got this here https://github.com/hMatoba/piexifjs/issues/1#issuecomment-260176317
+    def degToDmsRational(degFloat):
+        minFloat = degFloat % 1 * 60
+        secFloat = minFloat % 1 * 60
+        deg = math.floor(degFloat)
+        deg_min = math.floor(minFloat)
+        sec = round(secFloat * 100)
+
+        return [[deg, 1], [deg_min, 1], [sec, 100]]
+
     def set_file_geo_data(file, json):
-        print("\nSetting geo data \n\n\n")
+        #print("\nSetting geo data \n\n\n")
         exif_dict = _piexif.load(file)
-        print(f"Google JSON looks like this {json['geoDataExif']}")
+        #print(f"Google JSON looks like this {json['geoDataExif']}")
+
+        longitude = float(json['geoDataExif']['longitude'])
+        latitude = float(json['geoDataExif']['latitude'])
+
+        # latitude >= 0: North latitude -> "N"
+        # latitude < 0: South latitude -> "S"
+        # longitude >= 0: East longitude -> "E"
+        # longitude < 0: West longitude -> "W"
+
+        if longitude >= 0:
+            longitude_ref = 'E'
+        else:
+            longitude_ref = 'W'
+            longitude = longitude * -1
+
+        if latitude >= 0:
+            latitude_ref = 'N'
+        else:
+            latitude_ref = 'S'
+            latitude = latitude * -1
+
+        # lat translation looks like this
+        # 37.429289 -> [37429289, 1000000]
+        magic_num = 1000000
+        #
+        # assuming that google stores their coords like XXX.XXXXXX, we multiply it my the magic number to get our desired output
+        # https://github.com/hMatoba/piexifjs/issues/1#issuecomment-107110517
 
         # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
         gps_ifd = {
             _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
             _piexif.GPSIFD.GPSAltitudeRef: 1,
-            _piexif.GPSIFD.GPSAltitude: json['geoDataExif']['altitude'],
-            _piexif.GPSIFD.GPSLatitudeRef: 'N',  # pretty sure it's always north...
-            _piexif.GPSIFD.GPSLatitude: json['geoDataExif']['latitude'],
-            _piexif.GPSIFD.GPSLongitudeRef: 'E',  # and I'm pretty sure it's always e
-            _piexif.GPSIFD.GPSLongitude: json['geoDataExif']['longitude'],
+            _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude'])),
+            _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
+            _piexif.GPSIFD.GPSLatitude: [latitude * magic_num, magic_num],
+            _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
+            _piexif.GPSIFD.GPSLongitude: [longitude * magic_num, magic_num]
         }
 
-        exif_dict['Exif']['GPS'] = gps_ifd
+        gps_exif = {"GPS": gps_ifd}
+        exif_dict.update(gps_exif)
+
+        print(gps_exif)
 
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
+            print("\n Added GEO data \n")
         except Exception as e:
             print("Couldn't insert geo exif!")
+            # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
             print(e)
 
     # Fixes ALL metadata, takes just file and dir and figures it out
@@ -291,7 +343,7 @@ def main():
             has_nice_date = True
             return
         except FileNotFoundError:
-            print('Couldnt find json for file :/')
+            print("Couldn't find json for file :/")
 
         if has_nice_date:
             return
