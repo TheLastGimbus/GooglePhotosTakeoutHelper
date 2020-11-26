@@ -301,16 +301,16 @@ def main():
             _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
             _piexif.GPSIFD.GPSAltitudeRef: 1,
             _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude'])),
-            _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
-            _piexif.GPSIFD.GPSLatitude: [latitude * magic_num, magic_num],
-            _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
-            _piexif.GPSIFD.GPSLongitude: [longitude * magic_num, magic_num]
+            #_piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
+            #_piexif.GPSIFD.GPSLatitude: [latitude * magic_num, magic_num],
+            #_piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
+            #_piexif.GPSIFD.GPSLongitude: [longitude * magic_num, magic_num]
         }
 
         gps_exif = {"GPS": gps_ifd}
         exif_dict.update(gps_exif)
 
-        print(gps_exif)
+        print(exif_dict)
 
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
