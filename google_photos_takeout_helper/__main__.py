@@ -256,11 +256,11 @@ def main():
 
     # got this here https://github.com/hMatoba/piexifjs/issues/1#issuecomment-260176317
     def degToDmsRational(degFloat):
-        minFloat = degFloat % 1 * 60
-        secFloat = minFloat % 1 * 60
+        min_float = degFloat % 1 * 60
+        sec_float = min_float % 1 * 60
         deg = math.floor(degFloat)
-        deg_min = math.floor(minFloat)
-        sec = round(secFloat * 100)
+        deg_min = math.floor(min_float)
+        sec = round(sec_float * 100)
 
         return [(deg, 1), (deg_min, 1), (sec, 100)]
 
@@ -287,25 +287,14 @@ def main():
             latitude_ref = 'S'
             latitude = latitude * -1
 
-        # lat translation looks like this
-        # 37.429289 -> [37429289, 1000000]
-        magic_num = 1000000
-        #
-        # assuming that google stores their coords like XXX.XXXXXX, we multiply it my the magic number to get our desired output
-        # https://github.com/hMatoba/piexifjs/issues/1#issuecomment-107110517
-
         # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
         gps_ifd = {
             _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
 
             _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
-            #_piexif.GPSIFD.GPSLatitude: [int(latitude * magic_num), magic_num], # BOTH NUMBERS HAVE TO BE INT
-            #_piexif.GPSIFD.GPSLatitude: [37429289, 1000000],
-
             _piexif.GPSIFD.GPSLatitude: degToDmsRational(latitude),
 
             _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
-            #_piexif.GPSIFD.GPSLongitude: [int(longitude * magic_num), magic_num],
             _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude),
 
             _piexif.GPSIFD.GPSAltitudeRef: 1,
@@ -314,8 +303,6 @@ def main():
 
         gps_exif = {"GPS": gps_ifd}
         exif_dict.update(gps_exif)
-
-        print(exif_dict)
 
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
