@@ -262,7 +262,7 @@ def main():
         deg_min = math.floor(minFloat)
         sec = round(secFloat * 100)
 
-        return [[deg, 1], [deg_min, 1], [sec, 100]]
+        return [(deg, 1), (deg_min, 1), (sec, 100)]
 
     def set_file_geo_data(file, json):
         exif_dict = _piexif.load(file)
@@ -299,17 +299,23 @@ def main():
             _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
 
             _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
-            _piexif.GPSIFD.GPSLatitude: [int(latitude * magic_num), magic_num], # BOTH NUMBERS HAVE TO BE INT
+            #_piexif.GPSIFD.GPSLatitude: [int(latitude * magic_num), magic_num], # BOTH NUMBERS HAVE TO BE INT
+            #_piexif.GPSIFD.GPSLatitude: [37429289, 1000000],
+
+            _piexif.GPSIFD.GPSLatitude: degToDmsRational(latitude),
 
             _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
-            _piexif.GPSIFD.GPSLongitude: [int(longitude * magic_num), magic_num],
+            #_piexif.GPSIFD.GPSLongitude: [int(longitude * magic_num), magic_num],
+            _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude),
 
             _piexif.GPSIFD.GPSAltitudeRef: 1,
-            _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude'])),
+            _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude']))
         }
 
         gps_exif = {"GPS": gps_ifd}
         exif_dict.update(gps_exif)
+
+        print(exif_dict)
 
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
@@ -335,9 +341,9 @@ def main():
         try:
             google_json = find_json_for_file(dir, file)
             date = get_date_str_from_json(google_json)
+            set_file_geo_data(file, google_json)
             set_file_exif_date(file, date)
             set_creation_date_from_str(file, date)
-            set_file_geo_data(file, google_json)
             has_nice_date = True
             return
         except FileNotFoundError:
