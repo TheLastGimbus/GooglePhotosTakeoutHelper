@@ -269,6 +269,7 @@ def main():
 
         longitude = float(json['geoDataExif']['longitude'])
         latitude = float(json['geoDataExif']['latitude'])
+        altitude = json['geoDataExif']['altitude']
 
         # latitude >= 0: North latitude -> "N"
         # latitude < 0: South latitude -> "S"
@@ -289,17 +290,24 @@ def main():
 
         # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
         gps_ifd = {
-            _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
-
-            _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
-            _piexif.GPSIFD.GPSLatitude: degToDmsRational(latitude),
-
-            _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
-            _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude),
-
-            _piexif.GPSIFD.GPSAltitudeRef: 1,
-            _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude']))
+            _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0)
         }
+
+        # skips it if it's empty
+        if latitude != 0 or longitude != 0:
+            gps_ifd.update({
+                _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
+                _piexif.GPSIFD.GPSLatitude: degToDmsRational(latitude),
+
+                _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
+                _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude)
+            })
+
+        if altitude != 0:
+            gps_ifd.update({
+                _piexif.GPSIFD.GPSAltitudeRef: 1,
+                _piexif.GPSIFD.GPSAltitude: change_to_rational(round(altitude))
+            })
 
         gps_exif = {"GPS": gps_ifd}
         exif_dict.update(gps_exif)
