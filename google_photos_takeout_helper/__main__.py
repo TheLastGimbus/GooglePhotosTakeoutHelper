@@ -265,9 +265,7 @@ def main():
         return [[deg, 1], [deg_min, 1], [sec, 100]]
 
     def set_file_geo_data(file, json):
-        #print("\nSetting geo data \n\n\n")
         exif_dict = _piexif.load(file)
-        #print(f"Google JSON looks like this {json['geoDataExif']}")
 
         longitude = float(json['geoDataExif']['longitude'])
         latitude = float(json['geoDataExif']['latitude'])
@@ -299,22 +297,22 @@ def main():
         # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
         gps_ifd = {
             _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
+
+            _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
+            _piexif.GPSIFD.GPSLatitude: [int(latitude * magic_num), magic_num], # BOTH NUMBERS HAVE TO BE INT
+
+            _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
+            _piexif.GPSIFD.GPSLongitude: [int(longitude * magic_num), magic_num],
+
             _piexif.GPSIFD.GPSAltitudeRef: 1,
             _piexif.GPSIFD.GPSAltitude: change_to_rational(round(json['geoDataExif']['altitude'])),
-            #_piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
-            #_piexif.GPSIFD.GPSLatitude: [latitude * magic_num, magic_num],
-            #_piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
-            #_piexif.GPSIFD.GPSLongitude: [longitude * magic_num, magic_num]
         }
 
         gps_exif = {"GPS": gps_ifd}
         exif_dict.update(gps_exif)
 
-        print(exif_dict)
-
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
-            print("\n Added GEO data \n")
         except Exception as e:
             print("Couldn't insert geo exif!")
             # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
