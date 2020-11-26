@@ -28,6 +28,8 @@ and everything will work as previously :)</sup>
 If, instead of one big folder, you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
 ### How to use for dummies (non-programming people):
+<details><summary>Click for detailed instructions</summary>
+<p>
 This script is written in Python. You need to install Python interpretert before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
 
 1. Download and install Python for your system: https://www.python.org/downloads/ (Google step by step installation instructions if you have trouble) - if the installator will ask you about some `PATH` and `pip`, make sure to check that too
@@ -44,6 +46,9 @@ Now, you should be able to just run it straight in cmd/terminal:
 // Or if this doesn't work: `python3 -m google_photos_takeout_helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/posts/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+
+</p>
+</details>
 
 ### Why do you need to cut out albums?
 They mostly contain duplicates of same photos that are in corresponding "date folder"
