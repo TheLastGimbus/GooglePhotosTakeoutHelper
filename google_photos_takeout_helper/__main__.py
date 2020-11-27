@@ -265,6 +265,15 @@ def main():
         return [(deg, 1), (deg_min, 1), (sec, 100)]
 
     def set_file_geo_data(file, json):
+        """
+        Reads the geoData from google and saves it to the EXIF. This works assuming that the geodata looks like -100.12093, 50.213143. Something like that.
+
+        Written by DalenW.
+        :param file:
+        :param json:
+        :return:
+        """
+
         exif_dict = _piexif.load(file)
 
         longitude = float(json['geoDataExif']['longitude'])
