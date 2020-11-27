@@ -7,8 +7,8 @@ README = (HERE/"README.md").read_text()
 
 setuptools.setup(
     name="google-photos-takeout-helper",
-    version="1.0.0",
-    description="Script that helps you export your photos from Google Photos to one, nice folder",
+    version="1.0.1",
+    description="Script that organizes the Google Photos Takeout archive into one big chronological folder",
     long_description=README,
     long_description_content_type='text/markdown',
     url='https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/',
