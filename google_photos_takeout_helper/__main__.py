@@ -67,7 +67,7 @@ def main():
     print()
     print('Type "yes i did that" to confirm:')
     response = input()
-    if response == 'yes i did that':
+    if response.lower() == 'yes i did that':
         print('Heeeere we go!')
     else:
         print('Ok come back when you do this')
