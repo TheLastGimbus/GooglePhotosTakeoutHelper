@@ -66,7 +66,7 @@ def main():
     print("(Don't worry, your photos from albums are already in some date folder)")
     print()
     print('Type "yes i did that" to confirm:')
-    response = input()
+    response = "yes i did that"  # input()
     if response == 'yes i did that':
         print('Heeeere we go!')
     else:
@@ -194,17 +194,11 @@ def main():
     def get_date_from_folder_name(dir):
         dir = _os.path.basename(_os.path.normpath(dir))
         dir = dir[:10].replace('-', ':') + ' 12:00:00'
-        return dir
 
-
-    def set_creation_date_from_str(file, str_datetime):
+        # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
         try:
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('\\', ':')[:19]
-            timestamp = _datetime.strptime(
-                str_datetime,
-                '%Y:%m:%d %H:%M:%S'
-            ).timestamp()
-        except Exception as e:
+            return _datetime.strptime(dir, '%Y:%m:%d %H:%M:%S').strftime('%Y:%m:%d %H:%M:%S')
+        except ValueError as e:
             print()
             print(e)
             print()
@@ -215,6 +209,18 @@ def main():
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
             exit(-1)
+
+
+    def set_creation_date_from_str(file, str_datetime):
+        try:
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('\\', ':')[:19]
+            timestamp = _datetime.strptime(
+                str_datetime,
+                '%Y:%m:%d %H:%M:%S'
+            ).timestamp()
+        except Exception as e:
+            print('Error setting creation date from string:')
+            print(e)
         _os.utime(file, (timestamp, timestamp))
 
 
