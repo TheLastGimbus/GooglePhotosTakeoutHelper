@@ -40,10 +40,19 @@ Now, you need to install my script with `pip` - a builtin tool that can install 
 
 If something goes wrong and it prints some red errors, try to add ` --user` flag at the end
 
+3. Prepare your Takeout:
+
+If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one folder. 
+
+Because I don't have good solution on how to handle albums, you will need to cut off all ["Album folders"](#why-do-you-need-to-cut-out-albums) - those who are not named like "2016-06-26" or "2016-06-26 #2" - don't worry, all photos from albums are in corresponding "date folders" already - they would just make a duplicate.
+
 Now, you should be able to just run it straight in cmd/terminal:
 
-3. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 // Or if this doesn't work: `python3 -m google_photos_takeout_helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+
+If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
+
 
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/posts/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
