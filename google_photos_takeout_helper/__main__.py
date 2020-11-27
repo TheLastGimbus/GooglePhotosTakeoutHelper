@@ -213,7 +213,9 @@ def main():
 
     def set_creation_date_from_str(file, str_datetime):
         try:
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('\\', ':')[:19]
+            # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
+            # God wish that americans won't have something like MM-DD-YYYY
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
