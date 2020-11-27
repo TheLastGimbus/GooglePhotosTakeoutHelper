@@ -66,7 +66,7 @@ def main():
     print("(Don't worry, your photos from albums are already in some date folder)")
     print()
     print('Type "yes i did that" to confirm:')
-    response = "yes i did that"  # input()
+    response = input()
     if response == 'yes i did that':
         print('Heeeere we go!')
     else:
