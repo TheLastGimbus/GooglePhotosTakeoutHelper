@@ -199,6 +199,7 @@ def main():
 
     def set_creation_date_from_str(file, str_datetime):
         try:
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('\\', ':')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
