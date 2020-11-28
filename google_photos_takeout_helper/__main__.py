@@ -297,12 +297,14 @@ def main():
 
         # fallbacks to GeoData Exif if it wasn't set in the photos editor.
         # https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/5#discussion_r531792314
-        if longitude == 0:
+        longitude = float(json['geoData']['longitude'])
+        latitude = float(json['geoData']['latitude'])
+        altitude = json['geoData']['altitude']
+        # Prioritise geoData set from GPhotos editor
+        if longitude == 0 and latitude == 0:
             longitude = float(json['geoDataExif']['longitude'])
-        if latitude == 0:
             latitude = float(json['geoDataExif']['latitude'])
-        if altitude == 0:
-            altitude = float(json['geoDataExif']['altitude'])
+            altitude = json['geoDataExif']['altitude']
 
         # latitude >= 0: North latitude -> "N"
         # latitude < 0: South latitude -> "S"
