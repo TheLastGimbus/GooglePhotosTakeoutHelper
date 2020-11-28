@@ -126,10 +126,12 @@ def main():
                 if extra in file.lower():
                     return False
         if args.skip_extras_harder:
-            search = '\([0-9]\)\.'
+            search = "\(\d+\)\."  # we leave the period in so it doesn't catch folders.
             if bool(_re.search(search, file)):
-                plain_file = _re.sub(search, '.', file) # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
-                if _os.path.isfile(plain_file): # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
+                # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
+                plain_file = _re.sub(search, '.', file)
+                # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
+                if _os.path.isfile(plain_file):
                     return False
         return True
 
