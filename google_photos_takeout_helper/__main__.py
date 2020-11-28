@@ -48,6 +48,11 @@ def main():
         help='Skips the extra photos like photos that end in "edited" or "EFFECTS".'
     )
     parser.add_argument(
+        '--skip-extras-harder',
+        action='store_true',
+        help='Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
+    )
+    parser.add_argument(
         '--dont-fix',
         action='store_true',
         help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
@@ -89,7 +94,7 @@ def main():
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
-    extra_formats = ['-edited', '-effects'] # I also recommend adding (1), but that can be a little risky. I see a ton of duplicates with that, others might not.
+    extra_formats = ['-edited', '-effects']
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -116,10 +121,15 @@ def main():
         if what not in photo_formats:
             return False
         # skips the extra photo file, like edited or effects. They're kinda useless.
-        # By DalenW. 
-        if args.skip_extras: # if the file name includes something under the extra_formats, it skips it.
+        if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
             for extra in extra_formats:
                 if extra in file.lower():
+                    return False
+        if args.skip_extras_harder:
+            search = '\([0-9]\)\.'
+            if bool(_re.search(search, file)):
+                plain_file = _re.sub(search, '.', file) # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
+                if _os.path.isfile(plain_file): # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
                     return False
         return True
 
@@ -216,7 +226,6 @@ def main():
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
             exit(-1)
-
 
     def set_creation_date_from_str(file, str_datetime):
         try:
