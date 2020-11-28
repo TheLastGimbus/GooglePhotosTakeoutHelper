@@ -284,11 +284,25 @@ def main():
         :return:
         """
 
-        exif_dict = _piexif.load(file)
+        # prevents crashes
+        try:
+            exif_dict = _piexif.load(file)
+        except (_piexif.InvalidImageDataError, ValueError):
+            exif_dict = {'0th': {}, 'Exif': {}}
 
-        longitude = float(json['geoDataExif']['longitude'])
-        latitude = float(json['geoDataExif']['latitude'])
-        altitude = json['geoDataExif']['altitude']
+        # fetches geo data from the photos editor first.
+        longitude = float(json['geoData']['longitude'])
+        latitude = float(json['geoData']['latitude'])
+        altitude = float(json['geoData']['altitude'])
+
+        # fallbacks to GeoData Exif if it wasn't set in the photos editor.
+        # https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/5#discussion_r531792314
+        if longitude == 0:
+            longitude = float(json['geoDataExif']['longitude'])
+        if latitude == 0:
+            latitude = float(json['geoDataExif']['latitude'])
+        if altitude == 0:
+            altitude = float(json['geoDataExif']['altitude'])
 
         # latitude >= 0: North latitude -> "N"
         # latitude < 0: South latitude -> "S"
