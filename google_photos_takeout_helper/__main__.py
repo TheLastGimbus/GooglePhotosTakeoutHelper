@@ -236,7 +236,7 @@ def main():
                 break
             except KeyError:
                 pass
-        if datetime_str is None:
+        if datetime_str is None or datetime_str == '':
             raise IOError('No DateTime in given exif')
         set_creation_date_from_str(file, datetime_str)
 
