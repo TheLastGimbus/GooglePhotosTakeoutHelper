@@ -43,6 +43,11 @@ def main():
              "and it may not be accurate"
     )
     parser.add_argument(
+        '--skip-extras',
+        action='store_true',
+        help='Skips the extra photos like photos that end in "edited" or "EFFECTS".'
+    )
+    parser.add_argument(
         '--dont-fix',
         action='store_true',
         help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
@@ -84,6 +89,7 @@ def main():
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
+    extra_formats = ['-edited', '-effects'] # I also recommend adding (1), but that can be a little risky. I see a ton of duplicates with that, others might not.
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -109,6 +115,12 @@ def main():
         what = _os.path.splitext(file.lower())[1]
         if what not in photo_formats:
             return False
+        # skips the extra photo file, like edited or effects. They're kinda useless.
+        # By DalenW. 
+        if args.skip_extras: # if the file name includes something under the extra_formats, it skips it.
+            for extra in extra_formats:
+                if extra in file.lower():
+                    return False
         return True
 
     def is_video(file):
