@@ -48,7 +48,7 @@ def main():
         help='Skips the extra photos like photos that end in "edited" or "EFFECTS".'
     )
     parser.add_argument(
-        '--skip-extras-harder',
+        '--skip-extras-harder',  # Oh yeah, skip my extras harder daddy
         action='store_true',
         help='Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
     )
