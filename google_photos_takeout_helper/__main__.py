@@ -9,6 +9,8 @@ def main():
     from datetime import datetime as _datetime
 
     import piexif as _piexif
+    from fractions import Fraction  # piexif requires some values to be stored as rationals
+    import math
 
     parser = _argparse.ArgumentParser(
         prog='Photos takeout helper',
@@ -43,6 +45,16 @@ def main():
              "and it may not be accurate"
     )
     parser.add_argument(
+        '--skip-extras',
+        action='store_true',
+        help='EXPERIMENTAL: Skips the extra photos like photos that end in "edited" or "EFFECTS".'
+    )
+    parser.add_argument(
+        '--skip-extras-harder',  # Oh yeah, skip my extras harder daddy
+        action='store_true',
+        help='EXPERIMENTAL: Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
+    )
+    parser.add_argument(
         '--dont-fix',
         action='store_true',
         help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
@@ -68,8 +80,8 @@ def main():
     print("(Don't worry, your photos from albums are already in some date folder)")
     print()
     print('Type "yes i did that" to confirm:')
-    response = "yes i did that"  # input()
-    if response == 'yes i did that':
+    response = input()
+    if response.lower() == 'yes i did that':
         print('Heeeere we go!')
     else:
         print('Ok come back when you do this')
@@ -84,9 +96,13 @@ def main():
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
+    extra_formats = [
+        '-edited', '-effects',  # EN/US
+        '-edytowane',  # PL
+        # Add more "edited" flags in more languages if you want
+    ]
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
-
 
     def for_all_files_recursive(
       dir,
@@ -106,13 +122,24 @@ def main():
                 print('Found something weird...')
                 print(file)
 
-
     def is_photo(file):
         what = _os.path.splitext(file.lower())[1]
         if what not in photo_formats:
             return False
+        # skips the extra photo file, like edited or effects. They're kinda useless.
+        if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
+            for extra in extra_formats:
+                if extra in file.lower():
+                    return False
+        if args.skip_extras_harder:
+            search = "\(\d+\)\."  # we leave the period in so it doesn't catch folders.
+            if bool(_re.search(search, file)):
+                # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
+                plain_file = _re.sub(search, '.', file)
+                # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
+                if _os.path.isfile(plain_file):
+                    return False
         return True
-
 
     def is_video(file):
         what = _os.path.splitext(file.lower())[1]
@@ -222,14 +249,12 @@ def main():
 
         return duplicates
 
-
     # Removes all duplicates in folder
     def remove_duplicates(dir):
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
             _os.remove(file)
         return True
-
 
     # PART 2: Fixing metadata and date-related stuff
 
@@ -245,7 +270,6 @@ def main():
                 raise FileNotFoundError('Couldnt find json for file: ' + file)
         else:
             raise FileNotFoundError('Couldnt find json for file: ' + file)
-
 
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir):
@@ -267,7 +291,6 @@ def main():
             print('==========!!!==========')
             exit(-1)
 
-
     def set_creation_date_from_str(file, str_datetime):
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
@@ -282,7 +305,6 @@ def main():
             print(e)
         _os.utime(file, (timestamp, timestamp))
 
-
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
@@ -293,10 +315,9 @@ def main():
                 break
             except KeyError:
                 pass
-        if datetime_str is None:
+        if datetime_str is None or datetime_str.strip() == '':
             raise IOError('No DateTime in given exif')
         set_creation_date_from_str(file, datetime_str)
-
 
     def set_file_exif_date(file, creation_date):
         try:
@@ -312,15 +333,111 @@ def main():
         try:
             _piexif.insert(_piexif.dump(exif_dict), file)
         except Exception as e:
-            print('Couldnt insert exif!')
+            print("Couldn't insert exif!")
             print(e)
-
 
     def get_date_str_from_json(json):
         return _datetime.fromtimestamp(
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
 
+    def change_to_rational(number):
+        """convert a number to rantional
+        Keyword arguments: number
+        return: tuple like (1, 2), (numerator, denominator)
+        """
+        f = Fraction(str(number))
+        return f.numerator, f.denominator
+
+    # got this here https://github.com/hMatoba/piexifjs/issues/1#issuecomment-260176317
+    def degToDmsRational(degFloat):
+        min_float = degFloat % 1 * 60
+        sec_float = min_float % 1 * 60
+        deg = math.floor(degFloat)
+        deg_min = math.floor(min_float)
+        sec = round(sec_float * 100)
+
+        return [(deg, 1), (deg_min, 1), (sec, 100)]
+
+    def set_file_geo_data(file, json):
+        """
+        Reads the geoData from google and saves it to the EXIF. This works assuming that the geodata looks like -100.12093, 50.213143. Something like that.
+
+        Written by DalenW.
+        :param file:
+        :param json:
+        :return:
+        """
+
+        # prevents crashes
+        try:
+            exif_dict = _piexif.load(file)
+        except (_piexif.InvalidImageDataError, ValueError):
+            exif_dict = {'0th': {}, 'Exif': {}}
+
+        # fetches geo data from the photos editor first.
+        longitude = float(json['geoData']['longitude'])
+        latitude = float(json['geoData']['latitude'])
+        altitude = float(json['geoData']['altitude'])
+
+        # fallbacks to GeoData Exif if it wasn't set in the photos editor.
+        # https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/5#discussion_r531792314
+        longitude = float(json['geoData']['longitude'])
+        latitude = float(json['geoData']['latitude'])
+        altitude = json['geoData']['altitude']
+        # Prioritise geoData set from GPhotos editor
+        if longitude == 0 and latitude == 0:
+            longitude = float(json['geoDataExif']['longitude'])
+            latitude = float(json['geoDataExif']['latitude'])
+            altitude = json['geoDataExif']['altitude']
+
+        # latitude >= 0: North latitude -> "N"
+        # latitude < 0: South latitude -> "S"
+        # longitude >= 0: East longitude -> "E"
+        # longitude < 0: West longitude -> "W"
+
+        if longitude >= 0:
+            longitude_ref = 'E'
+        else:
+            longitude_ref = 'W'
+            longitude = longitude * -1
+
+        if latitude >= 0:
+            latitude_ref = 'N'
+        else:
+            latitude_ref = 'S'
+            latitude = latitude * -1
+
+        # referenced from https://gist.github.com/c060604/8a51f8999be12fc2be498e9ca56adc72
+        gps_ifd = {
+            _piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0)
+        }
+
+        # skips it if it's empty
+        if latitude != 0 or longitude != 0:
+            gps_ifd.update({
+                _piexif.GPSIFD.GPSLatitudeRef: latitude_ref,
+                _piexif.GPSIFD.GPSLatitude: degToDmsRational(latitude),
+
+                _piexif.GPSIFD.GPSLongitudeRef: longitude_ref,
+                _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude)
+            })
+
+        if altitude != 0:
+            gps_ifd.update({
+                _piexif.GPSIFD.GPSAltitudeRef: 1,
+                _piexif.GPSIFD.GPSAltitude: change_to_rational(round(altitude))
+            })
+
+        gps_exif = {"GPS": gps_ifd}
+        exif_dict.update(gps_exif)
+
+        try:
+            _piexif.insert(_piexif.dump(exif_dict), file)
+        except Exception as e:
+            print("Couldn't insert geo exif!")
+            # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
+            print(e)
 
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(dir, file):
@@ -339,12 +456,13 @@ def main():
         try:
             google_json = find_json_for_file(dir, file)
             date = get_date_str_from_json(google_json)
+            set_file_geo_data(file, google_json)
             set_file_exif_date(file, date)
             set_creation_date_from_str(file, date)
             has_nice_date = True
             return
         except FileNotFoundError:
-            print('Couldnt find json for file :/')
+            print("Couldn't find json for file :/")
 
         if has_nice_date:
             return
@@ -354,7 +472,6 @@ def main():
         set_file_exif_date(file, date)
         set_creation_date_from_str(file, date)
         return True
-
 
     # PART 3: Copy all photos and videos to target folder
 
@@ -373,14 +490,12 @@ def main():
                 new_name = split[0] + '(' + str(i) + ')' + split[1]
                 i += 1
 
-
     def copy_to_target(dir, file):
         if is_photo(file) or is_video(file):
             new_file = new_name_if_exists(FIXED_DIR + '/' + _os.path.basename(file),
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
         return True
-
 
     def copy_to_target_and_divide(dir, file):
         creation_date = _os.path.getmtime(file)
@@ -393,7 +508,6 @@ def main():
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
         return True
-
 
     if not args.keep_duplicates:
         print('=====================')
@@ -439,6 +553,7 @@ def main():
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
+
 
 if __name__ == '__main__':
     main()
