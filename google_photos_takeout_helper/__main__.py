@@ -43,6 +43,16 @@ def main():
              "and it may not be accurate"
     )
     parser.add_argument(
+        '--skip-extras',
+        action='store_true',
+        help='EXPERIMENTAL: Skips the extra photos like photos that end in "edited" or "EFFECTS".'
+    )
+    parser.add_argument(
+        '--skip-extras-harder',  # Oh yeah, skip my extras harder daddy
+        action='store_true',
+        help='EXPERIMENTAL: Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
+    )
+    parser.add_argument(
         '--dont-fix',
         action='store_true',
         help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
@@ -84,14 +94,19 @@ def main():
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
+    extra_formats = [
+        '-edited', '-effects',  # EN/US
+        '-edytowane',  # PL
+        # Add more "edited" flags in more languages if you want
+    ]
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
     def for_all_files_recursive(
-            dir,
-            file_function=lambda fo, fi: True,
-            folder_function=lambda fo: True,
-            filter_fun=lambda file: True
+      dir,
+      file_function=lambda fo, fi: True,
+      folder_function=lambda fo: True,
+      filter_fun=lambda file: True
     ):
         for file in _os.listdir(dir):
             file = dir + '/' + file
@@ -109,6 +124,19 @@ def main():
         what = _os.path.splitext(file.lower())[1]
         if what not in photo_formats:
             return False
+        # skips the extra photo file, like edited or effects. They're kinda useless.
+        if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
+            for extra in extra_formats:
+                if extra in file.lower():
+                    return False
+        if args.skip_extras_harder:
+            search = "\(\d+\)\."  # we leave the period in so it doesn't catch folders.
+            if bool(_re.search(search, file)):
+                # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
+                plain_file = _re.sub(search, '.', file)
+                # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
+                if _os.path.isfile(plain_file):
+                    return False
         return True
 
     def is_video(file):
@@ -204,7 +232,6 @@ def main():
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
             exit(-1)
-
 
     def set_creation_date_from_str(file, str_datetime):
         try:
