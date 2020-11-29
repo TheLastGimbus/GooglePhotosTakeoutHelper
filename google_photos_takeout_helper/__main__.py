@@ -94,7 +94,11 @@ def main():
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
-    extra_formats = ['-edited', '-effects']
+    extra_formats = [
+        '-edited', '-effects',  # EN/US
+        '-edytowane',  # PL
+        # Add more "edited" flags in more languages if you want
+    ]
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
