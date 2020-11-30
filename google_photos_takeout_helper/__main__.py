@@ -83,6 +83,7 @@ def main():
         print('Heeeere we go!')
     else:
         print('Ok come back when you do this')
+        return
 
     PHOTOS_DIR = args.input_folder
     FIXED_DIR = args.output_folder
