@@ -95,9 +95,9 @@ def main():
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
     extra_formats = [
-        '-edited', '-effects',  # EN/US
+        '-edited', '-effects', '-smile',  # EN/US
         '-edytowane',  # PL
-        # Add more "edited" flags in more languages if you want
+        # Add more "edited" flags in more languages if you want. They need to be lowercase
     ]
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
@@ -238,13 +238,27 @@ def main():
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
             str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':')[:19]
+        except Exception as e:
+            print("Error fixing datetime string.")
+            print(e)
+
+        try:
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
-        except Exception as e:
-            print('Error setting creation date from string:')
-            print(e)
+        except Exception as e1:
+            try:
+                print("Looks like an error was thrown with an incorrect time string. Trying again differently...")
+                # Sometimes it reads the date wrong like so: 2006:11:09 10:54: 1.
+                # So if it throws an error, it will try again with a whitespace before the %S seconds.
+                timestamp = _datetime.strptime(
+                    str_datetime,
+                    '%Y:%m:%d %H:%M: %S'
+                ).timestamp()
+            except Exception as e2:
+                print('Error setting creation date from string:')
+                print(e2)
         _os.utime(file, (timestamp, timestamp))
 
     def set_creation_date_from_exif(file):
