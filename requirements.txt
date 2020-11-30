@@ -1,1 +1,1 @@
-piexif
+piexif==1.1.3
