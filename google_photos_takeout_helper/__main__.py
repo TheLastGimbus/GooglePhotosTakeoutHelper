@@ -216,7 +216,11 @@ def main():
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir):
         dir = _os.path.basename(_os.path.normpath(dir))
-        dir = dir[:10].replace('-', ':') + ' 12:00:00'
+        dir = dir[:10].replace('-', ':').replace(' ', ':') + ' 12:00:00'
+
+        # Sometimes google exports folders without the -, like 2009 08 30...
+        # So the end result would be 2009 08 30 12:00:00, which does not match the format.
+        # Therefore, we also replace the spaces with ':'
 
         # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
         try:
