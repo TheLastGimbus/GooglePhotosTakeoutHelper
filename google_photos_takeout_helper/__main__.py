@@ -6,6 +6,7 @@ def main():
     import shutil as _shutil
     from datetime import datetime as _datetime
     from pathlib import Path as Path
+    from collections import defaultdict
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
@@ -86,7 +87,7 @@ def main():
         print('Ok come back when you do this')
 
     PHOTOS_DIR = args.input_folder
-    FIXED_DIR = args.output_folder
+    FIXED_DIR = Path(args.output_folder)
 
     TAG_DATE_TIME_ORIGINAL = _piexif.ExifIFD.DateTimeOriginal
     TAG_DATE_TIME_DIGITIZED = _piexif.ExifIFD.DateTimeDigitized
@@ -101,48 +102,46 @@ def main():
         # Add more "edited" flags in more languages if you want
     ]
 
-    _os.makedirs(FIXED_DIR, exist_ok=True)
+    FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
     def for_all_files_recursive(
       dir,
-      file_function=lambda fo, fi: True,
+      file_function=lambda fo: True,
       folder_function=lambda fo: True,
       filter_fun=lambda file: True
     ):
-        for file in _os.listdir(dir):
-            file = dir + '/' + file
-            if _os.path.isdir(file):
+        dir = Path(dir)
+        for file in dir.rglob("*"):
+            if file.is_dir():
                 folder_function(file)
-                for_all_files_recursive(file, file_function, folder_function, filter_fun)
-            elif _os.path.isfile(file):
+                continue
+            elif file.is_file():
                 if filter_fun(file):
-                    file_function(dir, file)
+                    file_function(file)
             else:
                 print('Found something weird...')
                 print(file)
 
-    def is_photo(file):
-        what = _os.path.splitext(file.lower())[1]
-        if what not in photo_formats:
+    def is_photo(file: Path):
+        if file.suffix not in photo_formats:
             return False
         # skips the extra photo file, like edited or effects. They're kinda useless.
         if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
             for extra in extra_formats:
-                if extra in file.lower():
+                if extra in file.name.lower():
                     return False
         if args.skip_extras_harder:
-            search = "\(\d+\)\."  # we leave the period in so it doesn't catch folders.
-            if bool(_re.search(search, file)):
+            search = r"\(\d+\)\."  # we leave the period in so it doesn't catch folders.
+            if bool(_re.search(search, file.name)):
                 # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
-                plain_file = _re.sub(search, '.', file)
+                plain_file = file.with_name(_re.sub(search, '.', file))
                 # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
-                if _os.path.isfile(plain_file):
+                if plain_file.is_file():
                     return False
         return True
 
-    def is_video(file):
-        what = _os.path.splitext(file.lower())[1]
-        if what not in video_formats:
+    def is_video(file: Path):
+        if file.suffix not in video_formats:
             return False
         return True
 
@@ -150,39 +149,26 @@ def main():
 
     # THIS IS PARTLY COPIED FROM STACKOVERFLOW
     # THANK YOU @Todor Minakov
-    def find_duplicates(path, filter_fun=lambda file: True):
-        hashes_by_size = {}
+    def find_duplicates(path: Path, filter_fun=lambda file: True):
+        hashes_by_size = defaultdict(list)
         # Excluding original files (or first file if original not found)
         duplicates = []
 
-        for dirpath, dirnames, filenames in _os.walk(path):
-            for filename in filenames:
-                if not filter_fun(filename):
-                    continue
-                full_path = _os.path.join(dirpath, filename)
+        for file in path.rglob("*"):
+            if file.is_file() and filter_fun(file):
                 try:
-                    # if the target is a symlink (soft one), this will
-                    # dereference it - change the value to the actual target file
-                    full_path = _os.path.realpath(full_path)
-                    file_size = _os.path.getsize(full_path)
-                except (OSError,):
+                    file_size = file.stat().st_size
+                except (OSError, FileNotFoundError):
                     # not accessible (permissions, etc) - pass on
                     continue
-
-                duplicate = hashes_by_size.get(file_size)
-
-                if duplicate:
-                    hashes_by_size[file_size].append(full_path)
-                else:
-                    hashes_by_size[file_size] = []  # create the list for this file size
-                    hashes_by_size[file_size].append(full_path)
+                hashes_by_size[file_size].append(file)
 
         for size in hashes_by_size.keys():
             if len(hashes_by_size[size]) > 1:
                 original = None
-                for filename in hashes_by_size[size]:
-                    if not _re.search(r'\(\d+\).', filename):
-                        original = filename
+                for file in hashes_by_size[size]:
+                    if not _re.search(r'\(\d+\).', file.name):
+                        original = file
                 if original is None:
                     original = hashes_by_size[size][0]
 
@@ -193,30 +179,30 @@ def main():
         return duplicates
 
     # Removes all duplicates in folder
-    def remove_duplicates(dir):
+    def remove_duplicates(dir: Path):
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
-            _os.remove(file)
+            file.unlink()
         return True
 
     # PART 2: Fixing metadata and date-related stuff
 
     # Returns json dict
-    def find_json_for_file(dir, file):
-        potential_json = file + '.json'
-        if _os.path.isfile(potential_json):
+    def find_json_for_file(file: Path):
+        potential_json = file.with_name(file.name + '.json') 
+        if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
                     dict = _json.load(f)
                 return dict
             except:
-                raise FileNotFoundError('Couldnt find json for file: ' + file)
+                raise FileNotFoundError(f"Couldn't find json for file: {file}")
         else:
-            raise FileNotFoundError('Couldnt find json for file: ' + file)
+            raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
     # Returns date in 2019:01:01 23:59:59 format
-    def get_date_from_folder_name(dir):
-        dir = _os.path.basename(_os.path.normpath(dir))
+    def get_date_from_folder_name(dir: Path):
+        dir = dir.name
         dir = dir[:10].replace('-', ':') + ' 12:00:00'
 
         # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
@@ -234,7 +220,7 @@ def main():
             print('==========!!!==========')
             exit(-1)
 
-    def set_creation_date_from_str(file, str_datetime):
+    def set_creation_date_from_str(file: Path, str_datetime):
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
@@ -248,8 +234,8 @@ def main():
             print(e)
         _os.utime(file, (timestamp, timestamp))
 
-    def set_creation_date_from_exif(file):
-        exif_dict = _piexif.load(file)
+    def set_creation_date_from_exif(file: Path):
+        exif_dict = _piexif.load(str(file))
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
         datetime_str = None
         for tag in tags:
@@ -262,9 +248,9 @@ def main():
             raise IOError('No DateTime in given exif')
         set_creation_date_from_str(file, datetime_str)
 
-    def set_file_exif_date(file, creation_date):
+    def set_file_exif_date(file: Path, creation_date):
         try:
-            exif_dict = _piexif.load(file)
+            exif_dict = _piexif.load(str(file))
         except (_piexif.InvalidImageDataError, ValueError):
             exif_dict = {'0th': {}, 'Exif': {}}
 
@@ -274,7 +260,7 @@ def main():
         exif_dict['Exif'][TAG_DATE_TIME_DIGITIZED] = creation_date
 
         try:
-            _piexif.insert(_piexif.dump(exif_dict), file)
+            _piexif.insert(_piexif.dump(exif_dict), str(file))
         except Exception as e:
             print("Couldn't insert exif!")
             print(e)
@@ -302,7 +288,7 @@ def main():
 
         return [(deg, 1), (deg_min, 1), (sec, 100)]
 
-    def set_file_geo_data(file, json):
+    def set_file_geo_data(file: Path, json):
         """
         Reads the geoData from google and saves it to the EXIF. This works assuming that the geodata looks like -100.12093, 50.213143. Something like that.
 
@@ -314,7 +300,7 @@ def main():
 
         # prevents crashes
         try:
-            exif_dict = _piexif.load(file)
+            exif_dict = _piexif.load(str(file))
         except (_piexif.InvalidImageDataError, ValueError):
             exif_dict = {'0th': {}, 'Exif': {}}
 
@@ -376,14 +362,14 @@ def main():
         exif_dict.update(gps_exif)
 
         try:
-            _piexif.insert(_piexif.dump(exif_dict), file)
+            _piexif.insert(_piexif.dump(exif_dict), str(file))
         except Exception as e:
             print("Couldn't insert geo exif!")
             # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
             print(e)
 
     # Fixes ALL metadata, takes just file and dir and figures it out
-    def fix_metadata(dir, file):
+    def fix_metadata(file: Path):
         print(file)
 
         has_nice_date = False
@@ -397,7 +383,7 @@ def main():
             print('No creation date found in exif!')
 
         try:
-            google_json = find_json_for_file(dir, file)
+            google_json = find_json_for_file(file)
             date = get_date_str_from_json(google_json)
             set_file_geo_data(file, google_json)
             set_file_exif_date(file, date)
@@ -411,7 +397,7 @@ def main():
             return
 
         print('Last chance, coping folder name as date...')
-        date = get_date_from_folder_name(dir)
+        date = get_date_from_folder_name(file.parent)
         set_file_exif_date(file, date)
         set_creation_date_from_str(file, date)
         return True
@@ -419,35 +405,34 @@ def main():
     # PART 3: Copy all photos and videos to target folder
 
     # Makes a new name like 'photo(1).jpg'
-    def new_name_if_exists(file_name, watch_for_duplicates=True):
-        split = _os.path.splitext(file_name)
-        new_name = split[0] + split[1]
+    def new_name_if_exists(file: Path, watch_for_duplicates=True):
+        new_name = file
         i = 1
         while True:
-            if not _os.path.isfile(new_name):
+            if not new_name.is_file():
                 return new_name
             else:
                 if watch_for_duplicates:
-                    if _os.path.getsize(new_name) == _os.path.getsize(file_name):
-                        return file_name
-                new_name = split[0] + '(' + str(i) + ')' + split[1]
+                    if new_name.stat().st_size == file.stat().st_size:
+                        return file
+                new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
                 i += 1
 
     def copy_to_target(dir, file):
         if is_photo(file) or is_video(file):
-            new_file = new_name_if_exists(FIXED_DIR + '/' + _os.path.basename(file),
+            new_file = new_name_if_exists(FIXED_DIR / file.name,
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
         return True
 
-    def copy_to_target_and_divide(dir, file):
-        creation_date = _os.path.getmtime(file)
+    def copy_to_target_and_divide(file: Path):
+        creation_date = file.stat().st_mtime
         date = _datetime.fromtimestamp(creation_date)
 
-        new_path = f"{FIXED_DIR}/{date.year}/{date.month:02}/"
-        _os.makedirs(new_path, exist_ok=True)
+        new_path = FIXED_DIR / f"{date.year}/{date.month:02}/"
+        new_path.mkdir(parents=True, exist_ok=True)
 
-        new_file = new_name_if_exists(new_path + _os.path.basename(file),
+        new_file = new_name_if_exists(new_path / file.name,
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
         return True
