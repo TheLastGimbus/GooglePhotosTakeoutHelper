@@ -5,6 +5,7 @@ def main():
     import re as _re
     import shutil as _shutil
     from datetime import datetime as _datetime
+    from pathlib import Path as Path
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
