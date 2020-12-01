@@ -237,28 +237,16 @@ def main():
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':')[:19]
-        except Exception as e:
-            print("Error fixing datetime string.")
-            print(e)
-
-        try:
+            # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
+            # It replaces the extra whitespace with a 0 for proper parsing
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
-        except Exception as e1:
-            try:
-                print("Looks like an error was thrown with an incorrect time string. Trying again differently...")
-                # Sometimes it reads the date wrong like so: 2006:11:09 10:54: 1.
-                # So if it throws an error, it will try again with a whitespace before the %S seconds.
-                timestamp = _datetime.strptime(
-                    str_datetime,
-                    '%Y:%m:%d %H:%M: %S'
-                ).timestamp()
-            except Exception as e2:
-                print('Error setting creation date from string:')
-                print(e2)
+        except Exception as e:
+            print('Error setting creation date from string:')
+            print(e)
         _os.utime(file, (timestamp, timestamp))
 
     def set_creation_date_from_exif(file):
