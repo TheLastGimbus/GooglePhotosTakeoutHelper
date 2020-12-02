@@ -96,9 +96,9 @@ def main():
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
     extra_formats = [
-        '-edited', '-effects',  # EN/US
+        '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
-        # Add more "edited" flags in more languages if you want
+        # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
@@ -217,7 +217,11 @@ def main():
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir):
         dir = _os.path.basename(_os.path.normpath(dir))
-        dir = dir[:10].replace('-', ':') + ' 12:00:00'
+        dir = dir[:10].replace('-', ':').replace(' ', ':') + ' 12:00:00'
+
+        # Sometimes google exports folders without the -, like 2009 08 30...
+        # So the end result would be 2009 08 30 12:00:00, which does not match the format.
+        # Therefore, we also replace the spaces with ':'
 
         # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
         try:
@@ -238,7 +242,9 @@ def main():
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':')[:19]
+            # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
+            # It replaces the extra whitespace with a 0 for proper parsing
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
