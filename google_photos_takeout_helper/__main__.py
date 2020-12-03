@@ -4,6 +4,8 @@ def main():
     import os as _os
     import re as _re
     import shutil as _shutil
+    import hashlib as _hashlib
+    from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
 
     import piexif as _piexif
@@ -146,12 +148,42 @@ def main():
             return False
         return True
 
+    def chunk_reader(fobj, chunk_size=1024):
+        """ Generator that reads a file in chunks of bytes """
+        while True:
+            chunk = fobj.read(chunk_size)
+            if not chunk:
+                return
+            yield chunk
+    
+    def get_hash(file, first_chunk_only=False, hash_algo=_hashlib.sha1):
+        hashobj = hash_algo()
+        with open(file, "rb") as f:
+            if first_chunk_only:
+                hashobj.update(f.read(1024))
+            else:
+                for chunk in chunk_reader(f):
+                    hashobj.update(chunk)
+        return hashobj.digest()
+
     # PART 1: removing duplicates
 
     # THIS IS PARTLY COPIED FROM STACKOVERFLOW
-    # THANK YOU @Todor Minakov
+    # https://stackoverflow.com/questions/748675/finding-duplicate-files-and-removing-them
+    #
+    # We now use an optimized version linked from tfeldmann
+    # https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
+    #
+    # THANK YOU Todor Minakov (https://github.com/tminakov) and Thomas Feldmann (https://github.com/tfeldmann)
+    #
+    # NOTE: defaultdict(list) is a multimap, all init array handling is done internally 
+    # See: https://en.wikipedia.org/wiki/Multimap#Python
+    #
     def find_duplicates(path, filter_fun=lambda file: True):
-        hashes_by_size = {}
+        files_by_size = _defaultdict(list)
+        files_by_small_hash = _defaultdict(list)
+        files_by_full_hash = _defaultdict(list)
+
         # Excluding original files (or first file if original not found)
         duplicates = []
 
@@ -169,26 +201,52 @@ def main():
                     # not accessible (permissions, etc) - pass on
                     continue
 
-                duplicate = hashes_by_size.get(file_size)
+                files_by_size[file_size].append(full_path)
 
-                if duplicate:
-                    hashes_by_size[file_size].append(full_path)
-                else:
-                    hashes_by_size[file_size] = []  # create the list for this file size
-                    hashes_by_size[file_size].append(full_path)
+        # For all files with the same file size, get their hash on the first 1024 bytes
+        for file_size, files in files_by_size.items():
+            if len(files) < 2:
+                continue  # this file size is unique, no need to spend cpu cycles on it
 
-        for size in hashes_by_size.keys():
-            if len(hashes_by_size[size]) > 1:
-                original = None
-                for filename in hashes_by_size[size]:
-                    if not _re.search(r'\(\d+\).', filename):
-                        original = filename
-                if original is None:
-                    original = hashes_by_size[size][0]
+            for filename in files:
+                try:
+                    small_hash = get_hash(filename, first_chunk_only=True)
+                except OSError:
+                    # the file access might've changed till the exec point got here
+                    continue
+                files_by_small_hash[(file_size, small_hash)].append(filename)
 
-                dups = hashes_by_size[size].copy()
-                dups.remove(original)
-                duplicates += dups
+        # For all files with the hash on the first 1024 bytes, get their hash on the full
+        # file - if more than one file is inserted on a hash here they are certinly duplicates
+        for files in files_by_small_hash.values():
+            if len(files) < 2:
+                # the hash of the first 1k bytes is unique -> skip this file
+                continue
+
+            for filename in files:
+                try:
+                    full_hash = get_hash(filename, first_chunk_only=False)
+                except OSError:
+                    # the file access might've changed till the exec point got here
+                    continue
+
+                files_by_full_hash[full_hash].append(filename)
+
+        # Now we have the final multimap of absolute dups, We now can attempt to find the original file
+        # and remove all the other duplicates
+        for files in files_by_full_hash.values():
+            if len(files) < 2:
+                continue # this file size is unique, no need to spend cpu cycles on it
+            original = None
+            for filename in files:
+                if not _re.search(r'\(\d+\).', filename):
+                    original = filename
+            if original is None:
+                original = files[0]
+
+            dups = files.copy()
+            dups.remove(original)
+            duplicates += dups
 
         return duplicates
 
