@@ -104,8 +104,8 @@ def main():
     ]
 
     # Statistics:
-    removed_duplicates_count = 0
-    copied_files = 0
+    s_removed_duplicates_count = 0
+    s_copied_files = 0
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -259,8 +259,8 @@ def main():
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
             _os.remove(file)
-        nonlocal removed_duplicates_count
-        removed_duplicates_count += len(duplicates)
+        nonlocal s_removed_duplicates_count
+        s_removed_duplicates_count += len(duplicates)
         return True
 
     # PART 2: Fixing metadata and date-related stuff
@@ -517,8 +517,8 @@ def main():
             new_file = new_name_if_exists(FIXED_DIR + '/' + _os.path.basename(file),
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
-            nonlocal copied_files
-            copied_files += 1
+            nonlocal s_copied_files
+            s_copied_files += 1
         return True
 
     def copy_to_target_and_divide(dir, file):
@@ -531,8 +531,8 @@ def main():
         new_file = new_name_if_exists(new_path + _os.path.basename(file),
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
-        nonlocal copied_files
-        copied_files += 1
+        nonlocal s_copied_files
+        s_copied_files += 1
         return True
 
     if not args.keep_duplicates:
@@ -577,8 +577,8 @@ def main():
     print('DONE! FREEDOM!')
     print()
     print("Final statistics:")
-    print(f"Removed duplicates: {removed_duplicates_count}")
-    print(f"Files copied to target folder: {copied_files}")
+    print(f"Removed duplicates: {s_removed_duplicates_count}")
+    print(f"Files copied to target folder: {s_copied_files}")
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
