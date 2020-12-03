@@ -327,7 +327,7 @@ def main():
             except KeyError:
                 pass
         if not date_set_success:
-            raise IOError('No DateTime in given exif')
+            raise IOError('No correct DateTime in given exif')
 
     def set_file_exif_date(file, creation_date):
         try:
