@@ -289,8 +289,10 @@ def main():
             print(e)
             print()
             print('==========!!!==========')
+            print(f"Wrong folder name: {dir}")
             print("You probably forgot to remove 'album folders' from your takeout folder")
             print("Please do that - see README.md or --help for why")
+            print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#why-do-you-need-to-cut-out-albums")
             print()
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
@@ -307,24 +309,31 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
+            _os.utime(file, (timestamp, timestamp))
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
-        _os.utime(file, (timestamp, timestamp))
+            raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
-        datetime_str = None
+        datetime_str = ''
+        date_set_success = False
         for tag in tags:
             try:
                 datetime_str = exif_dict[tag[0]][tag[1]].decode('UTF-8')
+                set_creation_date_from_str(file, datetime_str)
+                date_set_success = True
                 break
             except KeyError:
-                pass
-        if datetime_str is None or datetime_str.strip() == '':
-            raise IOError('No DateTime in given exif')
-        set_creation_date_from_str(file, datetime_str)
+                pass  # No such tag - continue searching :/
+            except ValueError:
+                print("Wrong date format in exif!")
+                print(datetime_str)
+                print("does not match '%Y:%m:%d %H:%M:%S'")
+        if not date_set_success:
+            raise IOError('No correct DateTime in given exif')
 
     def set_file_exif_date(file, creation_date):
         try:
