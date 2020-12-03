@@ -105,6 +105,7 @@ def main():
 
     # Statistics:
     removed_duplicates_count = 0
+    copied_files = 0
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -516,6 +517,8 @@ def main():
             new_file = new_name_if_exists(FIXED_DIR + '/' + _os.path.basename(file),
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
+            nonlocal copied_files
+            copied_files += 1
         return True
 
     def copy_to_target_and_divide(dir, file):
@@ -528,6 +531,8 @@ def main():
         new_file = new_name_if_exists(new_path + _os.path.basename(file),
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
+        nonlocal copied_files
+        copied_files += 1
         return True
 
     if not args.keep_duplicates:
@@ -573,6 +578,7 @@ def main():
     print()
     print("Final statistics:")
     print(f"Removed duplicates: {removed_duplicates_count}")
+    print(f"Files copied to target folder: {copied_files}")
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
