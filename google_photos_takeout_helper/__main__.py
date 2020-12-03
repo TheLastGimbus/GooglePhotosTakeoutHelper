@@ -310,24 +310,28 @@ def main():
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
             _os.utime(file, (timestamp, timestamp))
-            return True
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
-            return False
+            raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
+        datetime_str = ''
         date_set_success = False
         for tag in tags:
             try:
                 datetime_str = exif_dict[tag[0]][tag[1]].decode('UTF-8')
-                if set_creation_date_from_str(file, datetime_str):
-                    date_set_success = True
-                    break
+                set_creation_date_from_str(file, datetime_str)
+                date_set_success = True
+                break
             except KeyError:
-                pass
+                pass  # No such tag - continue searching :/
+            except ValueError:
+                print("Wrong date format in exif!")
+                print(datetime_str)
+                print("does not match '%Y:%m:%d %H:%M:%S'")
         if not date_set_success:
             raise IOError('No correct DateTime in given exif')
 
