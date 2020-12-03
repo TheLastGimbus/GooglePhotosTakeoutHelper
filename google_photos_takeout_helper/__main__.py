@@ -103,6 +103,9 @@ def main():
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
+    # Statistics:
+    removed_duplicates_count = 0
+
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
     def for_all_files_recursive(
@@ -255,6 +258,8 @@ def main():
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
             _os.remove(file)
+        nonlocal removed_duplicates_count
+        removed_duplicates_count += len(duplicates)
         return True
 
     # PART 2: Fixing metadata and date-related stuff
@@ -566,6 +571,8 @@ def main():
     print()
     print('DONE! FREEDOM!')
     print()
+    print("Final statistics:")
+    print(f"Removed duplicates: {removed_duplicates_count}")
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
