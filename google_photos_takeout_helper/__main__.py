@@ -230,8 +230,8 @@ def main():
             if len(files) < 2:
                 continue # this file size is unique, no need to spend cpu cycles on it
             original = None
-            for filename in files:
-                if not _re.search(r'\(\d+\).', filename):
+            for file in files:
+                if not _re.search(r'\(\d+\).', file.name):
                     original = filename
             if original is None:
                 original = files[0]
