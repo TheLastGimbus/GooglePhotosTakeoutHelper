@@ -4,9 +4,10 @@ def main():
     import os as _os
     import re as _re
     import shutil as _shutil
+    import hashlib as _hashlib
+    from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
-    from collections import defaultdict
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
@@ -85,6 +86,7 @@ def main():
         print('Heeeere we go!')
     else:
         print('Ok come back when you do this')
+        exit(-2)
 
     PHOTOS_DIR = args.input_folder
     FIXED_DIR = Path(args.output_folder)
@@ -97,9 +99,9 @@ def main():
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
     extra_formats = [
-        '-edited', '-effects',  # EN/US
+        '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
-        # Add more "edited" flags in more languages if you want
+        # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
@@ -145,12 +147,42 @@ def main():
             return False
         return True
 
+    def chunk_reader(fobj, chunk_size=1024):
+        """ Generator that reads a file in chunks of bytes """
+        while True:
+            chunk = fobj.read(chunk_size)
+            if not chunk:
+                return
+            yield chunk
+    
+    def get_hash(file: Path, first_chunk_only=False, hash_algo=_hashlib.sha1):
+        hashobj = hash_algo()
+        with open(file, "rb") as f:
+            if first_chunk_only:
+                hashobj.update(f.read(1024))
+            else:
+                for chunk in chunk_reader(f):
+                    hashobj.update(chunk)
+        return hashobj.digest()
+
     # PART 1: removing duplicates
 
     # THIS IS PARTLY COPIED FROM STACKOVERFLOW
-    # THANK YOU @Todor Minakov
+    # https://stackoverflow.com/questions/748675/finding-duplicate-files-and-removing-them
+    #
+    # We now use an optimized version linked from tfeldmann
+    # https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
+    #
+    # THANK YOU Todor Minakov (https://github.com/tminakov) and Thomas Feldmann (https://github.com/tfeldmann)
+    #
+    # NOTE: defaultdict(list) is a multimap, all init array handling is done internally 
+    # See: https://en.wikipedia.org/wiki/Multimap#Python
+    #
     def find_duplicates(path: Path, filter_fun=lambda file: True):
-        hashes_by_size = defaultdict(list)
+        files_by_size = _defaultdict(list)
+        files_by_small_hash = _defaultdict(list)
+        files_by_full_hash = _defaultdict(list)
+
         # Excluding original files (or first file if original not found)
         duplicates = []
 
@@ -161,20 +193,52 @@ def main():
                 except (OSError, FileNotFoundError):
                     # not accessible (permissions, etc) - pass on
                     continue
-                hashes_by_size[file_size].append(file)
+                files_by_size[file_size].append(file)
 
-        for size in hashes_by_size.keys():
-            if len(hashes_by_size[size]) > 1:
-                original = None
-                for file in hashes_by_size[size]:
-                    if not _re.search(r'\(\d+\).', file.name):
-                        original = file
-                if original is None:
-                    original = hashes_by_size[size][0]
+        # For all files with the same file size, get their hash on the first 1024 bytes
+        for file_size, files in files_by_size.items():
+            if len(files) < 2:
+                continue  # this file size is unique, no need to spend cpu cycles on it
 
-                dups = hashes_by_size[size].copy()
-                dups.remove(original)
-                duplicates += dups
+            for filename in files:
+                try:
+                    small_hash = get_hash(filename, first_chunk_only=True)
+                except OSError:
+                    # the file access might've changed till the exec point got here
+                    continue
+                files_by_small_hash[(file_size, small_hash)].append(filename)
+
+        # For all files with the hash on the first 1024 bytes, get their hash on the full
+        # file - if more than one file is inserted on a hash here they are certinly duplicates
+        for files in files_by_small_hash.values():
+            if len(files) < 2:
+                # the hash of the first 1k bytes is unique -> skip this file
+                continue
+
+            for filename in files:
+                try:
+                    full_hash = get_hash(filename, first_chunk_only=False)
+                except OSError:
+                    # the file access might've changed till the exec point got here
+                    continue
+
+                files_by_full_hash[full_hash].append(filename)
+
+        # Now we have the final multimap of absolute dups, We now can attempt to find the original file
+        # and remove all the other duplicates
+        for files in files_by_full_hash.values():
+            if len(files) < 2:
+                continue # this file size is unique, no need to spend cpu cycles on it
+            original = None
+            for filename in files:
+                if not _re.search(r'\(\d+\).', filename):
+                    original = filename
+            if original is None:
+                original = files[0]
+
+            dups = files.copy()
+            dups.remove(original)
+            duplicates += dups
 
         return duplicates
 
@@ -203,7 +267,11 @@ def main():
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir: Path):
         dir = dir.name
-        dir = dir[:10].replace('-', ':') + ' 12:00:00'
+        dir = dir[:10].replace('-', ':').replace(' ', ':') + ' 12:00:00'
+
+        # Sometimes google exports folders without the -, like 2009 08 30...
+        # So the end result would be 2009 08 30 12:00:00, which does not match the format.
+        # Therefore, we also replace the spaces with ':'
 
         # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
         try:
@@ -224,7 +292,9 @@ def main():
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':')[:19]
+            # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
+            # It replaces the extra whitespace with a 0 for proper parsing
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
