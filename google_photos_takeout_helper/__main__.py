@@ -317,16 +317,17 @@ def main():
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
-        datetime_str = None
+        date_set_success = False
         for tag in tags:
             try:
                 datetime_str = exif_dict[tag[0]][tag[1]].decode('UTF-8')
-                break
+                if set_creation_date_from_str(file, datetime_str):
+                    date_set_success = True
+                    break
             except KeyError:
                 pass
-        if datetime_str is None or datetime_str.strip() == '':
+        if not date_set_success:
             raise IOError('No DateTime in given exif')
-        set_creation_date_from_str(file, datetime_str)
 
     def set_file_exif_date(file, creation_date):
         try:
