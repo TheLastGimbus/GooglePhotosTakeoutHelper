@@ -307,10 +307,12 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
+            _os.utime(file, (timestamp, timestamp))
+            return True
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
-        _os.utime(file, (timestamp, timestamp))
+            return False
 
     def set_creation_date_from_exif(file):
         exif_dict = _piexif.load(file)
