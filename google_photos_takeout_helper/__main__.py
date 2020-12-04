@@ -88,7 +88,7 @@ def main():
         print('Ok come back when you do this')
         exit(-2)
 
-    PHOTOS_DIR = args.input_folder
+    PHOTOS_DIR = Path(args.input_folder)
     FIXED_DIR = Path(args.output_folder)
 
     TAG_DATE_TIME_ORIGINAL = _piexif.ExifIFD.DateTimeOriginal
@@ -114,12 +114,11 @@ def main():
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
     def for_all_files_recursive(
-      dir,
+      dir: Path,
       file_function=lambda fo: True,
       folder_function=lambda fo: True,
       filter_fun=lambda file: True
     ):
-        dir = Path(dir)
         for file in dir.rglob("*"):
             if file.is_dir():
                 folder_function(file)
@@ -583,13 +582,13 @@ def main():
     print(f"Files copied to target folder: {s_copied_files}")
     print(f"Removed duplicates: {s_removed_duplicates_count}")
     print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
-    with open(PHOTOS_DIR + '/failed_inserting_exif.txt', 'w') as f:
+    with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
         f.write("# This file contains list of files where setting right exif date failed\n")
         f.write("# You might find it useful, but you can safely delete this :)\n")
         f.write("\n".join(s_cant_insert_exif_files))
         print(f" - you have full list in {f.name}")
     print(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
-    with open(PHOTOS_DIR + '/date_from_folder_name.txt', 'w') as f:
+    with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w') as f:
         f.write("# This file contains list of files where date was set from name of the folder\n")
         f.write("# You might find it useful, but you can safely delete this :)\n")
         f.write("\n".join(s_date_from_folder_files))
@@ -598,7 +597,7 @@ def main():
         # Remove duplicates: https://www.w3schools.com/python/python_howto_remove_duplicates.asp
         s_skipped_extra_files = list(dict.fromkeys(s_skipped_extra_files))
         print(f"Extra files that were skipped: {len(s_skipped_extra_files)}")
-        with open(PHOTOS_DIR + '/skipped_extra_files.txt', 'w') as f:
+        with open(PHOTOS_DIR / 'skipped_extra_files.txt', 'w') as f:
             f.write("# This file contains list of extra files (ending with '-edited' etc) which were skipped because "
                     "you've used either --skip-extras or --skip-extras-harder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
