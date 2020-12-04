@@ -106,6 +106,7 @@ def main():
     # Statistics:
     s_removed_duplicates_count = 0
     s_copied_files = 0
+    s_cant_insert_exif_files = []  # List of files where inserting exif failed
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -357,6 +358,8 @@ def main():
         except Exception as e:
             print("Couldn't insert exif!")
             print(e)
+            nonlocal s_cant_insert_exif_files
+            s_cant_insert_exif_files.append(file)
 
     def get_date_str_from_json(json):
         return _datetime.fromtimestamp(
@@ -579,6 +582,13 @@ def main():
     print("Final statistics:")
     print(f"Removed duplicates: {s_removed_duplicates_count}")
     print(f"Files copied to target folder: {s_copied_files}")
+    print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
+    if not args.dont_copy:
+        with open(PHOTOS_DIR + '/failed_inserting_exif.txt', 'w') as f:
+            f.write("# This file contains list of files where setting right exif date failed\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_cant_insert_exif_files))
+            print(f" - you have full list in {f.name}")
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
