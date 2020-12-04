@@ -115,7 +115,7 @@ def main():
 
     def for_all_files_recursive(
       dir: Path,
-      file_function=lambda fo: True,
+      file_function=lambda fi: True,
       folder_function=lambda fo: True,
       filter_fun=lambda file: True
     ):
