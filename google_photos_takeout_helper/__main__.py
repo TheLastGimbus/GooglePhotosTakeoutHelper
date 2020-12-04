@@ -104,6 +104,13 @@ def main():
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
+    # Statistics:
+    s_removed_duplicates_count = 0
+    s_copied_files = 0
+    s_cant_insert_exif_files = []  # List of files where inserting exif failed
+    s_date_from_folder_files = []  # List of files where date was set from folder name
+    s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
+
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
     def for_all_files_recursive(
@@ -128,9 +135,11 @@ def main():
         if file.suffix not in photo_formats:
             return False
         # skips the extra photo file, like edited or effects. They're kinda useless.
+        nonlocal s_skipped_extra_files
         if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
             for extra in extra_formats:
                 if extra in file.name.lower():
+                    s_skipped_extra_files.append(file)
                     return False
         if args.skip_extras_harder:
             search = r"\(\d+\)\."  # we leave the period in so it doesn't catch folders.
@@ -139,6 +148,7 @@ def main():
                 plain_file = file.with_name(_re.sub(search, '.', file))
                 # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
                 if plain_file.is_file():
+                    s_skipped_extra_files.append(file)
                     return False
         return True
 
@@ -247,6 +257,8 @@ def main():
         duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
         for file in duplicates:
             file.unlink()
+        nonlocal s_removed_duplicates_count
+        s_removed_duplicates_count += len(duplicates)
         return True
 
     # PART 2: Fixing metadata and date-related stuff
@@ -281,8 +293,10 @@ def main():
             print(e)
             print()
             print('==========!!!==========')
+            print(f"Wrong folder name: {dir}")
             print("You probably forgot to remove 'album folders' from your takeout folder")
             print("Please do that - see README.md or --help for why")
+            print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#why-do-you-need-to-cut-out-albums")
             print()
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
@@ -299,24 +313,31 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
+            _os.utime(file, (timestamp, timestamp))
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
-        _os.utime(file, (timestamp, timestamp))
+            raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file: Path):
         exif_dict = _piexif.load(str(file))
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
-        datetime_str = None
+        datetime_str = ''
+        date_set_success = False
         for tag in tags:
             try:
                 datetime_str = exif_dict[tag[0]][tag[1]].decode('UTF-8')
+                set_creation_date_from_str(file, datetime_str)
+                date_set_success = True
                 break
             except KeyError:
-                pass
-        if datetime_str is None or datetime_str.strip() == '':
-            raise IOError('No DateTime in given exif')
-        set_creation_date_from_str(file, datetime_str)
+                pass  # No such tag - continue searching :/
+            except ValueError:
+                print("Wrong date format in exif!")
+                print(datetime_str)
+                print("does not match '%Y:%m:%d %H:%M:%S'")
+        if not date_set_success:
+            raise IOError('No correct DateTime in given exif')
 
     def set_file_exif_date(file: Path, creation_date):
         try:
@@ -334,6 +355,8 @@ def main():
         except Exception as e:
             print("Couldn't insert exif!")
             print(e)
+            nonlocal s_cant_insert_exif_files
+            s_cant_insert_exif_files.append(file)
 
     def get_date_str_from_json(json):
         return _datetime.fromtimestamp(
@@ -470,6 +493,10 @@ def main():
         date = get_date_from_folder_name(file.parent)
         set_file_exif_date(file, date)
         set_creation_date_from_str(file, date)
+
+        nonlocal s_date_from_folder_files
+        s_date_from_folder_files.append(file)
+
         return True
 
     # PART 3: Copy all photos and videos to target folder
@@ -493,6 +520,8 @@ def main():
             new_file = new_name_if_exists(FIXED_DIR / file.name,
                                           watch_for_duplicates=not args.keep_duplicates)
             _shutil.copy2(file, new_file)
+            nonlocal s_copied_files
+            s_copied_files += 1
         return True
 
     def copy_to_target_and_divide(file: Path):
@@ -505,6 +534,8 @@ def main():
         new_file = new_name_if_exists(new_path / file.name,
                                       watch_for_duplicates=not args.keep_duplicates)
         _shutil.copy2(file, new_file)
+        nonlocal s_copied_files
+        s_copied_files += 1
         return True
 
     if not args.keep_duplicates:
@@ -548,6 +579,32 @@ def main():
     print()
     print('DONE! FREEDOM!')
     print()
+    print("Final statistics:")
+    print(f"Files copied to target folder: {s_copied_files}")
+    print(f"Removed duplicates: {s_removed_duplicates_count}")
+    print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
+    with open(PHOTOS_DIR + '/failed_inserting_exif.txt', 'w') as f:
+        f.write("# This file contains list of files where setting right exif date failed\n")
+        f.write("# You might find it useful, but you can safely delete this :)\n")
+        f.write("\n".join(s_cant_insert_exif_files))
+        print(f" - you have full list in {f.name}")
+    print(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
+    with open(PHOTOS_DIR + '/date_from_folder_name.txt', 'w') as f:
+        f.write("# This file contains list of files where date was set from name of the folder\n")
+        f.write("# You might find it useful, but you can safely delete this :)\n")
+        f.write("\n".join(s_date_from_folder_files))
+        print(f"(you have full list in {f.name})")
+    if args.skip_extras or args.skip_extras_harder:
+        # Remove duplicates: https://www.w3schools.com/python/python_howto_remove_duplicates.asp
+        s_skipped_extra_files = list(dict.fromkeys(s_skipped_extra_files))
+        print(f"Extra files that were skipped: {len(s_skipped_extra_files)}")
+        with open(PHOTOS_DIR + '/skipped_extra_files.txt', 'w') as f:
+            f.write("# This file contains list of extra files (ending with '-edited' etc) which were skipped because "
+                    "you've used either --skip-extras or --skip-extras-harder\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_skipped_extra_files))
+            print(f"(you have full list in {f.name})")
+
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
