@@ -60,7 +60,7 @@ If you have issues/questions, you can hit me up either by [Reddit](https://www.r
 </details>
 
 ### Why do you need to cut out albums?
-They mostly contain duplicates of same photos that are in corresponding "date folder"
+They mostly contain duplicates of same photos that are in corresponding "date folder". (Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)
 This script tries to get all "photo taken time" stuff right. If it finds json - it sets everything from that json (it contains data of edited timestamp that you might've corrected in Google Photos). If it can't - it tries to get Exif data form photo.
 IF it can't find anything like that, it sets date from folder name.
 
