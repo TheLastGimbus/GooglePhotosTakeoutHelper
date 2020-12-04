@@ -135,10 +135,10 @@ def main():
         if what not in photo_formats:
             return False
         # skips the extra photo file, like edited or effects. They're kinda useless.
+        nonlocal s_skipped_extra_files
         if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
             for extra in extra_formats:
                 if extra in file.lower():
-                    nonlocal s_skipped_extra_files
                     s_skipped_extra_files.append(file)
                     return False
         if args.skip_extras_harder:
@@ -148,7 +148,6 @@ def main():
                 plain_file = _re.sub(search, '.', file)
                 # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
                 if _os.path.isfile(plain_file):
-                    nonlocal s_skipped_extra_files
                     s_skipped_extra_files.append(file)
                     return False
         return True
@@ -603,7 +602,7 @@ def main():
         f.write("# This file contains list of files where date was set from name of the folder\n")
         f.write("# You might find it useful, but you can safely delete this :)\n")
         f.write("\n".join(s_date_from_folder_files))
-        print(f" - you have full list in {f.name}")
+        print(f"(you have full list in {f.name})")
     if args.skip_extras or args.skip_extras_harder:
         # Remove duplicates: https://www.w3schools.com/python/python_howto_remove_duplicates.asp
         s_skipped_extra_files = list(dict.fromkeys(s_skipped_extra_files))
@@ -613,7 +612,7 @@ def main():
                     "you've used either --skip-extras or --skip-extras-harder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
-            print(f" - you have full list in {f.name}")
+            print(f"(you have full list in {f.name})")
 
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
