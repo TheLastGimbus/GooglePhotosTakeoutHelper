@@ -107,6 +107,7 @@ def main():
     s_removed_duplicates_count = 0
     s_copied_files = 0
     s_cant_insert_exif_files = []  # List of files where inserting exif failed
+    s_date_from_folder_files = []  # List of files where date was set from folder name
 
     _os.makedirs(FIXED_DIR, exist_ok=True)
 
@@ -496,6 +497,10 @@ def main():
         date = get_date_from_folder_name(dir)
         set_file_exif_date(file, date)
         set_creation_date_from_str(file, date)
+
+        nonlocal s_date_from_folder_files
+        s_date_from_folder_files.append(file)
+
         return True
 
     # PART 3: Copy all photos and videos to target folder
@@ -580,8 +585,8 @@ def main():
     print('DONE! FREEDOM!')
     print()
     print("Final statistics:")
-    print(f"Removed duplicates: {s_removed_duplicates_count}")
     print(f"Files copied to target folder: {s_copied_files}")
+    print(f"Removed duplicates: {s_removed_duplicates_count}")
     print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
     if not args.dont_copy:
         with open(PHOTOS_DIR + '/failed_inserting_exif.txt', 'w') as f:
@@ -589,6 +594,14 @@ def main():
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_cant_insert_exif_files))
             print(f" - you have full list in {f.name}")
+    print(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
+    if not args.dont_copy:
+        with open(PHOTOS_DIR + '/date_from_folder_name.txt', 'w') as f:
+            f.write("# This file contains list of files where date was set from name of the folder\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_date_from_folder_files))
+            print(f" - you have full list in {f.name}")
+
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
     print('Have a nice day!')
