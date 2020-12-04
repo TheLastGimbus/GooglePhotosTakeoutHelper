@@ -142,7 +142,7 @@ def main():
                     s_skipped_extra_files.append(file)
                     return False
         if args.skip_extras_harder:
-            search = "\(\d+\)\."  # we leave the period in so it doesn't catch folders.
+            search = r"\(\d+\)\."  # we leave the period in so it doesn't catch folders.
             if bool(_re.search(search, file)):
                 # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
                 plain_file = _re.sub(search, '.', file)
