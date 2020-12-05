@@ -514,7 +514,7 @@ def main():
                 new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
                 i += 1
 
-    def copy_to_target(dir, file):
+    def copy_to_target(file: Path):
         if is_photo(file) or is_video(file):
             new_file = new_name_if_exists(FIXED_DIR / file.name,
                                           watch_for_duplicates=not args.keep_duplicates)
