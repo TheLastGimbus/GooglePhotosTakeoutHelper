@@ -138,16 +138,16 @@ def main():
         if args.skip_extras or args.skip_extras_harder:  # if the file name includes something under the extra_formats, it skips it.
             for extra in extra_formats:
                 if extra in file.name.lower():
-                    s_skipped_extra_files.append(file)
+                    s_skipped_extra_files.append(str(file.resolve()))
                     return False
         if args.skip_extras_harder:
             search = r"\(\d+\)\."  # we leave the period in so it doesn't catch folders.
             if bool(_re.search(search, file.name)):
                 # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
-                plain_file = file.with_name(_re.sub(search, '.', file))
+                plain_file = file.with_name(_re.sub(search, '.', str(file)))
                 # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
                 if plain_file.is_file():
-                    s_skipped_extra_files.append(file)
+                    s_skipped_extra_files.append(str(file.resolve()))
                     return False
         return True
 
@@ -355,7 +355,7 @@ def main():
             print("Couldn't insert exif!")
             print(e)
             nonlocal s_cant_insert_exif_files
-            s_cant_insert_exif_files.append(file)
+            s_cant_insert_exif_files.append(str(file.resolve()))
 
     def get_date_str_from_json(json):
         return _datetime.fromtimestamp(
@@ -494,7 +494,7 @@ def main():
         set_creation_date_from_str(file, date)
 
         nonlocal s_date_from_folder_files
-        s_date_from_folder_files.append(file)
+        s_date_from_folder_files.append(str(file.resolve()))
 
         return True
 
