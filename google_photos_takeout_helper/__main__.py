@@ -209,13 +209,13 @@ def main():
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
-            for filename in files:
+            for file in files:
                 try:
-                    small_hash = get_hash(filename, first_chunk_only=True)
+                    small_hash = get_hash(file, first_chunk_only=True)
                 except OSError:
                     # the file access might've changed till the exec point got here
                     continue
-                files_by_small_hash[(file_size, small_hash)].append(filename)
+                files_by_small_hash[(file_size, small_hash)].append(file)
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certinly duplicates
@@ -224,14 +224,14 @@ def main():
                 # the hash of the first 1k bytes is unique -> skip this file
                 continue
 
-            for filename in files:
+            for file in files:
                 try:
-                    full_hash = get_hash(filename, first_chunk_only=False)
+                    full_hash = get_hash(file, first_chunk_only=False)
                 except OSError:
                     # the file access might've changed till the exec point got here
                     continue
 
-                files_by_full_hash[full_hash].append(filename)
+                files_by_full_hash[full_hash].append(file)
 
         # Now we have the final multimap of absolute dups, We now can attempt to find the original file
         # and remove all the other duplicates
@@ -241,7 +241,7 @@ def main():
             original = None
             for file in files:
                 if not _re.search(r'\(\d+\).', file.name):
-                    original = filename
+                    original = file
             if original is None:
                 original = files[0]
 
