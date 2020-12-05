@@ -22,7 +22,7 @@ def main():
         and then copies it all to one folder.
         "Why do I need to delete album folders?"
         -They mostly contain duplicates of same photos that are in corresponding "date folder" :/
-        You need to do this before running this.
+        You need to do this before running this. (Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)
         """,
     )
     parser.add_argument(
@@ -78,7 +78,7 @@ def main():
     print("That is, all album folders, and everything that isn't named")
     print('2016-06-16 (or with "#", they are good)')
     print('See README.md or --help on why')
-    print("(Don't worry, your photos from albums are already in some date folder)")
+    print("(Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)")
     print()
     print('Type "yes i did that" to confirm:')
     response = input()
