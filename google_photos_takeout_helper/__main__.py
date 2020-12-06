@@ -263,15 +263,32 @@ def main():
     # PART 2: Fixing metadata and date-related stuff
 
     # Returns json dict
-    def find_json_for_file(file: Path):
+    def find_json_for_file(file: Path, _found_json = _defaultdict(dict)):
         potential_json = file.with_name(file.name + '.json') 
         if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
-                    dict = _json.load(f)
-                return dict
+                    json_dict = _json.load(f)
+                return json_dict
             except:
                 raise FileNotFoundError(f"Couldn't find json for file: {file}")
+
+        # Check if we need to load this folder
+        if file.parent not in _found_json:
+            for json_file in file.parent.rglob("*.json"):
+                try:
+                    with json_file.open('r') as f:
+                        json_dict = _json.load(f)
+                        if "title" in json_dict:
+                            # We found a JSON file with a proper title, store the file name
+                            _found_json[file.parent][json_dict["title"]] = json_dict
+                except:
+                    print(f"Couldn't open json file {json_file}")
+        
+        # Check if we have found the JSON file among all the loaded ones in the folder
+        if file.parent in _found_json and file.name in _found_json[file.parent]:
+            # Great we found a valid JSON file in this folder corresponding to this file
+            return _found_json[file.parent][file.name]
         else:
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
