@@ -36,7 +36,9 @@ This script is written in Python. You need to install Python interpretert before
 
 Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You can run it either by typing `pip3 <options>` or `python3 -m pip <options>`:
 
-2. `pip3 install -U google-photos-takeout-helper` / `python3 -m pip install -U google-photos-takeout-helper`
+2. `pip3 install -U google-photos-takeout-helper`
+
+// Or `python3 -m pip install -U google-photos-takeout-helper`
 
 If something goes wrong and it prints some red errors, try to add ` --user` flag at the end
 
@@ -49,7 +51,10 @@ Because I don't have good solution on how to handle albums, you will need to cut
 Now, you should be able to just run it straight in cmd/terminal:
 
 4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+
 // Or if this doesn't work: `python3 -m google_photos_takeout_helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+
+// Ps note: Jezus fucking Christ people, without the "[ ]" :facepalm:
 
 If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
