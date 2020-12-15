@@ -12,6 +12,13 @@ This script does just that - it organizes and cleans up your Takeout for you :+1
 
 It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other porperties correctly, and put it in one big folder (or folders divided by month)
 
+# BIG DISCLAIMER - GOOGLE RECENTLY CHANGED FOLDER STRUCTURE
+...and broke our script. If you took your takeout ~after Dec 5, you probably have 
+"Year folders" instead of "date folders" - this script DOES NOT work with that - we are currently fixing this but if you
+have few folders like "Photos from 2016" instead of hundreds of "2016-11-23" THIS SCRIPT WILL NOT WORK :disappointed:
+
+See #30 for discussion
+
 ## How to use:
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
 1. `pip3 install -U google-photos-takeout-helper`
