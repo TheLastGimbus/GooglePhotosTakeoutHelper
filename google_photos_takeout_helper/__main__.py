@@ -124,7 +124,7 @@ def main():
             if file.is_dir():
                 folder_function(file)
                 continue
-            elif file.is_file():
+            if file.is_file():
                 if filter_fun(file):
                     file_function(file)
             else:
