@@ -8,7 +8,7 @@ def main():
     import hashlib as _hashlib
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
-    from pathlib import Path as Path
+    from pathlib import Path
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
