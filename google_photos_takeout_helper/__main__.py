@@ -508,12 +508,11 @@ def main():
         while True:
             if not new_name.is_file():
                 return new_name
-            else:
-                if watch_for_duplicates:
-                    if new_name.stat().st_size == file.stat().st_size:
-                        return file
-                new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
-                i += 1
+            if watch_for_duplicates:
+                if new_name.stat().st_size == file.stat().st_size:
+                    return file
+            new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
+            i += 1
 
     def copy_to_target(file: Path):
         if is_photo(file) or is_video(file):
