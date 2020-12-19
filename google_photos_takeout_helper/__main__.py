@@ -1,3 +1,4 @@
+import sys
 def main():
     import argparse as _argparse
     import json as _json
@@ -86,7 +87,7 @@ def main():
         print('Heeeere we go!')
     else:
         print('Ok come back when you do this')
-        exit(-2)
+        sys.exit(-2)
 
     PHOTOS_DIR = Path(args.input_folder)
     FIXED_DIR = Path(args.output_folder)
@@ -299,7 +300,7 @@ def main():
             print()
             print('Once you do this, just run it again :)')
             print('==========!!!==========')
-            exit(-1)
+            sys.exit(-1)
 
     def set_creation_date_from_str(file: Path, str_datetime):
         try:
