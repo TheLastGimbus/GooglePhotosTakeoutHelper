@@ -271,9 +271,23 @@ def main():
                     dict = _json.load(f)
                 return dict
             except:
-                raise FileNotFoundError(f"Couldn't find json for file: {file}")
+                raise FileNotFoundError(f"Couldn't open json file: {potential_json}")
         else:
-            raise FileNotFoundError(f"Couldn't find json for file: {file}")
+            # Try find json file under the 51-character-limit from Google
+            # Truncate file.name by (51-5) characters and find it again
+            filename_wo_suffix = file.with_suffix('').name
+            filename_truncated51 = filename_wo_suffix[:51-5] + ".json"
+            potential_json = file.parent.joinpath(filename_truncated51)
+            if potential_json.is_file():
+                try:
+                    with open(potential_json, 'r') as f:
+                        dict = _json.load(f)
+                    return dict
+                except:
+                    raise FileNotFoundError(f"Couldn't open json file: {potential_json}")
+
+        raise FileNotFoundError(f"Couldn't find json for file: {file}")
+
 
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir: Path):
