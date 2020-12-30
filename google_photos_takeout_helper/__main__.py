@@ -514,14 +514,32 @@ def main():
                 new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
                 i += 1
 
+    def copyfile(file: Path, new_file: Path):
+        _shutil.copyfile(file, new_file)
+        try:
+            _shutil.copystat(file, new_file)
+        except PermissionError as e:
+            print(f'File "{new_file}" metadata copy error: {e}')
+            print('Check your user permission and file system. FAT32 is NOT capable keeping lots of metadata for example.')
+
+            try:
+                stat = _os.stat(file)
+                _os.utime(new_file, (stat.st_atime, stat.st_mtime))
+                print(f'File "{new_file}"" metadata copied from "{file}"')
+            except:
+                print(f'Cannot modify "{new_file}" metadata')
+                return False
+        return True
+
     def copy_to_target(file: Path):
         if is_photo(file) or is_video(file):
             new_file = new_name_if_exists(FIXED_DIR / file.name,
                                           watch_for_duplicates=not args.keep_duplicates)
-            _shutil.copy2(file, new_file)
             nonlocal s_copied_files
-            s_copied_files += 1
-        return True
+            if copyfile(file, new_file):
+                s_copied_files += 1
+                return True
+        return False
 
     def copy_to_target_and_divide(file: Path):
         creation_date = file.stat().st_mtime
@@ -532,10 +550,12 @@ def main():
 
         new_file = new_name_if_exists(new_path / file.name,
                                       watch_for_duplicates=not args.keep_duplicates)
-        _shutil.copy2(file, new_file)
+
         nonlocal s_copied_files
-        s_copied_files += 1
-        return True
+        if copyfile(file, new_file):
+            s_copied_files += 1
+            return True
+        return False
 
     if not args.keep_duplicates:
         print('=====================')
