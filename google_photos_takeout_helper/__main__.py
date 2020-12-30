@@ -7,6 +7,7 @@ def main():
     import hashlib as _hashlib
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
+    from datetime import timedelta as _timedelta
     from pathlib import Path as Path
 
     import piexif as _piexif
@@ -110,6 +111,7 @@ def main():
     s_cant_insert_exif_files = []  # List of files where inserting exif failed
     s_date_from_folder_files = []  # List of files where date was set from folder name
     s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
+    s_failed_files = []
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -274,32 +276,46 @@ def main():
                 raise FileNotFoundError(f"Couldn't find json for file: {file}")
         else:
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
+    class NotParsableFolderNameError(Exception):
+        def NotParsableFolderNameError(path, reason):
+            self.path = path
+            self.reason = reason
 
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_name(dir: Path):
-        dir = dir.name
-        dir = dir[:10].replace('-', ':').replace(' ', ':') + ' 12:00:00'
 
         # Sometimes google exports folders without the -, like 2009 08 30...
-        # So the end result would be 2009 08 30 12:00:00, which does not match the format.
-        # Therefore, we also replace the spaces with ':'
+        # It probably won't have '/' as delimiter for obvious reason but leave it to be safe
+        dir = dir.name
+        res = _re.search(r'(\d{4}[-/ ]d{2}[-/ ]\d{2})', dir)
+        if not res:
+            res = _re.search(r'Photos from (\d{4})', dir)
+            if res:
+                print()
+                print('==========!!!==========')
+                print(f"Wrong folder name: {dir}")
+                print("You might have hit the recent Google Takeout structure changes, see")
+                print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/30")
+                print('==========!!!==========')
+                raise NotParsableFolderNameError(dir, "2020 Google Takeout structure changes.")
+            else:
+                print()
+                print('==========!!!==========')
+                print(f"Wrong folder name: {dir}")
+                print("You probably forgot to remove 'album folders' from your takeout folder")
+                print("Please do that - see README.md or --help for why")
+                print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#why-do-you-need-to-cut-out-albums")
+                print()
+                print('Once you do this, just run it again :)')
+                print('==========!!!==========')
+                raise NotParsableFolderNameError(dir, "Incorrect folder name.")
 
-        # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
+        dir = res.group(0)
         try:
-            return _datetime.strptime(dir, '%Y:%m:%d %H:%M:%S').strftime('%Y:%m:%d %H:%M:%S')
+            dt = _datetime.strptime(dir, "%Y-%m-%d") + _timedelta(hours=12)
+            return dt.strftime("%Y:%m:%d %H:%M:%S")
         except ValueError as e:
-            print()
-            print(e)
-            print()
-            print('==========!!!==========')
-            print(f"Wrong folder name: {dir}")
-            print("You probably forgot to remove 'album folders' from your takeout folder")
-            print("Please do that - see README.md or --help for why")
-            print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#why-do-you-need-to-cut-out-albums")
-            print()
-            print('Once you do this, just run it again :)')
-            print('==========!!!==========')
-            exit(-1)
+            raise NotParsableFolderNameError(dir, "datetime parsing error.")
 
     def set_creation_date_from_str(file: Path, str_datetime):
         try:
@@ -489,12 +505,22 @@ def main():
             return
 
         print('Last chance, coping folder name as date...')
-        date = get_date_from_folder_name(file.parent)
-        set_file_exif_date(file, date)
-        set_creation_date_from_str(file, date)
+        try:
+            date = get_date_from_folder_name(file.parent)
+            set_file_exif_date(file, date)
+            set_creation_date_from_str(file, date)
 
-        nonlocal s_date_from_folder_files
-        s_date_from_folder_files.append(str(file.resolve()))
+            nonlocal s_date_from_folder_files
+            s_date_from_folder_files.append(str(file.resolve()))
+        except NotParsableFolderNameError:
+
+            nonlocal s_failed_files
+
+            print(f'Failed our last chance, file "{file}" will be added to failed list.')
+
+            s_failed_files.append(str(file.resolve))
+
+            return False
 
         return True
 
@@ -603,6 +629,10 @@ def main():
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
             print(f"(you have full list in {f.name})")
+    with open(PHOTOS_DIR / 'failed_files.txt', 'w') as f:
+        f.write("# Unfortunately those are failed files without metadata fixes.")
+        f.write("\n".join(s_failed_files))
+        print(f"you have full list in {f.name}")
 
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
