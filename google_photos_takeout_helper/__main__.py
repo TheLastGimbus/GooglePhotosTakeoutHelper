@@ -131,7 +131,7 @@ def main():
                 print(file)
 
     def is_photo(file: Path):
-        if file.suffix not in photo_formats:
+        if file.suffix.lower() not in photo_formats:
             return False
         # skips the extra photo file, like edited or effects. They're kinda useless.
         nonlocal s_skipped_extra_files
@@ -152,7 +152,7 @@ def main():
         return True
 
     def is_video(file: Path):
-        if file.suffix not in video_formats:
+        if file.suffix.lower() not in video_formats:
             return False
         return True
 
