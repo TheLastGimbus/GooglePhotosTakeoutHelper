@@ -518,7 +518,7 @@ def main():
 
             print(f'Failed our last chance, file "{file}" will be added to failed list.')
 
-            s_failed_files.append(str(file.resolve))
+            s_failed_files.append(str(file.resolve()))
 
             return False
 
@@ -630,7 +630,7 @@ def main():
             f.write("\n".join(s_skipped_extra_files))
             print(f"(you have full list in {f.name})")
     with open(PHOTOS_DIR / 'failed_files.txt', 'w') as f:
-        f.write("# Unfortunately those are failed files without metadata fixes.")
+        f.write("# Unfortunately those are failed files without metadata fixes.\n")
         f.write("\n".join(s_failed_files))
         print(f"you have full list in {f.name}")
 
