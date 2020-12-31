@@ -111,7 +111,7 @@ def main():
     s_cant_insert_exif_files = []  # List of files where inserting exif failed
     s_date_from_folder_files = []  # List of files where date was set from folder name
     s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
-    s_failed_files = []
+    s_failed_fixing_metadata = []
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -514,11 +514,11 @@ def main():
             s_date_from_folder_files.append(str(file.resolve()))
         except NotParsableFolderNameError:
 
-            nonlocal s_failed_files
+            nonlocal s_failed_fixing_metadata
 
             print(f'Failed our last chance, file "{file}" will be added to failed list.')
 
-            s_failed_files.append(str(file.resolve()))
+            s_failed_fixing_metadata.append(str(file.resolve()))
 
             return False
 
@@ -629,9 +629,9 @@ def main():
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
             print(f"(you have full list in {f.name})")
-    with open(PHOTOS_DIR / 'failed_files.txt', 'w') as f:
+    with open(PHOTOS_DIR / 'failed_fixing_metadata.txt', 'w') as f:
         f.write("# Unfortunately those are failed files without metadata fixes.\n")
-        f.write("\n".join(s_failed_files))
+        f.write("\n".join(s_failed_fixing_metadata))
         print(f"you have full list in {f.name}")
 
     print()
