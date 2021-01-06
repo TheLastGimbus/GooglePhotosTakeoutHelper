@@ -343,10 +343,7 @@ def main():
             # God wish that americans won't have something like MM-DD-YYYY
             # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
             # It replaces the extra whitespace with a 0 for proper parsing
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\',
-                                                                                                      ':').replace(': ',
-                                                                                                                   ':0')[
-                           :19]
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
