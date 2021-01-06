@@ -88,13 +88,13 @@ def main():
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
-    #Album Multimap
+    # Album Multimap
     album_mmap = _defaultdict(list)
 
-    #Duplicate by full hash multimap
+    # Duplicate by full hash multimap
     files_by_full_hash = _defaultdict(list)
 
-    #holds all the renamed files that clashed from their 
+    # holds all the renamed files that clashed from their
     rename_map = dict()
 
     meta_file_memo = dict()
@@ -158,7 +158,7 @@ def main():
             if not chunk:
                 return
             yield chunk
-    
+
     def get_hash(file: Path, first_chunk_only=False, hash_algo=_hashlib.sha1):
         hashobj = hash_algo()
         with open(file, "rb") as f:
@@ -175,7 +175,7 @@ def main():
         try:
             meta_file_exists = find_album_meta_json_file(path)
 
-            if meta_file_exists: #means that we are processing an album so process
+            if meta_file_exists:  # means that we are processing an album so process
                 for file in path.rglob("*"):
                     if file.is_file() and filter_fun(file):
                         file_name = file.name
@@ -185,7 +185,8 @@ def main():
                                 if full_hash in files_by_full_hash:
                                     full_hash_files = files_by_full_hash[full_hash]
                                     if len(full_hash_files) != 1:
-                                        print("full_hash_files list should only be one after duplication removal, bad state")
+                                        print(
+                                            "full_hash_files list should only be one after duplication removal, bad state")
                                         exit()
                                     else:
 
@@ -196,7 +197,7 @@ def main():
                             except:
                                 pass
 
-                        #check rename map in case there was an overlap namechange
+                        # check rename map in case there was an overlap namechange
 
                         if str(file) in rename_map:
                             file_name = rename_map[str(file)].name
@@ -204,7 +205,6 @@ def main():
                         album_mmap[file.parent.name].append(file_name)
         except:
             pass
-            
 
     # PART 3: removing duplicates
 
@@ -270,11 +270,11 @@ def main():
         # and remove all the other duplicates
         for files in files_by_full_hash.values():
             if len(files) < 2:
-                continue # this file size is unique, no need to spend cpu cycles on it
+                continue  # this file size is unique, no need to spend cpu cycles on it
 
             s_removed_duplicates_count += len(files) - 1
             for file in files:
-            #TODO reconsider which dup we delete these now that we're searching globally?
+                # TODO reconsider which dup we delete these now that we're searching globally?
                 if len(files) > 1:
                     file.unlink()
                     files.remove(file)
@@ -284,7 +284,7 @@ def main():
 
     # Returns json dict
     def find_json_for_file(file: Path):
-        potential_json = file.with_name(file.name + '.json') 
+        potential_json = file.with_name(file.name + '.json')
         if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
@@ -305,7 +305,8 @@ def main():
                         dict = _json.load(f)
                         if "date" in dict["albumData"]:
                             if "timestamp" in dict["albumData"]["date"]:
-                                return _datetime.fromtimestamp(int(dict["albumData"]["date"]["timestamp"])).strftime('%Y:%m:%d %H:%M:%S')
+                                return _datetime.fromtimestamp(int(dict["albumData"]["date"]["timestamp"])).strftime(
+                                    '%Y:%m:%d %H:%M:%S')
                 except:
                     pass
         except:
@@ -331,15 +332,16 @@ def main():
 
         return None
 
-
-
     def set_creation_date_from_str(file: Path, str_datetime):
         try:
             # Turns out exif can have different formats - YYYY:MM:DD, YYYY/..., YYYY-... etc
             # God wish that americans won't have something like MM-DD-YYYY
             # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
             # It replaces the extra whitespace with a 0 for proper parsing
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\',
+                                                                                                      ':').replace(': ',
+                                                                                                                   ':0')[
+                           :19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
@@ -522,7 +524,7 @@ def main():
 
         print('Last chance, coping folder meta as date...')
         date = get_date_from_folder_meta(file.parent)
-        if date: 
+        if date:
             set_file_exif_date(file, date)
             set_creation_date_from_str(file, date)
 
