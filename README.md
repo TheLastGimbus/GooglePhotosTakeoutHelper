@@ -54,27 +54,9 @@ Now, you should be able to just run it straight in cmd/terminal:
 
 If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
-Unless you specify, --keep-duplicates, duplicate images with the same picture, the same exif data, and in the same output directory will only keep a single copy around and delete the rest. This will happen to identical files even if they have different names.
+// (For now, info about albums is saved in `/ORIGINAL_INPUT_FOLDER/albums.json`)
 
-Album data will currently only be represented in the albums.json file in the following format:
-{
-  "your-album-name": [
-     "IMG_1.jpg",
-     "IMG_2.png",
-     ...
-  ],
-  "your-second-album-name": [
-     "IMG_1.jpg",
-     "IMG_2.png",
-     ...
-  ],
-  ...
-}
-
-
-
-
-If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/posts/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
 </p>
 </details>
