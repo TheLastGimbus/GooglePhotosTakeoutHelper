@@ -302,22 +302,21 @@ def main():
 
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_meta(dir: Path):
+        file = find_album_meta_json_file(dir)
+        if not file:
+            print("Couldn't pull datetime from album meta")
+            return None
         try:
-            file = find_album_meta_json_file(dir)
-            if file:
-                try:
-                    with open(str(file), 'r') as f:
-                        dict = _json.load(f)
-                        if "date" in dict["albumData"]:
-                            if "timestamp" in dict["albumData"]["date"]:
-                                return _datetime.fromtimestamp(int(dict["albumData"]["date"]["timestamp"])).strftime(
-                                    '%Y:%m:%d %H:%M:%S')
-                except:
-                    pass
-        except:
-            pass
+            with open(str(file), 'r') as fi:
+                album_dict = _json.load(fi)
+                # find_album_meta_json_file *should* give us "safe" file
+                time = int(album_dict["albumData"]["date"]["timestamp"])
+                return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
+        except KeyError:
+            print("get_date_from_folder_meta - json doesn't have required stuff "
+                  "- that probably means that either google fucked us again, or find_album_meta_json_file"
+                  "is seriously broken")
 
-        print("Couldn't pull datetime from album meta")
         return None
 
     def find_album_meta_json_file(dir: Path):
@@ -528,18 +527,23 @@ def main():
             print("Couldn't find json for file ")
 
         if has_nice_date:
-            return
+            return True
 
         print('Last chance, coping folder meta as date...')
         date = get_date_from_folder_meta(file.parent)
-        if date:
+        if date is not None:
             set_file_exif_date(file, date)
             set_creation_date_from_str(file, date)
+            nonlocal s_date_from_folder_files
+            s_date_from_folder_files.append(str(file.resolve()))
+            return True
+        else:
+            print('ERROR! There was literally no option to set date!!!')
+            # TODO
+            print('TODO: We should do something about this - move it to some separate folder, or write it down in '
+                  'another .txt file...')
 
-        nonlocal s_date_from_folder_files
-        s_date_from_folder_files.append(str(file.resolve()))
-
-        return True
+        return False
 
     # PART 2: Copy all photos and videos to target folder
 
