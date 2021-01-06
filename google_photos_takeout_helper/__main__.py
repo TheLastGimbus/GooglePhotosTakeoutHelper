@@ -179,39 +179,37 @@ def main():
     def populate_album_map(path: Path, filter_fun=lambda f: (is_photo(f) or is_video(f))):
         if not path.is_dir():
             raise NotADirectoryError('populate_album_map only handles directories not files')
-        try:
-            meta_file_exists = find_album_meta_json_file(path)
 
-            if meta_file_exists:  # means that we are processing an album so process
-                for file in path.rglob("*"):
-                    if file.is_file() and filter_fun(file):
-                        file_name = file.name
-                        if not Path(str(FIXED_DIR) + "/" + file.name).is_file():
-                            try:
-                                full_hash = get_hash(file, first_chunk_only=False)
-                                if full_hash in files_by_full_hash:
-                                    full_hash_files = files_by_full_hash[full_hash]
-                                    if len(full_hash_files) != 1:
-                                        print(
-                                            "full_hash_files list should only be one after duplication removal, bad state")
-                                        exit()
-                                    else:
+        meta_file_exists = find_album_meta_json_file(path)
+        if meta_file_exists is None or not meta_file_exists.exists():
+            return False
 
-                                        full_hash_file = full_hash_files[0]
-                                        file_name = full_hash_file.name
+        # means that we are processing an album so process
+        for file in path.rglob("*"):
+            if not (file.is_file() and filter_fun(file)):
+                continue
+            file_name = file.name
+            # If it's not in the output folder
+            if not (FIXED_DIR / file.name).is_file():
+                full_hash = None
+                try:
+                    full_hash = get_hash(file, first_chunk_only=False)
+                except Exception as e:
+                    print(e)
+                    print(f"populate_album_map - couldn't get hash of {file}")
+                if full_hash is not None and full_hash in files_by_full_hash:
+                    full_hash_files = files_by_full_hash[full_hash]
+                    if len(full_hash_files) != 1:
+                        print("full_hash_files list should only be one after duplication removal, bad state")
+                        exit(-5)
+                        return False
+                    file_name = full_hash_files[0].name
 
+            # check rename map in case there was an overlap namechange
+            if str(file) in rename_map:
+                file_name = rename_map[str(file)].name
 
-                            except:
-                                pass
-
-                        # check rename map in case there was an overlap namechange
-
-                        if str(file) in rename_map:
-                            file_name = rename_map[str(file)].name
-
-                        album_mmap[file.parent.name].append(file_name)
-        except:
-            pass
+            album_mmap[file.parent.name].append(file_name)
 
     # PART 3: removing duplicates
 
@@ -335,7 +333,7 @@ def main():
                         return file
             except Exception as e:
                 print(e)
-                raise FileNotFoundError(f"find_album_meta_json_file - Couldn't find json for file: {file}")
+                print(f"find_album_meta_json_file - Error opening file: {file}")
 
         return None
 
