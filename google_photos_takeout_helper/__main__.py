@@ -402,6 +402,8 @@ def main():
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
 
+    # ========= THIS IS ALL GPS STUFF =========
+
     def change_to_rational(number):
         """convert a number to rantional
         Keyword arguments: number
@@ -499,6 +501,8 @@ def main():
             print("Couldn't insert geo exif!")
             # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
             print(e)
+
+    # ============ END OF GPS STUFF ============
 
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
@@ -610,7 +614,6 @@ def main():
         remove_duplicates(
             dir=FIXED_DIR
         )
-
     if not args.no_albums:
         print('=====================')
         print('Populate albums...')
