@@ -68,6 +68,11 @@ def main():
         help="Create folders and subfolders based on the date the photos were taken"
              "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
     )
+    parser.add_argument(
+        '--no-albums',
+        action='store_true',
+        help="Don't do anything about the albums"
+    )
     args = parser.parse_args()
 
     print('Heeeere we go!')
@@ -605,16 +610,17 @@ def main():
             dir=FIXED_DIR
         )
 
-    print('=====================')
-    print('Populate albums...')
-    print('=====================')
-    for_all_files_recursive(
-        dir=PHOTOS_DIR,
-        folder_function=populate_album_map
-    )
+    if not args.no_albums:
+        print('=====================')
+        print('Populate albums...')
+        print('=====================')
+        for_all_files_recursive(
+            dir=PHOTOS_DIR,
+            folder_function=populate_album_map
+        )
 
-    with open(str(FIXED_DIR) + '/albums.json', 'w+') as outfile:
-        _json.dump(album_mmap, outfile)
+        with open(PHOTOS_DIR / 'albums.json', 'w') as outfile:
+            _json.dump(album_mmap, outfile)
 
     print()
     print('DONE! FREEDOM!')
