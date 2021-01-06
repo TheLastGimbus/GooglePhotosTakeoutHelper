@@ -12,6 +12,8 @@ def main():
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
     import math
+    if _os.name == 'nt':
+        import win32_setctime as _windoza_setctime
 
     parser = _argparse.ArgumentParser(
         prog='Photos takeout helper',
@@ -349,6 +351,8 @@ def main():
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
             _os.utime(file, (timestamp, timestamp))
+            if _os.name == 'nt':
+                _windoza_setctime.setctime()
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
