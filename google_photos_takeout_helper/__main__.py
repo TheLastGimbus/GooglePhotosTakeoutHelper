@@ -349,7 +349,7 @@ def main():
             ).timestamp()
             _os.utime(file, (timestamp, timestamp))
             if _os.name == 'nt':
-                _windoza_setctime.setctime()
+                _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
