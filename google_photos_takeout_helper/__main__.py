@@ -38,13 +38,6 @@ def main():
         help='Output folders which in all photos will be placed in'
     )
     parser.add_argument(
-        '--keep-duplicates',
-        action='store_true',
-        help="Don't remove duplicates. Disclaimer: "
-             "duplicates will have trouble to find correct creation date, "
-             "and it may not be accurate"
-    )
-    parser.add_argument(
         '--skip-extras',
         action='store_true',
         help='EXPERIMENTAL: Skips the extra photos like photos that end in "edited" or "EFFECTS".'
@@ -55,25 +48,16 @@ def main():
         help='EXPERIMENTAL: Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
     )
     parser.add_argument(
-        '--dont-fix',
-        action='store_true',
-        help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
-    )
-    parser.add_argument(
-        '--dont-copy',
-        action='store_true',
-        help="Don't copy files to target folder. I don't know why would you not want to do that, but ok"
-    )
-    parser.add_argument(
         "--divide-to-dates",
         action='store_true',
         help="Create folders and subfolders based on the date the photos were taken"
              "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
     )
     parser.add_argument(
-        '--no-albums',
-        action='store_true',
-        help="Don't do anything about the albums"
+        '--albums',
+        type=str,
+        help="EXPERIMENTAL, MAY NOT WORK FOR EVERYONE: What kind of 'albums solution' you would like:\n"
+             "'json' - written in a json file\n"
     )
     args = parser.parse_args()
 
@@ -580,16 +564,15 @@ def main():
         s_copied_files += 1
         return True
 
-    if not args.dont_fix:
-        print('=====================')
-        print('Fixing files metadata and creation dates...')
-        print('=====================')
-        for_all_files_recursive(
-            dir=PHOTOS_DIR,
-            file_function=fix_metadata,
-            filter_fun=lambda f: (is_photo(f) or is_video(f))
-        )
-    if not args.dont_fix and not args.dont_copy and args.divide_to_dates:
+    print('=====================')
+    print('Fixing files metadata and creation dates...')
+    print('=====================')
+    for_all_files_recursive(
+        dir=PHOTOS_DIR,
+        file_function=fix_metadata,
+        filter_fun=lambda f: (is_photo(f) or is_video(f))
+    )
+    if args.divide_to_dates:
         print('=====================')
         print('Creating subfolders and dividing files based on date...')
         print('=====================')
@@ -598,7 +581,7 @@ def main():
             file_function=copy_to_target_and_divide,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
-    elif not args.dont_copy:
+    else:
         print('=====================')
         print('Coping all files to one folder...')
         print('(If you want, you can get them organized in folders based on year and month.'
@@ -609,27 +592,28 @@ def main():
             file_function=copy_to_target,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
-    if not args.keep_duplicates:
-        print('=====================')
-        print('Removing duplicates...')
-        print('=====================')
-        remove_duplicates(
-            dir=FIXED_DIR
-        )
-    if not args.no_albums:
-        print('=====================')
-        print('Populate albums...')
-        print('=====================')
-        for_all_files_recursive(
-            dir=PHOTOS_DIR,
-            folder_function=populate_album_map
-        )
-
-        with open(PHOTOS_DIR / 'albums.json', 'w') as outfile:
-            _json.dump(album_mmap, outfile)
+    print('=====================')
+    print('Removing duplicates...')
+    print('=====================')
+    remove_duplicates(
+        dir=FIXED_DIR
+    )
+    if args.albums is not None:
+        if args.albums.lower() == 'json':
+            print('=====================')
+            print('Populate json file with albums...')
+            print('=====================')
+            for_all_files_recursive(
+                dir=PHOTOS_DIR,
+                folder_function=populate_album_map
+            )
+            file = PHOTOS_DIR / 'albums.json'
+            with open(file, 'w') as outfile:
+                _json.dump(album_mmap, outfile)
+            print(str(file))
 
     print()
-    print('DONE! FREEDOM!')
+    print('DONE! FREEEEEDOOOOM!!!')
     print()
     print("Final statistics:")
     print(f"Files copied to target folder: {s_copied_files}")
