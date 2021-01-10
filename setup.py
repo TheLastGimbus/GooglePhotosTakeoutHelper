@@ -7,7 +7,7 @@ README = (HERE/"README.md").read_text()
 
 setuptools.setup(
     name="google-photos-takeout-helper",
-    version="1.2.0",
+    version="2.0.0rc1",
     description="Script that organizes the Google Photos Takeout archive into one big chronological folder",
     long_description=README,
     long_description_content_type='text/markdown',
