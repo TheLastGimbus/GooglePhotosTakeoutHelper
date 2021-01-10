@@ -13,11 +13,14 @@ This script does just that - it organizes and cleans up your Takeout for you :+1
 It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other porperties correctly, and put it in one big folder (or folders divided by month)
 
 # BIG DISCLAIMER - GOOGLE RECENTLY CHANGED FOLDER STRUCTURE
-...and broke our script. If you took your takeout ~after Dec 5, you probably have 
-"Year folders" instead of "date folders" - this script DOES NOT work with that - we are currently fixing this but if you
-have few folders like "Photos from 2016" instead of hundreds of "2016-11-23" THIS SCRIPT WILL NOT WORK :disappointed:
 
-See #30 for discussion
+- If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use newest
+  version `2.0.0rc1`
+  - `pip install -U google-photos-takeout-helper==2.0.0rc`
+- If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
+  - `pip install -U google-photos-takeout-helper==1.2.0`
+
+I don't know if new version fully works, so let me know if it doesn't :+1:
 
 ## How to use:
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
@@ -27,10 +30,6 @@ See #30 for discussion
 
 Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
 
-<sup>If you previously used this script in form where you 
-download and run it - don't worry! Downloading it with pip is even simpler, 
-and everything will work as previously :)</sup>
-
 If, instead of one big folder, you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
 ### How to use for dummies (non-programming people):
@@ -38,20 +37,25 @@ If, instead of one big folder, you want your photos to be divided by year and mo
 <p>
 This script is written in Python. You need to install Python interpretert before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
 
-1. Download and install Python for your system: https://www.python.org/downloads/ (Google step by step installation instructions if you have trouble) - if the installator will ask you about some `PATH` and `pip`, make sure to check that too
+1. Download and install Python for your system: https://www.python.org/downloads/ (Google step by step installation
+   instructions if you have trouble) - if the installator will ask you about some `PATH` and `pip`, make sure to check
+   that too
 
-Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You can run it either by typing `pip3 <options>` or `python3 -m pip <options>`:
+Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You
+can run it either by typing `pip3 <options>` or `python3 -m pip <options>`:
 
 2. `pip3 install -U google-photos-takeout-helper`
 
 // Or `python3 -m pip install -U google-photos-takeout-helper`
 
+// Watch out for versions, described in "BIG DISCLAIMER" above
+
 If something goes wrong and it prints some red errors, try to add ` --user` flag at the end
 
 3. Prepare your Takeout:
 
-If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one folder. 
-Now, you should be able to just run it straight in cmd/terminal:
+If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one
+folder. Now, you should be able to just run it straight in cmd/terminal:
 
 4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
@@ -60,8 +64,6 @@ Now, you should be able to just run it straight in cmd/terminal:
 // Ps note: Don't use the "[ ]" in the command above.
 
 If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
-
-// (For now, info about albums is saved in `/ORIGINAL_INPUT_FOLDER/albums.json`)
 
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
