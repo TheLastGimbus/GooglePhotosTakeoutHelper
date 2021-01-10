@@ -16,7 +16,7 @@ It will take all of your photos from those tiny folders, set their `exif` and `l
 
 - If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use the newest
   version `2.0.0rc1`
-  - `pip install -U google-photos-takeout-helper==2.0.0rc`
+  - `pip install -U google-photos-takeout-helper==2.0.0rc1`
 - If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
   - `pip install -U google-photos-takeout-helper==1.2.0`
 
