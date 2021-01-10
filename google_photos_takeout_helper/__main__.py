@@ -12,6 +12,8 @@ def main():
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
     import math
+    if _os.name == 'nt':
+        import win32_setctime as _windoza_setctime
 
     parser = _argparse.ArgumentParser(
         prog='Photos takeout helper',
@@ -20,9 +22,6 @@ def main():
         """This script takes all of your photos form Google Photos takeout, 
         fixes their exif DateTime data (when they were taken) and file creation date,
         and then copies it all to one folder.
-        "Why do I need to delete album folders?"
-        -They mostly contain duplicates of same photos that are in corresponding "date folder" :/
-        You need to do this before running this. (Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)
         """,
     )
     parser.add_argument(
@@ -39,13 +38,6 @@ def main():
         help='Output folders which in all photos will be placed in'
     )
     parser.add_argument(
-        '--keep-duplicates',
-        action='store_true',
-        help="Don't remove duplicates. Disclaimer: "
-             "duplicates will have trouble to find correct creation date, "
-             "and it may not be accurate"
-    )
-    parser.add_argument(
         '--skip-extras',
         action='store_true',
         help='EXPERIMENTAL: Skips the extra photos like photos that end in "edited" or "EFFECTS".'
@@ -56,37 +48,20 @@ def main():
         help='EXPERIMENTAL: Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
     )
     parser.add_argument(
-        '--dont-fix',
-        action='store_true',
-        help="Don't try to fix Dates. I don't know why would you not want to do that, but ok"
-    )
-    parser.add_argument(
-        '--dont-copy',
-        action='store_true',
-        help="Don't copy files to target folder. I don't know why would you not want to do that, but ok"
-    )
-    parser.add_argument(
         "--divide-to-dates",
         action='store_true',
         help="Create folders and subfolders based on the date the photos were taken"
              "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
     )
+    parser.add_argument(
+        '--albums',
+        type=str,
+        help="EXPERIMENTAL, MAY NOT WORK FOR EVERYONE: What kind of 'albums solution' you would like:\n"
+             "'json' - written in a json file\n"
+    )
     args = parser.parse_args()
 
-    print('DISCLAIMER!')
-    print("Before running this script, you need to cut out all folders that aren't dates")
-    print("That is, all album folders, and everything that isn't named")
-    print('2016-06-16 (or with "#", they are good)')
-    print('See README.md or --help on why')
-    print("(Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)")
-    print()
-    print('Type "yes i did that" to confirm:')
-    response = input()
-    if response.lower() == 'yes i did that':
-        print('Heeeere we go!')
-    else:
-        print('Ok come back when you do this')
-        exit(-2)
+    print('Heeeere we go!')
 
     PHOTOS_DIR = Path(args.input_folder)
     FIXED_DIR = Path(args.output_folder)
@@ -103,6 +78,17 @@ def main():
         '-edytowane',  # PL
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
+
+    # Album Multimap
+    album_mmap = _defaultdict(list)
+
+    # Duplicate by full hash multimap
+    files_by_full_hash = _defaultdict(list)
+
+    # holds all the renamed files that clashed from their
+    rename_map = dict()
+
+    meta_file_memo = dict()
 
     # Statistics:
     s_removed_duplicates_count = 0
@@ -163,7 +149,7 @@ def main():
             if not chunk:
                 return
             yield chunk
-    
+
     def get_hash(file: Path, first_chunk_only=False, hash_algo=_hashlib.sha1):
         hashobj = hash_algo()
         with open(file, "rb") as f:
@@ -174,7 +160,42 @@ def main():
                     hashobj.update(chunk)
         return hashobj.digest()
 
-    # PART 1: removing duplicates
+    def populate_album_map(path: Path, filter_fun=lambda f: (is_photo(f) or is_video(f))):
+        if not path.is_dir():
+            raise NotADirectoryError('populate_album_map only handles directories not files')
+
+        meta_file_exists = find_album_meta_json_file(path)
+        if meta_file_exists is None or not meta_file_exists.exists():
+            return False
+
+        # means that we are processing an album so process
+        for file in path.rglob("*"):
+            if not (file.is_file() and filter_fun(file)):
+                continue
+            file_name = file.name
+            # If it's not in the output folder
+            if not (FIXED_DIR / file.name).is_file():
+                full_hash = None
+                try:
+                    full_hash = get_hash(file, first_chunk_only=False)
+                except Exception as e:
+                    print(e)
+                    print(f"populate_album_map - couldn't get hash of {file}")
+                if full_hash is not None and full_hash in files_by_full_hash:
+                    full_hash_files = files_by_full_hash[full_hash]
+                    if len(full_hash_files) != 1:
+                        print("full_hash_files list should only be one after duplication removal, bad state")
+                        exit(-5)
+                        return False
+                    file_name = full_hash_files[0].name
+
+            # check rename map in case there was an overlap namechange
+            if str(file) in rename_map:
+                file_name = rename_map[str(file)].name
+
+            album_mmap[file.parent.name].append(file_name)
+
+    # PART 3: removing duplicates
 
     # THIS IS PARTLY COPIED FROM STACKOVERFLOW
     # https://stackoverflow.com/questions/748675/finding-duplicate-files-and-removing-them
@@ -190,10 +211,6 @@ def main():
     def find_duplicates(path: Path, filter_fun=lambda file: True):
         files_by_size = _defaultdict(list)
         files_by_small_hash = _defaultdict(list)
-        files_by_full_hash = _defaultdict(list)
-
-        # Excluding original files (or first file if original not found)
-        duplicates = []
 
         for file in path.rglob("*"):
             if file.is_file() and filter_fun(file):
@@ -233,38 +250,30 @@ def main():
 
                 files_by_full_hash[full_hash].append(file)
 
-        # Now we have the final multimap of absolute dups, We now can attempt to find the original file
+    # Removes all duplicates in folder
+    def remove_duplicates(dir: Path):
+        find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
+        nonlocal s_removed_duplicates_count
+
+        # Now we have populated the final multimap of absolute dups, We now can attempt to find the original file
         # and remove all the other duplicates
         for files in files_by_full_hash.values():
             if len(files) < 2:
-                continue # this file size is unique, no need to spend cpu cycles on it
-            original = None
+                continue  # this file size is unique, no need to spend cpu cycles on it
+
+            s_removed_duplicates_count += len(files) - 1
             for file in files:
-                if not _re.search(r'\(\d+\).', file.name):
-                    original = file
-            if original is None:
-                original = files[0]
-
-            dups = files.copy()
-            dups.remove(original)
-            duplicates += dups
-
-        return duplicates
-
-    # Removes all duplicates in folder
-    def remove_duplicates(dir: Path):
-        duplicates = find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
-        for file in duplicates:
-            file.unlink()
-        nonlocal s_removed_duplicates_count
-        s_removed_duplicates_count += len(duplicates)
+                # TODO reconsider which dup we delete these now that we're searching globally?
+                if len(files) > 1:
+                    file.unlink()
+                    files.remove(file)
         return True
 
-    # PART 2: Fixing metadata and date-related stuff
+    # PART 1: Fixing metadata and date-related stuff
 
     # Returns json dict
     def find_json_for_file(file: Path):
-        potential_json = file.with_name(file.name + '.json') 
+        potential_json = file.with_name(file.name + '.json')
         if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
@@ -276,30 +285,40 @@ def main():
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
     # Returns date in 2019:01:01 23:59:59 format
-    def get_date_from_folder_name(dir: Path):
-        dir = dir.name
-        dir = dir[:10].replace('-', ':').replace(' ', ':') + ' 12:00:00'
-
-        # Sometimes google exports folders without the -, like 2009 08 30...
-        # So the end result would be 2009 08 30 12:00:00, which does not match the format.
-        # Therefore, we also replace the spaces with ':'
-
-        # Reformat it to check if it matcher, and quit if doesn't match - it's probably a date folder
+    def get_date_from_folder_meta(dir: Path):
+        file = find_album_meta_json_file(dir)
+        if not file:
+            print("Couldn't pull datetime from album meta")
+            return None
         try:
-            return _datetime.strptime(dir, '%Y:%m:%d %H:%M:%S').strftime('%Y:%m:%d %H:%M:%S')
-        except ValueError as e:
-            print()
-            print(e)
-            print()
-            print('==========!!!==========')
-            print(f"Wrong folder name: {dir}")
-            print("You probably forgot to remove 'album folders' from your takeout folder")
-            print("Please do that - see README.md or --help for why")
-            print("https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#why-do-you-need-to-cut-out-albums")
-            print()
-            print('Once you do this, just run it again :)')
-            print('==========!!!==========')
-            exit(-1)
+            with open(str(file), 'r') as fi:
+                album_dict = _json.load(fi)
+                # find_album_meta_json_file *should* give us "safe" file
+                time = int(album_dict["albumData"]["date"]["timestamp"])
+                return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
+        except KeyError:
+            print("get_date_from_folder_meta - json doesn't have required stuff "
+                  "- that probably means that either google fucked us again, or find_album_meta_json_file"
+                  "is seriously broken")
+
+        return None
+
+    def find_album_meta_json_file(dir: Path):
+        if str(dir) in meta_file_memo:
+            return meta_file_memo[str(dir)]
+
+        for file in dir.rglob("*.json"):
+            try:
+                with open(str(file), 'r') as f:
+                    dict = _json.load(f)
+                    if "albumData" in dict:
+                        meta_file_memo[str(dir)] = file
+                        return file
+            except Exception as e:
+                print(e)
+                print(f"find_album_meta_json_file - Error opening file: {file}")
+
+        return None
 
     def set_creation_date_from_str(file: Path, str_datetime):
         try:
@@ -313,6 +332,8 @@ def main():
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
             _os.utime(file, (timestamp, timestamp))
+            if _os.name == 'nt':
+                _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
             print('Error setting creation date from string:')
             print(e)
@@ -361,6 +382,8 @@ def main():
         return _datetime.fromtimestamp(
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
+
+    # ========= THIS IS ALL GPS STUFF =========
 
     def change_to_rational(number):
         """convert a number to rantional
@@ -460,6 +483,8 @@ def main():
             # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
             print(e)
 
+    # ============ END OF GPS STUFF ============
+
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
         print(file)
@@ -483,41 +508,44 @@ def main():
             has_nice_date = True
             return
         except FileNotFoundError:
-            print("Couldn't find json for file :/")
+            print("Couldn't find json for file ")
 
         if has_nice_date:
-            return
+            return True
 
-        print('Last chance, coping folder name as date...')
-        date = get_date_from_folder_name(file.parent)
-        set_file_exif_date(file, date)
-        set_creation_date_from_str(file, date)
+        print('Last chance, coping folder meta as date...')
+        date = get_date_from_folder_meta(file.parent)
+        if date is not None:
+            set_file_exif_date(file, date)
+            set_creation_date_from_str(file, date)
+            nonlocal s_date_from_folder_files
+            s_date_from_folder_files.append(str(file.resolve()))
+            return True
+        else:
+            print('ERROR! There was literally no option to set date!!!')
+            # TODO
+            print('TODO: We should do something about this - move it to some separate folder, or write it down in '
+                  'another .txt file...')
 
-        nonlocal s_date_from_folder_files
-        s_date_from_folder_files.append(str(file.resolve()))
+        return False
 
-        return True
-
-    # PART 3: Copy all photos and videos to target folder
+    # PART 2: Copy all photos and videos to target folder
 
     # Makes a new name like 'photo(1).jpg'
-    def new_name_if_exists(file: Path, watch_for_duplicates=True):
+    def new_name_if_exists(file: Path):
         new_name = file
         i = 1
         while True:
             if not new_name.is_file():
                 return new_name
             else:
-                if watch_for_duplicates:
-                    if new_name.stat().st_size == file.stat().st_size:
-                        return file
                 new_name = file.with_name(f"{file.stem}({i}){file.suffix}")
+                rename_map[str(file)] = new_name
                 i += 1
 
     def copy_to_target(file: Path):
         if is_photo(file) or is_video(file):
-            new_file = new_name_if_exists(FIXED_DIR / file.name,
-                                          watch_for_duplicates=not args.keep_duplicates)
+            new_file = new_name_if_exists(FIXED_DIR / file.name)
             _shutil.copy2(file, new_file)
             nonlocal s_copied_files
             s_copied_files += 1
@@ -530,31 +558,21 @@ def main():
         new_path = FIXED_DIR / f"{date.year}/{date.month:02}/"
         new_path.mkdir(parents=True, exist_ok=True)
 
-        new_file = new_name_if_exists(new_path / file.name,
-                                      watch_for_duplicates=not args.keep_duplicates)
+        new_file = new_name_if_exists(new_path / file.name)
         _shutil.copy2(file, new_file)
         nonlocal s_copied_files
         s_copied_files += 1
         return True
 
-    if not args.keep_duplicates:
-        print('=====================')
-        print('Removing duplicates...')
-        print('=====================')
-        for_all_files_recursive(
-            dir=PHOTOS_DIR,
-            folder_function=remove_duplicates
-        )
-    if not args.dont_fix:
-        print('=====================')
-        print('Fixing files metadata and creation dates...')
-        print('=====================')
-        for_all_files_recursive(
-            dir=PHOTOS_DIR,
-            file_function=fix_metadata,
-            filter_fun=lambda f: (is_photo(f) or is_video(f))
-        )
-    if not args.dont_fix and not args.dont_copy and args.divide_to_dates:
+    print('=====================')
+    print('Fixing files metadata and creation dates...')
+    print('=====================')
+    for_all_files_recursive(
+        dir=PHOTOS_DIR,
+        file_function=fix_metadata,
+        filter_fun=lambda f: (is_photo(f) or is_video(f))
+    )
+    if args.divide_to_dates:
         print('=====================')
         print('Creating subfolders and dividing files based on date...')
         print('=====================')
@@ -563,7 +581,7 @@ def main():
             file_function=copy_to_target_and_divide,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
-    elif not args.dont_copy:
+    else:
         print('=====================')
         print('Coping all files to one folder...')
         print('(If you want, you can get them organized in folders based on year and month.'
@@ -574,9 +592,28 @@ def main():
             file_function=copy_to_target,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
+    print('=====================')
+    print('Removing duplicates...')
+    print('=====================')
+    remove_duplicates(
+        dir=FIXED_DIR
+    )
+    if args.albums is not None:
+        if args.albums.lower() == 'json':
+            print('=====================')
+            print('Populate json file with albums...')
+            print('=====================')
+            for_all_files_recursive(
+                dir=PHOTOS_DIR,
+                folder_function=populate_album_map
+            )
+            file = PHOTOS_DIR / 'albums.json'
+            with open(file, 'w') as outfile:
+                _json.dump(album_mmap, outfile)
+            print(str(file))
 
     print()
-    print('DONE! FREEDOM!')
+    print('DONE! FREEEEEDOOOOM!!!')
     print()
     print("Final statistics:")
     print(f"Files copied to target folder: {s_copied_files}")

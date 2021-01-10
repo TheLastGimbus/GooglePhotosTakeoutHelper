@@ -23,8 +23,7 @@ See #30 for discussion
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
 1. `pip3 install -U google-photos-takeout-helper`
 2. Extract all contents from your Google Takeout to one folder
-3. Cut out/remove all ["album folders"](#why-do-you-need-to-cut-out-albums) that aren't named "2016-06-16" or something like that
-4. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+3. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
 
@@ -52,31 +51,22 @@ If something goes wrong and it prints some red errors, try to add ` --user` flag
 3. Prepare your Takeout:
 
 If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one folder. 
-
-Because I don't have good solution on how to handle albums, you will need to cut off all ["Album folders"](#why-do-you-need-to-cut-out-albums) - those who are not named like "2016-06-26" or "2016-06-26 #2" - don't worry, all photos from albums are in corresponding "date folders" already - they would just make a duplicate.
-
 Now, you should be able to just run it straight in cmd/terminal:
 
 4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 // Or if this doesn't work: `python3 -m google_photos_takeout_helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
-// Ps note: Jezus fucking Christ people, without the "[ ]" :facepalm:
+// Ps note: Don't use the "[ ]" in the command above.
 
 If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
 
+// (For now, info about albums is saved in `/ORIGINAL_INPUT_FOLDER/albums.json`)
 
-If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/posts/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
 </p>
 </details>
-
-### Why do you need to cut out albums?
-They mostly contain duplicates of same photos that are in corresponding "date folder". (Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)
-This script tries to get all "photo taken time" stuff right. If it finds json - it sets everything from that json (it contains data of edited timestamp that you might've corrected in Google Photos). If it can't - it tries to get Exif data form photo.
-IF it can't find anything like that, it sets date from folder name.
-
-All of this is so that you can then safely store ALL of your photos in one folder, and they will all be in right order.
 
 #### Unless you move them around your Android phone. 
 Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reseted to current.
@@ -90,7 +80,7 @@ https://github.com/SimpleMobileTools/Simple-Gallery
 
  - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but it's approach to photos is still not perfect. (And you need to set up your own server)
 
- - Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
+ - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 
 #### Other Takeout projects
@@ -107,4 +97,4 @@ https://github.com/HardFork/KeepToText
 ### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data
 - [x] Gps data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
-- [ ] Some way to handle albums - Kinda WIP in #10
+- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing: 
