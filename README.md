@@ -10,11 +10,11 @@ What if you want to just have one folder with all photos, in chronological order
 
 This script does just that - it organizes and cleans up your Takeout for you :+1:
 
-It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other porperties correctly, and put it in one big folder (or folders divided by month)
+It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other properties correctly, and put it in one big folder (or folders divided by a month)
 
 # BIG DISCLAIMER - GOOGLE RECENTLY CHANGED FOLDER STRUCTURE
 
-- If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use newest
+- If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use the newest
   version `2.0.0rc1`
   - `pip install -U google-photos-takeout-helper==2.0.0rc`
 - If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
@@ -24,37 +24,37 @@ I don't know if new version fully works, so let me know if it doesn't :+1:
 
 ## How to use:
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
-1. `pip3 install -U google-photos-takeout-helper`
+1. `pip install -U google-photos-takeout-helper`
 2. Extract all contents from your Google Takeout to one folder
 3. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
 
-If, instead of one big folder, you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
+If, instead of one big folder, you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
 
 ### How to use for dummies (non-programming people):
 <details><summary>Click for detailed instructions</summary>
 <p>
-This script is written in Python. You need to install Python interpretert before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
+This script is written in Python. You need to install Python interpreter before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
 
-1. Download and install Python for your system: https://www.python.org/downloads/ (Google step by step installation
-   instructions if you have trouble) - if the installator will ask you about some `PATH` and `pip`, make sure to check
+1. Download and install Python for your system: https://www.python.org/downloads/ (Google step-by-step installation
+   instructions if you have trouble) - if the installer will ask you about some `PATH` and `pip`, make sure to check
    that too
 
 Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You
-can run it either by typing `pip3 <options>` or `python3 -m pip <options>`:
+can run it either by typing `pip <options>` or `python3 -m pip <options>`:
 
-2. `pip3 install -U google-photos-takeout-helper`
+2. `pip install -U google-photos-takeout-helper`
 
 // Or `python3 -m pip install -U google-photos-takeout-helper`
 
 // Watch out for versions, described in "BIG DISCLAIMER" above
 
-If something goes wrong and it prints some red errors, try to add ` --user` flag at the end
+If something goes wrong, and it prints some red errors, try to add ` --user` flag at the end
 
 3. Prepare your Takeout:
 
-If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one
+If your Takeout was divided into multiple `.zip`s, you will need to extract them, and move their contents into one
 folder. Now, you should be able to just run it straight in cmd/terminal:
 
 4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
@@ -63,14 +63,14 @@ folder. Now, you should be able to just run it straight in cmd/terminal:
 
 // Ps note: Don't use the "[ ]" in the command above.
 
-If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
+If you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
 
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
 </p>
 </details>
 
-#### Unless you move them around your Android phone. 
+#### ...unless you move them around your Android phone. 
 Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reseted to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out:
