@@ -90,4 +90,4 @@ https://github.com/HardFork/KeepToText
 ### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data
 - [x] Gps data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
-- [x] Some way to handle albums - Done!
+- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing: 
