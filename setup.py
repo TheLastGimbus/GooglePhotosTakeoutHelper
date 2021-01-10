@@ -23,6 +23,7 @@ setuptools.setup(
         'Intended Audience :: End Users/Desktop',
         'Topic :: Multimedia :: Graphics'
     ],
+    python_requires='>=3.6',
     install_requires=(HERE/'requirements.txt').read_text().split('\n'),
     entry_points={
         'console_scripts': [
