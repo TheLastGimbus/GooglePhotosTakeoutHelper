@@ -19,7 +19,7 @@ def main():
         prog='Photos takeout helper',
         usage='python3 photos_helper.py -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
         description=
-        """This script takes all of your photos form Google Photos takeout, 
+        """This script takes all of your photos from Google Photos takeout, 
         fixes their exif DateTime data (when they were taken) and file creation date,
         and then copies it all to one folder.
         """,
