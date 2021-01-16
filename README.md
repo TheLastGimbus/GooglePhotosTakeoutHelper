@@ -15,8 +15,8 @@ It will take all of your photos from those tiny folders, set their `exif` and `l
 # BIG DISCLAIMER - GOOGLE RECENTLY CHANGED FOLDER STRUCTURE
 
 - If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use the newest
-  version `2.0.0rc1`
-  - `pip install -U google-photos-takeout-helper==2.0.0rc1`
+  version
+  - `pip install -U google-photos-takeout-helper`
 - If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
   - `pip install -U google-photos-takeout-helper==1.2.0`
 
@@ -70,8 +70,11 @@ If you have issues/questions, you can hit me up either by [Reddit](https://www.r
 </p>
 </details>
 
-#### ...unless you move them around your Android phone. 
-Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reseted to current.
+### If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+Thanks :sparkling_heart:
+
+##### But, be aware if you move your photos on you Android phone...
+Beware, that (99% of the times), if you move some files in Android, their creation and modification time is re-seted to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out:
 
