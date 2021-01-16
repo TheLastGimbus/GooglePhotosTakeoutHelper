@@ -643,6 +643,8 @@ def main():
 
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
+    print()
+    print('If I helped you, you can consider donating me: https://www.paypal.me/TheLastGimbus')
     print('Have a nice day!')
 
 
