@@ -467,7 +467,7 @@ def main():
                 _piexif.GPSIFD.GPSLongitude: degToDmsRational(longitude)
             })
 
-        if altitude != 0:
+        if not isinstance(altitude, str) and altitude != 0:
             gps_ifd.update({
                 _piexif.GPSIFD.GPSAltitudeRef: 1,
                 _piexif.GPSIFD.GPSAltitude: change_to_rational(round(altitude))
