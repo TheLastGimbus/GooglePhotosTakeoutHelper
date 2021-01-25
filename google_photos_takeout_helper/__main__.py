@@ -90,6 +90,8 @@ def main():
 
     meta_file_memo = dict()
 
+    _all_jsons_dict = _defaultdict(dict)
+
     # Statistics:
     s_removed_duplicates_count = 0
     s_copied_files = 0
@@ -272,7 +274,7 @@ def main():
     # PART 1: Fixing metadata and date-related stuff
 
     # Returns json dict
-    def find_json_for_file(file: Path, _found_json = _defaultdict(dict)):
+    def find_json_for_file(file: Path):
         potential_json = file.with_name(file.name + '.json')
         if potential_json.is_file():
             try:
@@ -282,22 +284,23 @@ def main():
             except:
                 raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
+        nonlocal _all_jsons_dict
         # Check if we need to load this folder
-        if file.parent not in _found_json:
+        if file.parent not in _all_jsons_dict:
             for json_file in file.parent.rglob("*.json"):
                 try:
                     with json_file.open('r') as f:
                         json_dict = _json.load(f)
                         if "title" in json_dict:
                             # We found a JSON file with a proper title, store the file name
-                            _found_json[file.parent][json_dict["title"]] = json_dict
+                            _all_jsons_dict[file.parent][json_dict["title"]] = json_dict
                 except:
                     print(f"Couldn't open json file {json_file}")
         
         # Check if we have found the JSON file among all the loaded ones in the folder
-        if file.parent in _found_json and file.name in _found_json[file.parent]:
+        if file.parent in _all_jsons_dict and file.name in _all_jsons_dict[file.parent]:
             # Great we found a valid JSON file in this folder corresponding to this file
-            return _found_json[file.parent][file.name]
+            return _all_jsons_dict[file.parent][file.name]
         else:
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
