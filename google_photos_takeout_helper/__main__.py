@@ -90,12 +90,15 @@ def main():
 
     meta_file_memo = dict()
 
+    _all_jsons_dict = _defaultdict(dict)
+
     # Statistics:
     s_removed_duplicates_count = 0
     s_copied_files = 0
     s_cant_insert_exif_files = []  # List of files where inserting exif failed
     s_date_from_folder_files = []  # List of files where date was set from folder name
     s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
+    s_no_json_found = []  # List of files where we couldn't find json
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -277,11 +280,31 @@ def main():
         if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
-                    dict = _json.load(f)
-                return dict
+                    json_dict = _json.load(f)
+                return json_dict
             except:
                 raise FileNotFoundError(f"Couldn't find json for file: {file}")
+
+        nonlocal _all_jsons_dict
+        # Check if we need to load this folder
+        if file.parent not in _all_jsons_dict:
+            for json_file in file.parent.rglob("*.json"):
+                try:
+                    with json_file.open('r') as f:
+                        json_dict = _json.load(f)
+                        if "title" in json_dict:
+                            # We found a JSON file with a proper title, store the file name
+                            _all_jsons_dict[file.parent][json_dict["title"]] = json_dict
+                except:
+                    print(f"Couldn't open json file {json_file}")
+        
+        # Check if we have found the JSON file among all the loaded ones in the folder
+        if file.parent in _all_jsons_dict and file.name in _all_jsons_dict[file.parent]:
+            # Great we found a valid JSON file in this folder corresponding to this file
+            return _all_jsons_dict[file.parent][file.name]
         else:
+            nonlocal s_no_json_found
+            s_no_json_found.append(str(file.resolve()))
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
     # Returns date in 2019:01:01 23:59:59 format
@@ -618,6 +641,8 @@ def main():
     print("Final statistics:")
     print(f"Files copied to target folder: {s_copied_files}")
     print(f"Removed duplicates: {s_removed_duplicates_count}")
+    # TODO: Hide this with --verbose flag
+    print(f"Files for which we couldn't find json: {len(s_no_json_found)}")
     print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
     with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
         f.write("# This file contains list of files where setting right exif date failed\n")
