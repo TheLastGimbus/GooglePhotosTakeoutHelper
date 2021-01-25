@@ -98,6 +98,7 @@ def main():
     s_cant_insert_exif_files = []  # List of files where inserting exif failed
     s_date_from_folder_files = []  # List of files where date was set from folder name
     s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
+    s_no_json_found = []  # List of files where we couldn't find json
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -302,6 +303,8 @@ def main():
             # Great we found a valid JSON file in this folder corresponding to this file
             return _all_jsons_dict[file.parent][file.name]
         else:
+            nonlocal s_no_json_found
+            s_no_json_found.append(str(file.resolve()))
             raise FileNotFoundError(f"Couldn't find json for file: {file}")
 
     # Returns date in 2019:01:01 23:59:59 format
@@ -638,6 +641,8 @@ def main():
     print("Final statistics:")
     print(f"Files copied to target folder: {s_copied_files}")
     print(f"Removed duplicates: {s_removed_duplicates_count}")
+    # TODO: Hide this with --verbose flag
+    print(f"Files for which we couldn't find json: {len(s_no_json_found)}")
     print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
     with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
         f.write("# This file contains list of files where setting right exif date failed\n")
