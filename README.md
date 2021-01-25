@@ -10,69 +10,71 @@ What if you want to just have one folder with all photos, in chronological order
 
 This script does just that - it organizes and cleans up your Takeout for you :+1:
 
-It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other porperties correctly, and put it in one big folder (or folders divided by month)
+It will take all of your photos from those tiny folders, set their `exif` and `last modified`, and other properties correctly, and put it in one big folder (or folders divided by a month)
+
+# BIG DISCLAIMER - GOOGLE RECENTLY CHANGED FOLDER STRUCTURE
+
+- If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use the newest
+  version
+  - `pip install -U google-photos-takeout-helper`
+- If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
+  - `pip install -U google-photos-takeout-helper==1.2.0`
+
+I don't know if new version fully works, so let me know if it doesn't :+1:
 
 ## How to use:
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) (select only Google Photos)
-1. `pip3 install -U google-photos-takeout-helper`
+1. `pip install -U google-photos-takeout-helper`
 2. Extract all contents from your Google Takeout to one folder
-3. Cut out/remove all ["album folders"](#why-do-you-need-to-cut-out-albums) that aren't named "2016-06-16" or something like that
-4. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
+3. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 Alternatively, if you don't have PATH set right, you can call it `python3 -m google_photos_takeout_helper`
 
-<sup>If you previously used this script in form where you 
-download and run it - don't worry! Downloading it with pip is even simpler, 
-and everything will work as previously :)</sup>
-
-If, instead of one big folder, you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
+If, instead of one big folder, you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
 
 ### How to use for dummies (non-programming people):
 <details><summary>Click for detailed instructions</summary>
 <p>
-This script is written in Python. You need to install Python interpretert before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
+This script is written in Python. You need to install Python interpreter before you use it - don't worry, it's easy :wink: Then, everything with Python will be done through terminal/cmd
 
-1. Download and install Python for your system: https://www.python.org/downloads/ (Google step by step installation instructions if you have trouble) - if the installator will ask you about some `PATH` and `pip`, make sure to check that too
+1. Download and install Python for your system: https://www.python.org/downloads/ (Google step-by-step installation
+   instructions if you have trouble) - if the installer will ask you about some `PATH` and `pip`, make sure to check
+   that too
 
-Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You can run it either by typing `pip3 <options>` or `python3 -m pip <options>`:
+Now, you need to install my script with `pip` - a builtin tool that can install other Python programs and scripts. You
+can run it either by typing `pip <options>` or `python3 -m pip <options>`:
 
-2. `pip3 install -U google-photos-takeout-helper`
+2. `pip install -U google-photos-takeout-helper`
 
 // Or `python3 -m pip install -U google-photos-takeout-helper`
 
-If something goes wrong and it prints some red errors, try to add ` --user` flag at the end
+// Watch out for versions, described in "BIG DISCLAIMER" above
+
+If something goes wrong, and it prints some red errors, try to add ` --user` flag at the end
 
 3. Prepare your Takeout:
 
-If your Takeout was dividied into multiple `.zip`s, you will need to extract them, and move their contents into one folder. 
-
-Because I don't have good solution on how to handle albums, you will need to cut off all ["Album folders"](#why-do-you-need-to-cut-out-albums) - those who are not named like "2016-06-26" or "2016-06-26 #2" - don't worry, all photos from albums are in corresponding "date folders" already - they would just make a duplicate.
-
-Now, you should be able to just run it straight in cmd/terminal:
+If your Takeout was divided into multiple `.zip`s, you will need to extract them, and move their contents into one
+folder. Now, you should be able to just run it straight in cmd/terminal:
 
 4. `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
 // Or if this doesn't work: `python3 -m google_photos_takeout_helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
-// Ps note: Jezus fucking Christ people, without the "[ ]" :facepalm:
+// Ps note: Don't use the "[ ]" in the command above.
 
-If you want your photos to be divided by year and month, run it with `--divide-to-dates` flag.
+If you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
 
-
-If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/posts/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
 </p>
 </details>
 
-### Why do you need to cut out albums?
-They mostly contain duplicates of same photos that are in corresponding "date folder". (Note: not ALL photos found in album folders will be duplicated in date folders. You should maintain a separate backup of the original Google Takeout folder/zip to ensure you don't lose any photos. See [Issue #22](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/22) for more details)
-This script tries to get all "photo taken time" stuff right. If it finds json - it sets everything from that json (it contains data of edited timestamp that you might've corrected in Google Photos). If it can't - it tries to get Exif data form photo.
-IF it can't find anything like that, it sets date from folder name.
+### If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+Thanks :sparkling_heart:
 
-All of this is so that you can then safely store ALL of your photos in one folder, and they will all be in right order.
-
-#### Unless you move them around your Android phone. 
-Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reseted to current.
+##### But, be aware if you move your photos on you Android phone...
+Beware, that (99% of the times), if you move some files in Android, their creation and modification time is re-seted to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out:
 
@@ -83,7 +85,7 @@ https://github.com/SimpleMobileTools/Simple-Gallery
 
  - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but it's approach to photos is still not perfect. (And you need to set up your own server)
 
- - Guys at [Photoprims](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
+ - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 
 #### Other Takeout projects
@@ -100,4 +102,4 @@ https://github.com/HardFork/KeepToText
 ### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data
 - [x] Gps data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
-- [ ] Some way to handle albums - Kinda WIP in #10
+- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing: 
