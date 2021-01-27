@@ -51,7 +51,6 @@ def main():
         "--divide-to-dates",
         action='store_true',
         help="Create folders and subfolders based on the date the photos were taken"
-             "If you use the --dont-copy flag, or the --dont-fix flag, this is useless"
     )
     parser.add_argument(
         '--albums',
