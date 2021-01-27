@@ -337,6 +337,8 @@ def main():
                     if "albumData" in dict:
                         meta_file_memo[str(dir)] = file
                         return file
+                    else:
+                        meta_file_memo[str(dir)] = None
             except Exception as e:
                 print(e)
                 print(f"find_album_meta_json_file - Error opening file: {file}")
