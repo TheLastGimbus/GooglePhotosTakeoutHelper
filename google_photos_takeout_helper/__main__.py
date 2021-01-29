@@ -513,7 +513,6 @@ def main():
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
         print(file)
-        raise IOError("cipa 122")
 
         has_nice_date = False
         try:
