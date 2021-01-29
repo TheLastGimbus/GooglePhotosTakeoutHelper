@@ -64,11 +64,12 @@ folder. Now, you should be able to just run it straight in cmd/terminal:
 // Ps note: Don't use the "[ ]" in the command above.
 
 If you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
-
-If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
-
 </p>
 </details>
+
+### Contact/errors
+If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+
 
 ### If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
 Thanks :sparkling_heart:
@@ -102,4 +103,5 @@ https://github.com/HardFork/KeepToText
 ### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data
 - [x] Gps data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
-- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing: 
+- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing:
+- [ ] Windoza standalone `.exe` file - #43
