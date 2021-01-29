@@ -296,7 +296,7 @@ def main():
                             _all_jsons_dict[file.parent][json_dict["title"]] = json_dict
                 except:
                     print(f"Couldn't open json file {json_file}")
-        
+
         # Check if we have found the JSON file among all the loaded ones in the folder
         if file.parent in _all_jsons_dict and file.name in _all_jsons_dict[file.parent]:
             # Great we found a valid JSON file in this folder corresponding to this file
@@ -425,13 +425,6 @@ def main():
 
         return [(deg, 1), (deg_min, 1), (sec, 100)]
 
-    # converts a string input into a float. If it fails, it returns 0.0
-    def string_to_float(num):
-        if type(num) == str:
-            return 0.0
-        else:
-            return float(num)
-
     def set_file_geo_data(file: Path, json):
         """
         Reads the geoData from google and saves it to the EXIF. This works assuming that the geodata looks like -100.12093, 50.213143. Something like that.
@@ -448,18 +441,24 @@ def main():
         except (_piexif.InvalidImageDataError, ValueError):
             exif_dict = {'0th': {}, 'Exif': {}}
 
+        # converts a string input into a float. If it fails, it returns 0.0
+        def _str_to_float(num):
+            if type(num) == str:
+                return 0.0
+            else:
+                return float(num)
 
         # fallbacks to GeoData Exif if it wasn't set in the photos editor.
         # https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/5#discussion_r531792314
-        longitude = string_to_float(json['geoData']['longitude'])
-        latitude = string_to_float(json['geoData']['latitude'])
-        altitude = string_to_float(json['geoData']['altitude'])
+        longitude = _str_to_float(json['geoData']['longitude'])
+        latitude = _str_to_float(json['geoData']['latitude'])
+        altitude = _str_to_float(json['geoData']['altitude'])
 
         # Prioritise geoData set from GPhotos editor. If it's blank, fall back to geoDataExif
         if longitude == 0 and latitude == 0:
-            longitude = string_to_float(json['geoDataExif']['longitude'])
-            latitude = string_to_float(json['geoDataExif']['latitude'])
-            altitude = string_to_float(json['geoDataExif']['altitude'])
+            longitude = _str_to_float(json['geoDataExif']['longitude'])
+            latitude = _str_to_float(json['geoDataExif']['latitude'])
+            altitude = _str_to_float(json['geoDataExif']['altitude'])
 
         # latitude >= 0: North latitude -> "N"
         # latitude < 0: South latitude -> "S"
