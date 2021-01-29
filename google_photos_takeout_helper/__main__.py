@@ -358,7 +358,11 @@ def main():
             raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file: Path):
-        exif_dict = _piexif.load(str(file))
+        try:
+            # Why do you need to be like that, Piexif...
+            exif_dict = _piexif.load(str(file))
+        except Exception as e:
+            raise IOError("Can't read file's exif!")
         tags = [['0th', TAG_DATE_TIME], ['Exif', TAG_DATE_TIME_ORIGINAL], ['Exif', TAG_DATE_TIME_DIGITIZED]]
         datetime_str = ''
         date_set_success = False
@@ -380,7 +384,7 @@ def main():
     def set_file_exif_date(file: Path, creation_date):
         try:
             exif_dict = _piexif.load(str(file))
-        except (_piexif.InvalidImageDataError, ValueError):
+        except:  # Sorry but Piexif is too unpredictable
             exif_dict = {'0th': {}, 'Exif': {}}
 
         creation_date = creation_date.encode('UTF-8')
@@ -434,7 +438,7 @@ def main():
         # prevents crashes
         try:
             exif_dict = _piexif.load(str(file))
-        except (_piexif.InvalidImageDataError, ValueError):
+        except:
             exif_dict = {'0th': {}, 'Exif': {}}
 
         # converts a string input into a float. If it fails, it returns 0.0
@@ -514,7 +518,7 @@ def main():
         try:
             set_creation_date_from_exif(file)
             has_nice_date = True
-        except (_piexif.InvalidImageDataError, ValueError) as e:
+        except (_piexif.InvalidImageDataError, ValueError, IOError) as e:
             print(e)
             print(f'No exif for {file}')
         except IOError:
@@ -672,4 +676,18 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        import traceback as _t
+        _t.print_exc()
+        print(
+            "\n"
+            "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
+            "Most of the times, you should cut out the last printed file to some other folder, and continue\n"
+            "\n"
+            "If this doesn't help, and it keeps doing this after many cut-outs, you can check out issues tab:\n"
+            "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues \n"
+            "to see if anyone has similar issue, or contact me other way:\n"
+            "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/blob/master/README.md#contacterrors \n"
+        )
