@@ -5,6 +5,7 @@ def main():
     import re as _re
     import shutil as _shutil
     import hashlib as _hashlib
+    import functools as _functools
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
@@ -86,8 +87,6 @@ def main():
 
     # holds all the renamed files that clashed from their
     rename_map = dict()
-
-    meta_file_memo = dict()
 
     _all_jsons_dict = _defaultdict(dict)
 
@@ -325,16 +324,13 @@ def main():
 
         return None
 
+    @_functools.lru_cache(maxsize=None)
     def find_album_meta_json_file(dir: Path):
-        if str(dir) in meta_file_memo:
-            return meta_file_memo[str(dir)]
-
         for file in dir.rglob("*.json"):
             try:
                 with open(str(file), 'r') as f:
                     dict = _json.load(f)
                     if "albumData" in dict:
-                        meta_file_memo[str(dir)] = file
                         return file
             except Exception as e:
                 print(e)
