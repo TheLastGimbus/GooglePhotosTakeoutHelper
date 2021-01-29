@@ -425,6 +425,13 @@ def main():
 
         return [(deg, 1), (deg_min, 1), (sec, 100)]
 
+    # converts a string input into a float. If it fails, it returns 0.0
+    def string_to_float(num):
+        try:
+            return float(num)
+        except Exception as e:
+            return 0.0
+
     def set_file_geo_data(file: Path, json):
         """
         Reads the geoData from google and saves it to the EXIF. This works assuming that the geodata looks like -100.12093, 50.213143. Something like that.
@@ -441,21 +448,18 @@ def main():
         except (_piexif.InvalidImageDataError, ValueError):
             exif_dict = {'0th': {}, 'Exif': {}}
 
-        # fetches geo data from the photos editor first.
-        longitude = float(json['geoData']['longitude'])
-        latitude = float(json['geoData']['latitude'])
-        altitude = float(json['geoData']['altitude'])
 
         # fallbacks to GeoData Exif if it wasn't set in the photos editor.
         # https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/5#discussion_r531792314
-        longitude = float(json['geoData']['longitude'])
-        latitude = float(json['geoData']['latitude'])
-        altitude = json['geoData']['altitude']
-        # Prioritise geoData set from GPhotos editor
+        longitude = string_to_float(json['geoData']['longitude'])
+        latitude = string_to_float(json['geoData']['latitude'])
+        altitude = string_to_float(json['geoData']['altitude'])
+
+        # Prioritise geoData set from GPhotos editor. If it's blank, fall back to geoDataExif
         if longitude == 0 and latitude == 0:
-            longitude = float(json['geoDataExif']['longitude'])
-            latitude = float(json['geoDataExif']['latitude'])
-            altitude = json['geoDataExif']['altitude']
+            longitude = string_to_float(json['geoDataExif']['longitude'])
+            latitude = string_to_float(json['geoDataExif']['latitude'])
+            altitude = string_to_float(json['geoDataExif']['altitude'])
 
         # latitude >= 0: North latitude -> "N"
         # latitude < 0: South latitude -> "S"
