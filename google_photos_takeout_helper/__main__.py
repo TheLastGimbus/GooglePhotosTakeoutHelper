@@ -427,10 +427,10 @@ def main():
 
     # converts a string input into a float. If it fails, it returns 0.0
     def string_to_float(num):
-        try:
-            return float(num)
-        except Exception as e:
+        if type(num) == str:
             return 0.0
+        else:
+            return float(num)
 
     def set_file_geo_data(file: Path, json):
         """
