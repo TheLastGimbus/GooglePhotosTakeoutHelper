@@ -513,6 +513,7 @@ def main():
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
         print(file)
+        raise IOError("cipa 122")
 
         has_nice_date = False
         try:
@@ -678,12 +679,12 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception as e:
+    except:
         import traceback as _t
-        _t.print_exc(e)
+        _t.print_exc()
         print(
             "\n"
-            "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha\n"
+            "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
             "Most of the times, you should cut out the last printed file to some other folder, and continue\n"
             "\n"
             "If this doesn't help, and it keeps doing this after many cut-outs, you can check out issues tab:\n"
