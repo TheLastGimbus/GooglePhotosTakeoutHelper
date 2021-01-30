@@ -30,7 +30,7 @@ jobs:
       - name: Install pyinstaller
         run: pip install pyinstaller
       - name: Build dist/
-        run: pyinstaller google_photos_takeout_helper/__main__.py
+        run: pyinstaller --onefile google_photos_takeout_helper\__main__.py
       - name: Show whats going on
         run: |
           ls
