@@ -645,18 +645,28 @@ def main():
     print(f"Removed duplicates: {s_removed_duplicates_count}")
     # TODO: Hide this with --verbose flag
     print(f"Files for which we couldn't find json: {len(s_no_json_found)}")
-    print(f"Files where inserting correct exif failed: {len(s_cant_insert_exif_files)}")
-    with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
-        f.write("# This file contains list of files where setting right exif date failed\n")
-        f.write("# You might find it useful, but you can safely delete this :)\n")
-        f.write("\n".join(s_cant_insert_exif_files))
-        print(f" - you have full list in {f.name}")
+    if len(s_no_json_found) > 0:
+        with open(PHOTOS_DIR / 'no_json_found.txt', 'w') as f:
+            f.write("# This file contains list of files for which there was no corresponding .json file found\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_no_json_found))
+            print(f" - you have full list in {f.name}")
+    print(f"Files where inserting new exif failed: {len(s_cant_insert_exif_files)}")
+    print("(This is not necessary bad thing - pretty much all videos fail, "
+          "and your photos probably have their original exif already")
+    if len(s_cant_insert_exif_files) > 0:
+        with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
+            f.write("# This file contains list of files where setting right exif date failed\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_cant_insert_exif_files))
+            print(f" - you have full list in {f.name}")
     print(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
-    with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w') as f:
-        f.write("# This file contains list of files where date was set from name of the folder\n")
-        f.write("# You might find it useful, but you can safely delete this :)\n")
-        f.write("\n".join(s_date_from_folder_files))
-        print(f"(you have full list in {f.name})")
+    if len(s_date_from_folder_files) > 0:
+        with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w') as f:
+            f.write("# This file contains list of files where date was set from name of the folder\n")
+            f.write("# You might find it useful, but you can safely delete this :)\n")
+            f.write("\n".join(s_date_from_folder_files))
+            print(f" - you have full list in {f.name}")
     if args.skip_extras or args.skip_extras_harder:
         # Remove duplicates: https://www.w3schools.com/python/python_howto_remove_duplicates.asp
         s_skipped_extra_files = list(dict.fromkeys(s_skipped_extra_files))
@@ -666,7 +676,7 @@ def main():
                     "you've used either --skip-extras or --skip-extras-harder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
-            print(f"(you have full list in {f.name})")
+            print(f" - you have full list in {f.name}")
 
     print()
     print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
