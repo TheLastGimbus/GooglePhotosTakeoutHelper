@@ -20,7 +20,12 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
+      - uses: actions/cache@v2
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       # Runs a set of commands using the runners shell
       - name: Install pyinstaller
         run: pip install pyinstaller
@@ -29,5 +34,6 @@ jobs:
       - name: Show whats going on
         run: |
           ls
-          ls *\
+          ls build
+          ls dist
         
