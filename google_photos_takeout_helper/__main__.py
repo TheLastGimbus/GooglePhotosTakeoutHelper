@@ -97,6 +97,7 @@ def main():
     s_date_from_folder_files = []  # List of files where date was set from folder name
     s_skipped_extra_files = []  # List of extra files ("-edited" etc) which were skipped
     s_no_json_found = []  # List of files where we couldn't find json
+    s_no_date_at_all = []  # List of files where there was absolutely no option to set correct date
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -547,10 +548,8 @@ def main():
             s_date_from_folder_files.append(str(file.resolve()))
             return True
         else:
-            print('ERROR! There was literally no option to set date!!!')
-            # TODO
-            print('TODO: We should do something about this - move it to some separate folder, or write it down in '
-                  'another .txt file...')
+            print('WARNING! There was literally no option to set date!!!')
+            s_no_date_at_all.append(str(file.resolve()))
 
         return False
 
@@ -652,9 +651,9 @@ def main():
             f.write("\n".join(s_no_json_found))
             print(f" - you have full list in {f.name}")
     print(f"Files where inserting new exif failed: {len(s_cant_insert_exif_files)}")
-    print("(This is not necessary bad thing - pretty much all videos fail, "
-          "and your photos probably have their original exif already")
     if len(s_cant_insert_exif_files) > 0:
+        print("(This is not necessary bad thing - pretty much all videos fail, "
+              "and your photos probably have their original exif already")
         with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
             f.write("# This file contains list of files where setting right exif date failed\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
@@ -676,6 +675,16 @@ def main():
                     "you've used either --skip-extras or --skip-extras-harder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
+            print(f" - you have full list in {f.name}")
+    if len(s_no_date_at_all) > 0:
+        print()
+        print(f"!!! There were {len(s_no_date_at_all)} files where there was absolutely no way to set "
+              f"a correct date! They will probably appear at the top of the others, as their 'last modified' "
+              f"value is set to moment of downloading your takeout :/")
+        with open(PHOTOS_DIR / 'unsorted.txt', 'w') as f:
+            f.write("# This file contains list of files where there was no way to set correct date!\n")
+            f.write("# You probably want to set their dates manually - but you can delete this if you want\n")
+            f.write("\n".join(s_date_from_folder_files))
             print(f" - you have full list in {f.name}")
 
     print()
