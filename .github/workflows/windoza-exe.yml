@@ -31,13 +31,11 @@ jobs:
           ls dist
           type __main__.spec
       - name: Upload exe to latest release
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: svenstaro/upload-release-action@v2
         with:
-          upload_url: https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases/2.1.0b2
-          asset_path: .\dist\__main__.exe
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\dist\__main__.exe
           asset_name: takeout-helper.exe
-          asset_content_type: application/vnd.microsoft.portable-executable
+          tag: ${{ github.ref }}
+          overwrite: true
         
