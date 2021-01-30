@@ -30,9 +30,9 @@ jobs:
           ls build
           ls dist
           type __main__.spec
-      - name: Get latest tag
+      - name: Actions Ecosystem Action Get Latest Tag
+        uses: actions-ecosystem/action-get-latest-tag@v1.1.0
         id: latesttag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
       - name: Upload exe to latest release
         uses: svenstaro/upload-release-action@v2
         with:
