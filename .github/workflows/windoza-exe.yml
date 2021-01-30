@@ -36,4 +36,5 @@ jobs:
           ls
           ls build
           ls dist
+          type __main__.spec
         
