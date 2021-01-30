@@ -27,5 +27,7 @@ jobs:
       - name: Build dist/
         run: pyinstaller google_photos_takeout_helper/__main__.py
       - name: Show whats going on
-        run: ls -A dist/
+        run: |
+          ls
+          ls *\
         
