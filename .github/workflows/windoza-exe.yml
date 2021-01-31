@@ -35,4 +35,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: .\dist\__main__.exe
           asset_name: takeout-helper.exe
-          tag: ${{ steps.latest-tag.outputs.release }}        
+          tag: ${{ steps.latest-tag.outputs.release }} 
+          overwrite: true
