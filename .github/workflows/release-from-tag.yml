@@ -1,0 +1,28 @@
+name: Create release from semver tag
+
+on:
+  push:
+    tags: 
+      - v+([0-9]).+([0-9]).+([0-9])*
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo ${{ github.ref }}
+      - name: Check if it's pre-release
+        run: |
+          if [[ ${{ github.ref }} =~ ^refs/tags/v+([0-9]).+([0-9]).+([0-9])[a,b,rc]+([0-9]) ]]; then
+              echo ::set-output name=match::true
+          fi
+        id: if-pre-release
+      - name: Print
+        if: steps.if-pre-release.outputs.match == 'true'
+        run: echo dupaaa
