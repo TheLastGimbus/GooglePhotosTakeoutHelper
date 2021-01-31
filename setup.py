@@ -1,5 +1,6 @@
 import pathlib
 import setuptools
+from google_photos_takeout_helper.version import __version__
 
 HERE = pathlib.Path(__file__).parent
 
@@ -7,7 +8,7 @@ README = (HERE/"README.md").read_text()
 
 setuptools.setup(
     name="google-photos-takeout-helper",
-    version="2.1.0",
+    version=__version__,
     description="Script that organizes the Google Photos Takeout archive into one big chronological folder",
     long_description=README,
     long_description_content_type='text/markdown',
