@@ -549,6 +549,7 @@ def main():
             return True
         else:
             print('WARNING! There was literally no option to set date!!!')
+            nonlocal s_no_date_at_all
             s_no_date_at_all.append(str(file.resolve()))
 
         return False
@@ -684,7 +685,7 @@ def main():
         with open(PHOTOS_DIR / 'unsorted.txt', 'w') as f:
             f.write("# This file contains list of files where there was no way to set correct date!\n")
             f.write("# You probably want to set their dates manually - but you can delete this if you want\n")
-            f.write("\n".join(s_date_from_folder_files))
+            f.write("\n".join(s_no_date_at_all))
             print(f" - you have full list in {f.name}")
 
     print()
