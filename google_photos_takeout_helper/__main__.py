@@ -698,6 +698,8 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except SystemExit as e:
+        raise e
     except:
         import traceback as _t
         _t.print_exc()
