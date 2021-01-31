@@ -13,16 +13,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name: Echo github.ref
         run: echo ${{ github.ref }}
       - name: Check if it's pre-release
+        id: if-pre-release
         run: |
           if [[ ${{ github.ref }} =~ ^refs/tags/v+([0-9]).+([0-9]).+([0-9])[a,b,rc]+([0-9]) ]]; then
+              echo It's pre-release!
               echo ::set-output name=match::true
           fi
-        id: if-pre-release
-      - name: Print
-        if: steps.if-pre-release.outputs.match == 'true'
-        run: echo dupaaa
+      
+      # Get info from tag
+      - name: Get tag name
+        id: get-tag-name
+        run: |
+          X=${{ github.ref }}
+          echo ::set-output name=tag::${X##refs/tags/}
+      - name: Get tag message and save it to file
+        run: git show ${{ github.ref }} | tail -n +5 | sed '/commit /Q' > body_file.txt
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ steps.get-tag-name.outputs.tag }}
+          body_path: body_file.txt
+          prerelease: steps.if-pre-release.outputs.match == 'true'
