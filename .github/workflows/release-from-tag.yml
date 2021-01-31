@@ -1,9 +1,9 @@
-name: Create release from semver tag
+name: Create release from tag
 
 on:
   push:
-    tags: 
-      - v+([0-9]).+([0-9]).+([0-9])*
+    tags:
+      - v*
 
 jobs:
   create-release:
@@ -12,11 +12,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Echo github.ref
         run: echo ${{ github.ref }}
-      - name: Check if it's pre-release
+      - name: Check if its pre-release
         id: if-pre-release
         run: |
           if [[ ${{ github.ref }} =~ ^refs/tags/v+([0-9]).+([0-9]).+([0-9])[a,b,rc]+([0-9]) ]]; then
-              echo It's pre-release!
+              echo "It's pre-release!"
               echo ::set-output name=match::true
           fi
       
@@ -29,7 +29,7 @@ jobs:
       - name: Get tag message and save it to file
         run: git show ${{ github.ref }} | tail -n +5 | sed '/commit /Q' > body_file.txt
       
-      - name: Create Release
+      - name: Create release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

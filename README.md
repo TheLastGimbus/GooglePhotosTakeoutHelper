@@ -46,7 +46,7 @@ folder
 
 ```bash
 cd C:\Folder\Where\You\Downloaded\takeout-helper
-takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]`
+takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ```
 // Ps note: Don't use the "[ ]" in the command above.
 
