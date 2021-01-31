@@ -74,7 +74,7 @@ def main():
     TAG_PREVIEW_DATE_TIME = 50971
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
-    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v']
+    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v', '.mts', '.m2ts']
     extra_formats = [
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
@@ -541,7 +541,7 @@ def main():
         if has_nice_date:
             return True
 
-        print('Last chance, coping folder meta as date...')
+        print('Last chance, copying folder meta as date...')
         date = get_date_from_folder_meta(file.parent)
         if date is not None:
             set_file_exif_date(file, date)
