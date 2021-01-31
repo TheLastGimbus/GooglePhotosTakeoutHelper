@@ -22,14 +22,8 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Install pyinstaller
         run: pip install pyinstaller
-      - name: Build dist/
+      - name: Build exe
         run: pyinstaller --onefile google_photos_takeout_helper\__main__.py
-      - name: Show whats going on
-        run: |
-          ls
-          ls build
-          ls dist
-          type __main__.spec
       - name: Get Latest Release
         uses: pozetroninc/github-action-get-latest-release@v0.5.0
         with:
@@ -41,5 +35,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: .\dist\__main__.exe
           asset_name: takeout-helper.exe
-          tag: ${{ steps.latest-tag.outputs.release }}
-        
+          tag: ${{ steps.latest-tag.outputs.release }}        
