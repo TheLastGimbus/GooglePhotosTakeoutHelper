@@ -539,7 +539,7 @@ def main():
         if has_nice_date:
             return True
 
-        print('Last chance, coping folder meta as date...')
+        print('Last chance, copying folder meta as date...')
         date = get_date_from_folder_meta(file.parent)
         if date is not None:
             set_file_exif_date(file, date)
