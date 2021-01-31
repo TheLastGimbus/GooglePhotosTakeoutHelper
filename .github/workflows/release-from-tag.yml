@@ -27,14 +27,15 @@ jobs:
           X=${{ github.ref }}
           echo ::set-output name=tag::${X##refs/tags/}
       - name: Get tag message and save it to file
-        run: git show ${{ github.ref }} | tail -n +5 | sed '/commit /Q' > body_file.txt
+        run: |
+          git show ${{ steps.get-tag-name.outputs.tag }} | tail -n +5 | sed '/commit /Q' > body.md
+          cat body.md
       
       - name: Create release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ steps.get-tag-name.outputs.tag }}
-          body_path: body_file.txt
+          tag: ${{ github.ref }}
+          name: ${{ steps.get-tag-name.outputs.tag }}
+          bodyFile: body.md
           prerelease: steps.if-pre-release.outputs.match == 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
