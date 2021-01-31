@@ -20,6 +20,8 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+      - name: Install requirements.txt
+        run: pip install -r requirements.txt
       - name: Install pyinstaller
         run: pip install pyinstaller
       - name: Build exe
