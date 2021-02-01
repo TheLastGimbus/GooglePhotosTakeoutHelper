@@ -9,6 +9,7 @@ def main():
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
+    from google_photos_takeout_helper.__version__ import __version__
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals
@@ -17,14 +18,15 @@ def main():
         import win32_setctime as _windoza_setctime
 
     parser = _argparse.ArgumentParser(
-        prog='Photos takeout helper',
-        usage='python3 photos_helper.py -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
+        prog='Google Photos Takeout Helper',
+        usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
         description=
         """This script takes all of your photos from Google Photos takeout, 
         fixes their exif DateTime data (when they were taken) and file creation date,
         and then copies it all to one folder.
         """,
     )
+    parser.add_argument('--version', action='version', version=f"%(prog)s {__version__}")
     parser.add_argument(
         '-i', '--input-folder',
         type=str,
@@ -72,7 +74,7 @@ def main():
     TAG_PREVIEW_DATE_TIME = 50971
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
-    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v', '.mts', '.m2ts']
+    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v', '.mts', '.m2ts']
     extra_formats = [
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
@@ -698,6 +700,8 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except SystemExit as e:
+        raise e
     except:
         import traceback as _t
         _t.print_exc()
