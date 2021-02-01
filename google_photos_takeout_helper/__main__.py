@@ -74,7 +74,7 @@ def main():
     TAG_PREVIEW_DATE_TIME = 50971
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
-    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.m4v', '.mts', '.m2ts']
+    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v', '.mts', '.m2ts']
     extra_formats = [
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
