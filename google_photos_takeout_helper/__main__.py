@@ -277,12 +277,12 @@ def main():
 
     # Returns json dict
     def find_json_for_file(file: Path):
-        paranthesis_regexp = r'\([0-9]+\)'
-        paranthesis = _re.findall(paranthesis_regexp, file.name)
-        if len(paranthesis) == 1:
+        parenthesis_regexp = r'\([0-9]+\)'
+        parenthesis = _re.findall(parenthesis_regexp, file.name)
+        if len(parenthesis) == 1:
             # Fix for files that have as image/video IMG_1234(1).JPG with a json IMG_1234.JPG(1).json
-            stripped_filename = _re.sub(paranthesis_regexp, '', file.name)
-            potential_json = file.with_name(stripped_filename + paranthesis[0] + '.json')
+            stripped_filename = _re.sub(parenthesis_regexp, '', file.name)
+            potential_json = file.with_name(stripped_filename + parenthesis[0] + '.json')
         else:
             potential_json = file.with_name(file.name + '.json')
 
