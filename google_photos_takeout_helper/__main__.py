@@ -277,7 +277,15 @@ def main():
 
     # Returns json dict
     def find_json_for_file(file: Path):
-        potential_json = file.with_name(file.name + '.json')
+        paranthesis_regexp = r'\([0-9]+\)'
+        paranthesis = _re.findall(paranthesis_regexp, file.name)
+        if len(paranthesis) == 1:
+            # Fix for files that have as image/video IMG_1234(1).JPG with a json IMG_1234.JPG(1).json
+            stripped_filename = _re.sub(paranthesis_regexp, '', file.name)
+            potential_json = file.with_name(stripped_filename + paranthesis[0] + '.json')
+        else:
+            potential_json = file.with_name(file.name + '.json')
+
         if potential_json.is_file():
             try:
                 with open(potential_json, 'r') as f:
