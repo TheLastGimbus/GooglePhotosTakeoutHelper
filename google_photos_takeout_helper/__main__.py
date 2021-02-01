@@ -9,7 +9,7 @@ def main():
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
-    from version import __version__
+    from google_photos_takeout_helper.__version__ import __version__
 
     import piexif as _piexif
     from fractions import Fraction  # piexif requires some values to be stored as rationals

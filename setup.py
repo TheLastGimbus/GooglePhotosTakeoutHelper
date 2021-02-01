@@ -1,6 +1,6 @@
 import pathlib
 import setuptools
-from google_photos_takeout_helper.version import __version__
+from google_photos_takeout_helper.__version__ import __version__
 
 HERE = pathlib.Path(__file__).parent
 
