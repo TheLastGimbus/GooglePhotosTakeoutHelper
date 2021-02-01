@@ -19,6 +19,7 @@ def main():
 
     from tqdm import tqdm
     
+    
     parser = _argparse.ArgumentParser(
         prog='Google Photos Takeout Helper',
         usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
