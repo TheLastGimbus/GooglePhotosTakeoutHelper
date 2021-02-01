@@ -155,6 +155,16 @@ def main():
             yield chunk
 
     def get_hash(file: Path, first_chunk_only=False, hash_algo=_hashlib.sha1):
+        """Returns a hash of the provided Path_Obj.
+        Can return full hash or only first 1024 bytes of file.
+
+        Args:
+            file (Path_Obj): File to be hashed.
+            first_chunk_only (bool, optional): Hash total file?. Defaults to False.
+            hash_algo (Hash Function, optional): Hash routine to use. Defaults to _hashlib.sha1.
+
+        Returns: Hash Value
+        """        
         hashobj = hash_algo()
         with open(file, "rb") as f:
             if first_chunk_only:
@@ -239,7 +249,7 @@ def main():
                 files_by_small_hash[(file_size, small_hash)].append(file)
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
-        # file - if more than one file is inserted on a hash here they are certinly duplicates
+        # file - if more than one file is inserted on a hash here they are certainly duplicates
         for files in files_by_small_hash.values():
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
@@ -310,6 +320,14 @@ def main():
 
     # Returns date in 2019:01:01 23:59:59 format
     def get_date_from_folder_meta(dir: Path):
+        """Extract and return a date string.
+
+        Args:
+            path_obj (Path): Expected to be a directory.
+
+        Returns:
+            String: Returns date string in 2019:01:01 23:59:59 format
+        """        
         file = find_album_meta_json_file(dir)
         if not file:
             print("Couldn't pull datetime from album meta")
@@ -515,6 +533,15 @@ def main():
 
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
+        """Attempt to fix ALL file metadata.
+        Given nothing more than just file and dir and figure it out.
+
+        Args:
+            file_obj (Path): Expected to be a file of a type that can hold metadata.
+
+        Returns:
+            bool: Success or Failure
+        """        
         print(file)
 
         has_nice_date = False
@@ -560,6 +587,16 @@ def main():
 
     # Makes a new name like 'photo(1).jpg'
     def new_name_if_exists(file: Path):
+        """Make a new filename that avoids name collisions.
+        example: filename(xx).ext where xx is incremented until
+        unused filename is created.
+
+        Args:
+            file (Path): proposed unique filename.
+
+        Returns:
+            Path_obj: Guaranteed unique filename.
+        """        
         new_name = file
         i = 1
         while True:
@@ -571,6 +608,15 @@ def main():
                 i += 1
 
     def copy_to_target(file: Path):
+        """Copy offered file to new location
+         while ensuring not to overwrite any existing file.
+
+        Args:
+            file (Path): Filename to copy to new location.
+
+        Returns:
+            bool: Always returns True at this point.
+        """        
         if is_photo(file) or is_video(file):
             new_file = new_name_if_exists(FIXED_DIR / file.name)
             _shutil.copy2(file, new_file)
@@ -579,6 +625,15 @@ def main():
         return True
 
     def copy_to_target_and_divide(file: Path):
+        """Generate a destination for the offered file based on its' timestamp.
+            Destination is in the form root/year/month/filename.ext
+
+        Args:
+            file (Path): File to copy as a Path_obj
+
+        Returns:
+            bool: Always returns True at this point.
+        """       
         creation_date = file.stat().st_mtime
         date = _datetime.fromtimestamp(creation_date)
 
