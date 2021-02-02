@@ -17,7 +17,7 @@ def main():
     if _os.name == 'nt':
         import win32_setctime as _windoza_setctime
 
-    from tqdm import _tqdm
+    from tqdm import tqdm
 
     parser = _argparse.ArgumentParser(
         prog='Google Photos Takeout Helper',
@@ -111,7 +111,7 @@ def main():
       folder_function=lambda fo: True,
       filter_fun=lambda file: True
     ):
-        for file in dir.rglob("*"):
+        for file in tqdm(dir.rglob("*")):
             if file.is_dir():
                 folder_function(file)
                 continue
@@ -218,7 +218,7 @@ def main():
         files_by_size = _defaultdict(list)
         files_by_small_hash = _defaultdict(list)
 
-        for file in _tqdm(path.rglob("*")):
+        for file in tqdm(path.rglob("*")):
             if file.is_file() and filter_fun(file):
                 try:
                     file_size = file.stat().st_size
@@ -228,7 +228,7 @@ def main():
                 files_by_size[file_size].append(file)
 
         # For all files with the same file size, get their hash on the first 1024 bytes
-        for file_size, files in _tqdm(files_by_size.items()):
+        for file_size, files in tqdm(files_by_size.items()):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
@@ -242,7 +242,7 @@ def main():
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certainly duplicates
-        for files in _tqdm(files_by_small_hash.values()):
+        for files in tqdm(files_by_small_hash.values()):
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
                 continue
