@@ -1,3 +1,13 @@
+from loguru import logger
+import sys
+
+logger.remove() # removes the default console logger provided by Loguru.
+# I find it to be too noisy with details more appropriate for file logging.
+logger.add(sys.stdout, format="{message}", level="INFO") # INFO and messages of higher priority only shown on the console.
+# This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
+logger.add("file_{time}.log", level="TRACE", encoding="utf8") # Unicode instructions needed to avoid file write errors.
+
+@logger.catch # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
 def main():
     import argparse as _argparse
     import json as _json
@@ -63,7 +73,7 @@ def main():
     )
     args = parser.parse_args()
 
-    print('Heeeere we go!')
+    logger.info('Heeeere we go!')
 
     PHOTOS_DIR = Path(args.input_folder)
     FIXED_DIR = Path(args.output_folder)
@@ -117,8 +127,8 @@ def main():
                 if filter_fun(file):
                     file_function(file)
             else:
-                print('Found something weird...')
-                print(file)
+                logger.debug('Found something weird...')
+                logger.debug(file)
 
     def is_photo(file: Path):
         if file.suffix.lower() not in photo_formats:
@@ -183,12 +193,12 @@ def main():
                 try:
                     full_hash = get_hash(file, first_chunk_only=False)
                 except Exception as e:
-                    print(e)
-                    print(f"populate_album_map - couldn't get hash of {file}")
+                    logger.debug(e)
+                    logger.debug(f"populate_album_map - couldn't get hash of {file}")
                 if full_hash is not None and full_hash in files_by_full_hash:
                     full_hash_files = files_by_full_hash[full_hash]
                     if len(full_hash_files) != 1:
-                        print("full_hash_files list should only be one after duplication removal, bad state")
+                        logger.debug("full_hash_files list should only be one after duplication removal, bad state")
                         exit(-5)
                         return False
                     file_name = full_hash_files[0].name
@@ -297,7 +307,7 @@ def main():
                             # We found a JSON file with a proper title, store the file name
                             _all_jsons_dict[file.parent][json_dict["title"]] = json_dict
                 except:
-                    print(f"Couldn't open json file {json_file}")
+                    logger.debug(f"Couldn't open json file {json_file}")
 
         # Check if we have found the JSON file among all the loaded ones in the folder
         if file.parent in _all_jsons_dict and file.name in _all_jsons_dict[file.parent]:
@@ -312,7 +322,7 @@ def main():
     def get_date_from_folder_meta(dir: Path):
         file = find_album_meta_json_file(dir)
         if not file:
-            print("Couldn't pull datetime from album meta")
+            logger.debug("Couldn't pull datetime from album meta")
             return None
         try:
             with open(str(file), 'r') as fi:
@@ -321,7 +331,7 @@ def main():
                 time = int(album_dict["albumData"]["date"]["timestamp"])
                 return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
         except KeyError:
-            print("get_date_from_folder_meta - json doesn't have required stuff "
+            logger.debug("get_date_from_folder_meta - json doesn't have required stuff "
                   "- that probably means that either google fucked us again, or find_album_meta_json_file"
                   "is seriously broken")
 
@@ -336,8 +346,8 @@ def main():
                     if "albumData" in dict:
                         return file
             except Exception as e:
-                print(e)
-                print(f"find_album_meta_json_file - Error opening file: {file}")
+                logger.debug(e)
+                logger.debug(f"find_album_meta_json_file - Error opening file: {file}")
 
         return None
 
@@ -356,8 +366,8 @@ def main():
             if _os.name == 'nt':
                 _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
-            print('Error setting creation date from string:')
-            print(e)
+            logger.debug('Error setting creation date from string:')
+            logger.debug(e)
             raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file: Path):
@@ -378,9 +388,9 @@ def main():
             except KeyError:
                 pass  # No such tag - continue searching :/
             except ValueError:
-                print("Wrong date format in exif!")
-                print(datetime_str)
-                print("does not match '%Y:%m:%d %H:%M:%S'")
+                logger.debug("Wrong date format in exif!")
+                logger.debug(datetime_str)
+                logger.debug("does not match '%Y:%m:%d %H:%M:%S'")
         if not date_set_success:
             raise IOError('No correct DateTime in given exif')
 
@@ -398,8 +408,8 @@ def main():
         try:
             _piexif.insert(_piexif.dump(exif_dict), str(file))
         except Exception as e:
-            print("Couldn't insert exif!")
-            print(e)
+            logger.debug("Couldn't insert exif!")
+            logger.debug(e)
             nonlocal s_cant_insert_exif_files
             s_cant_insert_exif_files.append(str(file.resolve()))
 
@@ -507,25 +517,25 @@ def main():
         try:
             _piexif.insert(_piexif.dump(exif_dict), str(file))
         except Exception as e:
-            print("Couldn't insert geo exif!")
+            logger.debug("Couldn't insert geo exif!")
             # local variable 'new_value' referenced before assignment means that one of the GPS values is incorrect
-            print(e)
+            logger.debug(e)
 
     # ============ END OF GPS STUFF ============
 
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
-        print(file)
+        # logger.info(file)
 
         has_nice_date = False
         try:
             set_creation_date_from_exif(file)
             has_nice_date = True
         except (_piexif.InvalidImageDataError, ValueError, IOError) as e:
-            print(e)
-            print(f'No exif for {file}')
+            logger.debug(e)
+            logger.debug(f'No exif for {file}')
         except IOError:
-            print('No creation date found in exif!')
+            logger.debug('No creation date found in exif!')
 
         try:
             google_json = find_json_for_file(file)
@@ -535,13 +545,14 @@ def main():
             set_creation_date_from_str(file, date)
             has_nice_date = True
             return
-        except FileNotFoundError:
-            print("Couldn't find json for file ")
+        except FileNotFoundError as e:
+            logger.debug("Couldn't find json for file ")
+            logger.debug(e)
 
         if has_nice_date:
             return True
 
-        print('Last chance, copying folder meta as date...')
+        logger.debug(f'Last option, copying folder meta as date for {file}')
         date = get_date_from_folder_meta(file.parent)
         if date is not None:
             set_file_exif_date(file, date)
@@ -550,7 +561,7 @@ def main():
             s_date_from_folder_files.append(str(file.resolve()))
             return True
         else:
-            print('WARNING! There was literally no option to set date!!!')
+            logger.info(f'WARNING! There was literally no option to set date on {file}')
             nonlocal s_no_date_at_all
             s_no_date_at_all.append(str(file.resolve()))
 
@@ -591,110 +602,110 @@ def main():
         s_copied_files += 1
         return True
 
-    print('=====================')
-    print('Fixing files metadata and creation dates...')
-    print('=====================')
+    logger.info('=====================')
+    logger.info('Fixing files metadata and creation dates...')
+    logger.info('=====================')
     for_all_files_recursive(
         dir=PHOTOS_DIR,
         file_function=fix_metadata,
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
     if args.divide_to_dates:
-        print('=====================')
-        print('Creating subfolders and dividing files based on date...')
-        print('=====================')
+        logger.info('=====================')
+        logger.info('Creating subfolders and dividing files based on date...')
+        logger.info('=====================')
         for_all_files_recursive(
             dir=PHOTOS_DIR,
             file_function=copy_to_target_and_divide,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
     else:
-        print('=====================')
-        print('Coping all files to one folder...')
-        print('(If you want, you can get them organized in folders based on year and month.'
+        logger.info('=====================')
+        logger.info('Coping all files to one folder...')
+        logger.info('(If you want, you can get them organized in folders based on year and month.'
               ' Run with --divide-to-dates to do this)')
-        print('=====================')
+        logger.info('=====================')
         for_all_files_recursive(
             dir=PHOTOS_DIR,
             file_function=copy_to_target,
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
-    print('=====================')
-    print('Removing duplicates...')
-    print('=====================')
+    logger.info('=====================')
+    logger.info('Removing duplicates...')
+    logger.info('=====================')
     remove_duplicates(
         dir=FIXED_DIR
     )
     if args.albums is not None:
         if args.albums.lower() == 'json':
-            print('=====================')
-            print('Populate json file with albums...')
-            print('=====================')
+            logger.info('=====================')
+            logger.info('Populate json file with albums...')
+            logger.info('=====================')
             for_all_files_recursive(
                 dir=PHOTOS_DIR,
                 folder_function=populate_album_map
             )
             file = PHOTOS_DIR / 'albums.json'
-            with open(file, 'w') as outfile:
+            with open(file, 'w', encoding="utf-8") as outfile:
                 _json.dump(album_mmap, outfile)
-            print(str(file))
+            logger.info(str(file))
 
-    print()
-    print('DONE! FREEEEEDOOOOM!!!')
-    print()
-    print("Final statistics:")
-    print(f"Files copied to target folder: {s_copied_files}")
-    print(f"Removed duplicates: {s_removed_duplicates_count}")
+    logger.info('')
+    logger.info('DONE! FREEEEEDOOOOM!!!')
+    logger.info('')
+    logger.info("Final statistics:")
+    logger.info(f"Files copied to target folder: {s_copied_files}")
+    logger.info(f"Removed duplicates: {s_removed_duplicates_count}")
     # TODO: Hide this with --verbose flag
-    print(f"Files for which we couldn't find json: {len(s_no_json_found)}")
+    logger.info(f"Files for which we couldn't find json: {len(s_no_json_found)}")
     if len(s_no_json_found) > 0:
-        with open(PHOTOS_DIR / 'no_json_found.txt', 'w') as f:
+        with open(PHOTOS_DIR / 'no_json_found.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files for which there was no corresponding .json file found\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_no_json_found))
-            print(f" - you have full list in {f.name}")
-    print(f"Files where inserting new exif failed: {len(s_cant_insert_exif_files)}")
+            logger.info(f" - you have full list in {f.name}")
+    logger.info(f"Files where inserting new exif failed: {len(s_cant_insert_exif_files)}")
     if len(s_cant_insert_exif_files) > 0:
-        print("(This is not necessary bad thing - pretty much all videos fail, "
+        logger.info("(This is not necessary bad thing - pretty much all videos fail, "
               "and your photos probably have their original exif already")
-        with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w') as f:
+        with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files where setting right exif date failed\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_cant_insert_exif_files))
-            print(f" - you have full list in {f.name}")
-    print(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
+            logger.info(f" - you have full list in {f.name}")
+    logger.info(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
     if len(s_date_from_folder_files) > 0:
         with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w') as f:
             f.write("# This file contains list of files where date was set from name of the folder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_date_from_folder_files))
-            print(f" - you have full list in {f.name}")
+            logger.info(f" - you have full list in {f.name}")
     if args.skip_extras or args.skip_extras_harder:
         # Remove duplicates: https://www.w3schools.com/python/python_howto_remove_duplicates.asp
         s_skipped_extra_files = list(dict.fromkeys(s_skipped_extra_files))
-        print(f"Extra files that were skipped: {len(s_skipped_extra_files)}")
-        with open(PHOTOS_DIR / 'skipped_extra_files.txt', 'w') as f:
+        logger.info(f"Extra files that were skipped: {len(s_skipped_extra_files)}")
+        with open(PHOTOS_DIR / 'skipped_extra_files.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of extra files (ending with '-edited' etc) which were skipped because "
                     "you've used either --skip-extras or --skip-extras-harder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_skipped_extra_files))
-            print(f" - you have full list in {f.name}")
+            logger.info(f" - you have full list in {f.name}")
     if len(s_no_date_at_all) > 0:
-        print()
-        print(f"!!! There were {len(s_no_date_at_all)} files where there was absolutely no way to set "
+        logger.info('')
+        logger.info(f"!!! There were {len(s_no_date_at_all)} files where there was absolutely no way to set "
               f"a correct date! They will probably appear at the top of the others, as their 'last modified' "
               f"value is set to moment of downloading your takeout :/")
-        with open(PHOTOS_DIR / 'unsorted.txt', 'w') as f:
+        with open(PHOTOS_DIR / 'unsorted.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files where there was no way to set correct date!\n")
             f.write("# You probably want to set their dates manually - but you can delete this if you want\n")
             f.write("\n".join(s_no_date_at_all))
-            print(f" - you have full list in {f.name}")
+            logger.info(f" - you have full list in {f.name}")
 
-    print()
-    print('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
-    print()
-    print('If I helped you, you can consider donating me: https://www.paypal.me/TheLastGimbus')
-    print('Have a nice day!')
+    logger.info('')
+    logger.info('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
+    logger.info('')
+    logger.info('If I helped you, you can consider donating me: https://www.paypal.me/TheLastGimbus')
+    logger.info('Have a nice day!')
 
 
 if __name__ == '__main__':
@@ -705,7 +716,7 @@ if __name__ == '__main__':
     except:
         import traceback as _t
         _t.print_exc()
-        print(
+        logger.info(
             "\n"
             "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
             "Most of the times, you should cut out the last printed file to some other folder, and continue\n"
