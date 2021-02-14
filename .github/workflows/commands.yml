@@ -35,10 +35,10 @@ jobs:
           done
           END=`date +%s`
           RUNTIME=$((END-START)) 
-          echo "::set-output name=seconds::$RUNTIME"
-          echo "::set-output name=seconds-per-one::$(bc -l <<< "scale=4; $FULL_TIME/30")"
+          echo ::set-output name=seconds::$RUNTIME
+          echo ::set-output name=seconds-per-one::$(bc -l <<< "scale=4; $FULL_TIME/30")
           FILE_COUNT=$(find $FOLDER/Takeout/ -type f | wc -l)
-          echo "::set-output name=ms-per-file::$(bc -l <<< "scale=4; $FULL_TIME/30/$FILE_COUNT *1000)"
+          echo ::set-output name=ms-per-file::$(bc -l <<< "scale=4; $FULL_TIME/30/$FILE_COUNT *1000")
       - name: Prepare message
         id: prepare-message
         run: |
