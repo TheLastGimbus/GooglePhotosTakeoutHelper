@@ -282,7 +282,7 @@ def main():
 
     # Returns json dict
     def find_json_for_file(file: Path):
-        _sleep(0.5)
+        _sleep(1)
         potential_json = file.with_name(file.name + '.json')
         if potential_json.is_file():
             try:
