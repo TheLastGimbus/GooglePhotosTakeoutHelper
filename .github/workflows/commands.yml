@@ -34,7 +34,9 @@ jobs:
             python3 google_photos_takeout_helper/__main__.py -i $FOLDER/Takeout/ -o $FOLDER/output$i/ > log$i.txt
           done
           END=`date +%s`
-          RUNTIME=$((END-START)) 
+          RUNTIME=$((END-START))
+          echo "1st run output:"
+          cat log1.txt
           echo ::set-output name=seconds::$RUNTIME
           echo ::set-output name=seconds-per-one::$(bc -l <<< "scale=4; $RUNTIME/30")
           FILE_COUNT=$(find $FOLDER/Takeout/ -type f | wc -l)
