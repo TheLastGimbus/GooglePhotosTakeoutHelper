@@ -33,11 +33,7 @@ jobs:
         id: prepare-message
         run: |
           FULL_TIME=${{ steps.run-30-times.outputs.seconds }}
-          ONE_TIME=$(bc -l <<< "scale=3; $FULL_TIME/30")
-          echo "## :timer_clock:" > comment.md
-          echo "30 times $FULL_TIME seconds" >> comment.md
-          echo "1 time:  $ONE_TIME seconds" >> comment.md
-          echo "::set-output name=message::$(cat comment.md)"
+          echo "::set-output name=message::30 times $FULL_TIME, 1 time $(bc -l <<< "scale=3; $FULL_TIME/30") seconds"
       - name: Comment the time on PR
         uses: actions/github-script@0.3.0
         with:
