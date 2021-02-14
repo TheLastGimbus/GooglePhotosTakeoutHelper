@@ -115,6 +115,8 @@ def main():
       filter_fun=lambda file: True
     ):
         for file in dir.rglob("*"):
+            print('dupa')
+            _sleep(0.5)
             if file.is_dir():
                 folder_function(file)
                 continue
