@@ -1,0 +1,23 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Commands triggered by typing PR comment
+
+# Controls when the action will run. 
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  time:
+    name: Time how fast the script executes the test folder
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+          echo ${{ github.event.issue.comment }}
+          
