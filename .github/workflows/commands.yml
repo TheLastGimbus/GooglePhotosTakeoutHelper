@@ -19,5 +19,7 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
-          echo ${{ github.event.issue.comment }}
+          echo ${{ github.event.comment }}
+          echo 000000
+          echo ${{ github.event.comment.body }}
           
