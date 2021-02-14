@@ -10,16 +10,35 @@ on:
 jobs:
   time:
     name: Time how fast the script executes the test folder
-    if: ${{ github.event.issue.pull_request }}
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == "!time" }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          echo ${{ github.event.comment }}
-          echo 000000
+      - run: |
+          echo Comment message:
           echo ${{ github.event.comment.body }}
-          
+      - name: Run the script 30 times
+        id: run-30-times
+        run: |
+          START=`date +%s`
+          for i in {1..30} ; do
+            # TODO: Change this to actually run
+            python3 google_photos_takeout_helper/__main__.py --version
+          done
+          END=`date +%s`
+          RUNTIME=$((END-START)) 
+          echo "::set-output name=seconds::$RUNTIME"
+      - name: Prepare message
+        run: |
+          FULL_TIME=${{ steps.run-30-times.outputs.seconds }}
+          ONE_TIME=$(bc -l <<< "scale=3; $FULL_TIME/30")
+          echo "## :timer_clock:" > comment.md
+          echo "30 times $FULL_TIME seconds" >> comment.md
+          echo "1 time:  $ONE_TIME seconds" >> comment.md
+      - name: Comment the time on PR
+        uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: comment.md
