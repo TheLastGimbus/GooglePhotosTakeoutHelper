@@ -10,7 +10,7 @@ on:
 jobs:
   time:
     name: Time how fast the script executes the test folder
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == "!time" }}
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '!time' }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
