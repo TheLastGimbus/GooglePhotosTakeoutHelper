@@ -27,6 +27,7 @@ jobs:
       - name: Run the script 30 times
         id: run-30-times
         run: |
+          pip3 install -r requirements.txt
           FOLDER=scripts/gdrive/GooglePhotosTakeoutHelper-Assets/
           START=`date +%s`
           for i in {1..30} ; do
