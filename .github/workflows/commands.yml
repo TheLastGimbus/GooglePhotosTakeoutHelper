@@ -30,15 +30,22 @@ jobs:
           RUNTIME=$((END-START)) 
           echo "::set-output name=seconds::$RUNTIME"
       - name: Prepare message
+        id: prepare-message
         run: |
           FULL_TIME=${{ steps.run-30-times.outputs.seconds }}
           ONE_TIME=$(bc -l <<< "scale=3; $FULL_TIME/30")
           echo "## :timer_clock:" > comment.md
           echo "30 times $FULL_TIME seconds" >> comment.md
           echo "1 time:  $ONE_TIME seconds" >> comment.md
+          echo "::set-output name=message::$(cat comment.md)"
       - name: Comment the time on PR
-        uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@0.3.0
         with:
-          filename: comment.md
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              repo: context.repo.repo,
+              body: ${{ steps.prepare-message.outputs.message }}
+            })
