@@ -39,14 +39,14 @@ jobs:
           echo ::set-output name=seconds-per-one::$(bc -l <<< "scale=4; $RUNTIME/30")
           FILE_COUNT=$(find $FOLDER/Takeout/ -type f | wc -l)
           echo $FILE_COUNT
-          echo ::set-output name=ms-per-file::$(bc -l <<< "scale=4; $RUNTIME/30/$FILE_COUNT *1000")
+          echo ::set-output name=ms-per-file::$(bc -l <<< "scale=3; $RUNTIME/30/$FILE_COUNT *1000")
       - name: Prepare message
         id: prepare-message
         run: |
           FULL=${{ steps.run-30-times.outputs.seconds }}
           ONE=${{ steps.run-30-times.outputs.seconds-per-one }}
           FILE=${{ steps.run-30-times.outputs.ms-per-file }}
-          echo "::set-output name=message::30 times $FULL_TIME seconds, 1 time $ONE seconds, **$FILE ms per file**"
+          echo "::set-output name=message::30 times $FULL seconds, 1 time $ONE seconds, **$FILE ms per file**"
       - name: Comment the time on PR
         uses: actions/github-script@0.3.0
         with:
