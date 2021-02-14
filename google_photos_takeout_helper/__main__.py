@@ -105,6 +105,7 @@ def main():
     s_no_date_at_all = []  # List of files where there was absolutely no option to set correct date
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
+    print("real trash commit")
 
     def for_all_files_recursive(
       dir: Path,
