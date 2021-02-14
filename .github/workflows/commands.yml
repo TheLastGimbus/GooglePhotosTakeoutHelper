@@ -27,10 +27,10 @@ jobs:
       - name: Run the script 30 times
         id: run-30-times
         run: |
-          cd scripts/gdrive/GooglePhotosTakeoutHelper-Assets/
+          FOLDER=scripts/gdrive/GooglePhotosTakeoutHelper-Assets/
           START=`date +%s`
           for i in {1..30} ; do
-            python3 google_photos_takeout_helper/__main__.py -i Takeout/ -o output$i/ > log$i.txt
+            python3 google_photos_takeout_helper/__main__.py -i $FOLDER/Takeout/ -o $FOLDER/output$i/ > log$i.txt
           done
           END=`date +%s`
           RUNTIME=$((END-START)) 
