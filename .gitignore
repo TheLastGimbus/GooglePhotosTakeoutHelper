@@ -8,3 +8,5 @@ build/
 dist/
 *.egg-info
 .eggs/
+ALL_PHOTOS/
+*.log
