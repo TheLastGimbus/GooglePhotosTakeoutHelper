@@ -8,7 +8,6 @@ logger.add(lambda msg: _tqdm.write(msg, end=""), format="{message}", level="INFO
 # This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
 logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instructions needed to avoid file write errors.
 
-
 @logger.catch(
     message=
     "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
@@ -21,7 +20,7 @@ logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instruc
     "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/blob/master/README.md#contacterrors \n"
 
 )  # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
-def main():
+def main(cli_args):
     import argparse as _argparse
     import json as _json
     import os as _os
@@ -88,7 +87,7 @@ def main():
         help="EXPERIMENTAL, MAY NOT WORK FOR EVERYONE: What kind of 'albums solution' you would like:\n"
              "'json' - written in a json file\n"
     )
-    args = parser.parse_args()
+    args = parser.parse_args(cli_args)
 
     logger.info('Heeeere we go!')
 
@@ -753,4 +752,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

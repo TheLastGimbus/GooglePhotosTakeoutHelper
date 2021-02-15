@@ -1,0 +1,36 @@
+{
+  "title": "791e169dbac35bd185ea56d252246132.jpg",
+  "description": "",
+  "imageViews": "0",
+  "creationTime": {
+    "timestamp": "1562933300",
+    "formatted": "12.07.2019, 12:08:20 UTC"
+  },
+  "modificationTime": {
+    "timestamp": "1608088206",
+    "formatted": "16.12.2020, 03:10:06 UTC"
+  },
+  "photoTakenTime": {
+    "timestamp": "1459862992",
+    "formatted": "05.04.2016, 13:29:52 UTC"
+  },
+  "geoData": {
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "altitude": 0.0,
+    "latitudeSpan": 0.0,
+    "longitudeSpan": 0.0
+  },
+  "geoDataExif": {
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "altitude": 0.0,
+    "latitudeSpan": 0.0,
+    "longitudeSpan": 0.0
+  },
+  "googlePhotosOrigin": {
+    "mobileUpload": {
+      "deviceType": "IOS_PHONE"
+    }
+  }
+}
