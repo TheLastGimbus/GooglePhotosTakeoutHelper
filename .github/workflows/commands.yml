@@ -18,11 +18,7 @@ jobs:
       - run: hub pr checkout ${{ github.event.issue.number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: |
-          git branch
-          git log --oneline -n 5
-          echo Comment message:
-          echo ${{ github.event.comment.body }}
+      - run: echo ${{ github.event.comment.body }}
       - name: Download and unzip assets
         run: |
           cd scripts/gdrive/
@@ -45,7 +41,8 @@ jobs:
           echo ::set-output name=seconds::$RUNTIME
           echo ::set-output name=seconds-per-one::$(bc -l <<< "scale=4; $RUNTIME/30")
           FILE_COUNT=$(find $FOLDER/Takeout/ -type f | wc -l)
-          echo $FILE_COUNT
+          echo File count: $FILE_COUNT
+          echo ::set-output name=file-count::$FILE_COUNT
           echo ::set-output name=ms-per-file::$(bc -l <<< "scale=3; $RUNTIME/30/$FILE_COUNT *1000")
       - name: Prepare message
         id: prepare-message
@@ -53,7 +50,8 @@ jobs:
           FULL=${{ steps.run-30-times.outputs.seconds }}
           ONE=${{ steps.run-30-times.outputs.seconds-per-one }}
           FILE=${{ steps.run-30-times.outputs.ms-per-file }}
-          echo "::set-output name=message::30 times $FULL seconds, 1 time $ONE seconds, **$FILE ms per file**"
+          COUNT=${{ steps.run-30-times.outputs.file-count }}
+          echo "::set-output name=message::30 times $FULL seconds, 1 time $ONE seconds, $COUNT files - **$FILE ms per file**"
       - name: Comment the time on PR
         uses: actions/github-script@0.3.0
         with:
