@@ -33,6 +33,7 @@ def main():
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
+    from tqdm import tqdm as _tqdm
     try:
         from google_photos_takeout_helper.__version__ import __version__
     except ModuleNotFoundError:
@@ -267,7 +268,7 @@ def main():
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certinly duplicates
-        for files in files_by_small_hash.values():
+        for files in _tqdm(files_by_small_hash.values()):
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
                 continue
@@ -282,13 +283,12 @@ def main():
                 files_by_full_hash[full_hash].append(file)
 
     # Removes all duplicates in folder
-    def remove_duplicates(dir: Path):
-        find_duplicates(dir, lambda f: (is_photo(f) or is_video(f)))
+    # ONLY RUN AFTER RUNNING find_duplicates()
+    def remove_duplicates():
         nonlocal s_removed_duplicates_count
-
         # Now we have populated the final multimap of absolute dups, We now can attempt to find the original file
         # and remove all the other duplicates
-        for files in files_by_full_hash.values():
+        for files in _tqdm(files_by_full_hash.values()):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
@@ -628,40 +628,57 @@ def main():
         s_copied_files += 1
         return True
 
+    # xD python lambdas are shit - this is only because we can't do 2 commands, so we do them in arguments
+    def _walk_with_tqdm(res, bar: _tqdm):
+        bar.update()
+        return res
+
+    # Count *all* photo and video files - this is hacky, and we should use .rglob altogether instead of is_photo
+    _input_files_count = 0
+    for ext in photo_formats + video_formats:
+        _input_files_count += len(list(PHOTOS_DIR.rglob(f'**/*{ext}')))
+    logger.info(f'Input files: {_input_files_count}')
+
     logger.info('=====================')
     logger.info('Fixing files metadata and creation dates...')
-    logger.info('=====================')
+    # tqdm progress bar stuff
+    _metadata_bar = _tqdm(total=_input_files_count)
+
     for_all_files_recursive(
         dir=PHOTOS_DIR,
-        file_function=fix_metadata,
+        file_function=lambda f: _walk_with_tqdm(fix_metadata(f), _metadata_bar),
+        # TODO (probably never, but should): Change this maybe to path.rglob
         filter_fun=lambda f: (is_photo(f) or is_video(f))
     )
+    _metadata_bar.close()
+    logger.info('=====================')
+
+    logger.info('=====================')
+    _copy_bar = _tqdm(total=_input_files_count)
     if args.divide_to_dates:
-        logger.info('=====================')
         logger.info('Creating subfolders and dividing files based on date...')
-        logger.info('=====================')
         for_all_files_recursive(
             dir=PHOTOS_DIR,
-            file_function=copy_to_target_and_divide,
+            file_function=lambda f: _walk_with_tqdm(copy_to_target_and_divide(f), _copy_bar),
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
     else:
-        logger.info('=====================')
         logger.info('Coping all files to one folder...')
         logger.info('(If you want, you can get them organized in folders based on year and month.'
                     ' Run with --divide-to-dates to do this)')
-        logger.info('=====================')
         for_all_files_recursive(
             dir=PHOTOS_DIR,
-            file_function=copy_to_target,
+            file_function=lambda f: _walk_with_tqdm(copy_to_target(f), _copy_bar),
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
+    _copy_bar.close()
     logger.info('=====================')
+    logger.info('=====================')
+    logger.info('Finding duplicates...')
+    find_duplicates(FIXED_DIR, lambda f: (is_photo(f) or is_video(f)))
     logger.info('Removing duplicates...')
+    remove_duplicates()
     logger.info('=====================')
-    remove_duplicates(
-        dir=FIXED_DIR
-    )
     if args.albums is not None:
         if args.albums.lower() == 'json':
             logger.info('=====================')
