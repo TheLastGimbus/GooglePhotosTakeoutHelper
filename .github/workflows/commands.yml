@@ -14,11 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
       - run: |
           hub pr checkout ${{ github.event.issue.number }}
-#       - uses: actions/checkout@v2
-#         with:
-#           ref: 'refs/pull/${{ github.event.issue.number }}/merge'
       - run: |
           git branch
           git log --oneline -n 5
