@@ -7,7 +7,19 @@ logger.add(sys.stdout, format="{message}", level="INFO") # INFO and messages of 
 # This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
 logger.add("file_{time}.log", level="TRACE", encoding="utf8") # Unicode instructions needed to avoid file write errors.
 
-@logger.catch # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
+
+@logger.catch(
+    message=
+    "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
+    "Most of the times, you should cut out the last printed file (it should be down there somehwere) "
+    "to some other folder, and continue\n"
+    "\n"
+    "If this doesn't help, and it keeps doing this after many cut-outs, you can check out issues tab:\n"
+    "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues \n"
+    "to see if anyone has similar issue, or contact me other way:\n"
+    "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/blob/master/README.md#contacterrors \n"
+
+)  # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
 def main():
     import argparse as _argparse
     import json as _json
@@ -127,8 +139,7 @@ def main():
                 if filter_fun(file):
                     file_function(file)
             else:
-                logger.debug('Found something weird...')
-                logger.debug(file)
+                logger.debug(f'Found something weird... {file}')
 
     def is_photo(file: Path):
         if file.suffix.lower() not in photo_formats:
@@ -198,7 +209,7 @@ def main():
                 if full_hash is not None and full_hash in files_by_full_hash:
                     full_hash_files = files_by_full_hash[full_hash]
                     if len(full_hash_files) != 1:
-                        logger.debug("full_hash_files list should only be one after duplication removal, bad state")
+                        logger.error("full_hash_files list should only be one after duplication removal, bad state")
                         exit(-5)
                         return False
                     file_name = full_hash_files[0].name
@@ -331,7 +342,7 @@ def main():
                 time = int(album_dict["albumData"]["date"]["timestamp"])
                 return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
         except KeyError:
-            logger.debug("get_date_from_folder_meta - json doesn't have required stuff "
+            logger.error("get_date_from_folder_meta - json doesn't have required stuff "
                   "- that probably means that either google fucked us again, or find_album_meta_json_file"
                   "is seriously broken")
 
@@ -546,7 +557,6 @@ def main():
             has_nice_date = True
             return
         except FileNotFoundError as e:
-            logger.debug("Couldn't find json for file ")
             logger.debug(e)
 
         if has_nice_date:
@@ -561,7 +571,7 @@ def main():
             s_date_from_folder_files.append(str(file.resolve()))
             return True
         else:
-            logger.info(f'WARNING! There was literally no option to set date on {file}')
+            logger.warning(f'There was literally no option to set date on {file}')
             nonlocal s_no_date_at_all
             s_no_date_at_all.append(str(file.resolve()))
 
@@ -709,20 +719,4 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except SystemExit as e:
-        raise e
-    except:
-        import traceback as _t
-        _t.print_exc()
-        logger.info(
-            "\n"
-            "WHHoopssiee! Looks like script crashed! This shouldn't happen, although it often does haha :P\n"
-            "Most of the times, you should cut out the last printed file to some other folder, and continue\n"
-            "\n"
-            "If this doesn't help, and it keeps doing this after many cut-outs, you can check out issues tab:\n"
-            "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues \n"
-            "to see if anyone has similar issue, or contact me other way:\n"
-            "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/blob/master/README.md#contacterrors \n"
-        )
+    main()
