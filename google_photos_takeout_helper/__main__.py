@@ -1,11 +1,13 @@
-from loguru import logger
 import sys
 
-logger.remove() # removes the default console logger provided by Loguru.
+from loguru import logger
+
+logger.remove()  # removes the default console logger provided by Loguru.
 # I find it to be too noisy with details more appropriate for file logging.
-logger.add(sys.stdout, format="{message}", level="INFO") # INFO and messages of higher priority only shown on the console.
+# INFO and messages of higher priority only shown on the console.
+logger.add(sys.stdout, format="{message}", level="INFO")
 # This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
-logger.add("file_{time}.log", level="TRACE", encoding="utf8") # Unicode instructions needed to avoid file write errors.
+logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instructions needed to avoid file write errors.
 
 
 @logger.catch(
@@ -96,7 +98,8 @@ def main():
     TAG_PREVIEW_DATE_TIME = 50971
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
-    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v', '.mts', '.m2ts']
+    video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v',
+                     '.mts', '.m2ts']
     extra_formats = [
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
@@ -342,9 +345,11 @@ def main():
                 time = int(album_dict["albumData"]["date"]["timestamp"])
                 return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
         except KeyError:
-            logger.error("get_date_from_folder_meta - json doesn't have required stuff "
-                  "- that probably means that either google fucked us again, or find_album_meta_json_file"
-                  "is seriously broken")
+            logger.error(
+                "get_date_from_folder_meta - json doesn't have required stuff "
+                "- that probably means that either google fucked us again, or find_album_meta_json_file"
+                "is seriously broken"
+            )
 
         return None
 
@@ -633,7 +638,7 @@ def main():
         logger.info('=====================')
         logger.info('Coping all files to one folder...')
         logger.info('(If you want, you can get them organized in folders based on year and month.'
-              ' Run with --divide-to-dates to do this)')
+                    ' Run with --divide-to-dates to do this)')
         logger.info('=====================')
         for_all_files_recursive(
             dir=PHOTOS_DIR,
@@ -666,7 +671,6 @@ def main():
     logger.info("Final statistics:")
     logger.info(f"Files copied to target folder: {s_copied_files}")
     logger.info(f"Removed duplicates: {s_removed_duplicates_count}")
-    # TODO: Hide this with --verbose flag
     logger.info(f"Files for which we couldn't find json: {len(s_no_json_found)}")
     if len(s_no_json_found) > 0:
         with open(PHOTOS_DIR / 'no_json_found.txt', 'w', encoding="utf-8") as f:
@@ -677,7 +681,7 @@ def main():
     logger.info(f"Files where inserting new exif failed: {len(s_cant_insert_exif_files)}")
     if len(s_cant_insert_exif_files) > 0:
         logger.info("(This is not necessary bad thing - pretty much all videos fail, "
-              "and your photos probably have their original exif already")
+                    "and your photos probably have their original exif already")
         with open(PHOTOS_DIR / 'failed_inserting_exif.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files where setting right exif date failed\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
@@ -703,8 +707,8 @@ def main():
     if len(s_no_date_at_all) > 0:
         logger.info('')
         logger.info(f"!!! There were {len(s_no_date_at_all)} files where there was absolutely no way to set "
-              f"a correct date! They will probably appear at the top of the others, as their 'last modified' "
-              f"value is set to moment of downloading your takeout :/")
+                    f"a correct date! They will probably appear at the top of the others, as their 'last modified' "
+                    f"value is set to moment of downloading your takeout :/")
         with open(PHOTOS_DIR / 'unsorted.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files where there was no way to set correct date!\n")
             f.write("# You probably want to set their dates manually - but you can delete this if you want\n")
