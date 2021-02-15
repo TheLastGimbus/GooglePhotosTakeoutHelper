@@ -18,6 +18,8 @@ jobs:
         with:
           ref: 'refs/pull/${{ github.event.issue.number }}/merge'
       - run: |
+          git branch
+          git log --oneline -n 5
           echo Comment message:
           echo ${{ github.event.comment.body }}
       - name: Download and unzip assets
