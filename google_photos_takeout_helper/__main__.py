@@ -1,11 +1,10 @@
-import sys
-
+from tqdm import tqdm as _tqdm
 from loguru import logger
 
 logger.remove()  # removes the default console logger provided by Loguru.
 # I find it to be too noisy with details more appropriate for file logging.
 # INFO and messages of higher priority only shown on the console.
-logger.add(sys.stdout, format="{message}", level="INFO")
+logger.add(lambda msg: _tqdm.write(msg, end=""), format="{message}", level="INFO")
 # This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
 logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instructions needed to avoid file write errors.
 
@@ -33,7 +32,7 @@ def main():
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
     from pathlib import Path as Path
-    from tqdm import tqdm as _tqdm
+
     try:
         from google_photos_takeout_helper.__version__ import __version__
     except ModuleNotFoundError:
@@ -254,7 +253,8 @@ def main():
                 files_by_size[file_size].append(file)
 
         # For all files with the same file size, get their hash on the first 1024 bytes
-        for file_size, files in files_by_size.items():
+        logger.info('Step 1...')
+        for file_size, files in _tqdm(files_by_size.items()):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
@@ -268,6 +268,7 @@ def main():
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certinly duplicates
+        logger.info('Step 2...')
         for files in _tqdm(files_by_small_hash.values()):
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
@@ -663,7 +664,7 @@ def main():
             filter_fun=lambda f: (is_photo(f) or is_video(f))
         )
     else:
-        logger.info('Coping all files to one folder...')
+        logger.info('Copying all files to one folder...')
         logger.info('(If you want, you can get them organized in folders based on year and month.'
                     ' Run with --divide-to-dates to do this)')
         for_all_files_recursive(
