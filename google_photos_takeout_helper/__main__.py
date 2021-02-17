@@ -744,9 +744,9 @@ def main():
             logger.info(f" - you have full list in {f.name}")
 
     logger.info('')
-    logger.info('Sooo... what now? You can see README.md for what nice G Photos alternatives I found and recommend')
+    logger.info('Sooo... what now? You can see README.md for what nice G Photos alternatives I have found and would recommend')
     logger.info('')
-    logger.info('If I helped you, you can consider donating me: https://www.paypal.me/TheLastGimbus')
+    logger.info('If I helped you, you can consider donating: https://www.paypal.me/TheLastGimbus')
     logger.info('Have a nice day!')
 
 
