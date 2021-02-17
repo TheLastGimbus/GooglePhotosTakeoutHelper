@@ -254,7 +254,7 @@ def main():
 
         # For all files with the same file size, get their hash on the first 1024 bytes
         logger.info('Calculating small hashes...')
-        for file_size, files in _tqdm(files_by_size.items()):
+        for file_size, files in _tqdm(files_by_size.items(), unit='files-by-size'):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
@@ -269,7 +269,7 @@ def main():
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certinly duplicates
         logger.info('Calculating full hashes...')
-        for files in _tqdm(files_by_small_hash.values()):
+        for files in _tqdm(files_by_small_hash.values(), unit='files-by-small-hash'):
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
                 continue
@@ -289,7 +289,7 @@ def main():
         nonlocal s_removed_duplicates_count
         # Now we have populated the final multimap of absolute dups, We now can attempt to find the original file
         # and remove all the other duplicates
-        for files in _tqdm(files_by_full_hash.values()):
+        for files in _tqdm(files_by_full_hash.values(), unit='duplicates'):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
 
@@ -637,14 +637,14 @@ def main():
     # Count *all* photo and video files - this is hacky, and we should use .rglob altogether instead of is_photo
     logger.info("Counting how many input files we have ahead...")
     _input_files_count = 0
-    for ext in _tqdm(photo_formats + video_formats):
+    for ext in _tqdm(photo_formats + video_formats, unit='formats'):
         _input_files_count += len(list(PHOTOS_DIR.rglob(f'**/*{ext}')))
     logger.info(f'Input files: {_input_files_count}')
 
     logger.info('=====================')
     logger.info('Fixing files metadata and creation dates...')
     # tqdm progress bar stuff
-    _metadata_bar = _tqdm(total=_input_files_count)
+    _metadata_bar = _tqdm(total=_input_files_count, unit='files')
 
     for_all_files_recursive(
         dir=PHOTOS_DIR,
@@ -656,7 +656,7 @@ def main():
     logger.info('=====================')
 
     logger.info('=====================')
-    _copy_bar = _tqdm(total=_input_files_count)
+    _copy_bar = _tqdm(total=_input_files_count, unit='files')
     if args.divide_to_dates:
         logger.info('Creating subfolders and dividing files based on date...')
         for_all_files_recursive(
