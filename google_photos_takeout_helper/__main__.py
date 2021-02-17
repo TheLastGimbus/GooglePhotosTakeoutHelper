@@ -253,7 +253,7 @@ def main():
                 files_by_size[file_size].append(file)
 
         # For all files with the same file size, get their hash on the first 1024 bytes
-        logger.info('Step 1...')
+        logger.info('Calculating small hashes...')
         for file_size, files in _tqdm(files_by_size.items()):
             if len(files) < 2:
                 continue  # this file size is unique, no need to spend cpu cycles on it
@@ -268,7 +268,7 @@ def main():
 
         # For all files with the hash on the first 1024 bytes, get their hash on the full
         # file - if more than one file is inserted on a hash here they are certinly duplicates
-        logger.info('Step 2...')
+        logger.info('Calculating full hashes...')
         for files in _tqdm(files_by_small_hash.values()):
             if len(files) < 2:
                 # the hash of the first 1k bytes is unique -> skip this file
