@@ -635,8 +635,9 @@ def main():
         return res
 
     # Count *all* photo and video files - this is hacky, and we should use .rglob altogether instead of is_photo
+    logger.info("Counting how many input files we have ahead...")
     _input_files_count = 0
-    for ext in photo_formats + video_formats:
+    for ext in _tqdm(photo_formats + video_formats):
         _input_files_count += len(list(PHOTOS_DIR.rglob(f'**/*{ext}')))
     logger.info(f'Input files: {_input_files_count}')
 
