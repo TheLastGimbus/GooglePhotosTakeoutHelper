@@ -22,7 +22,7 @@ jobs:
       - name: Download and unzip assets
         run: |
           cd scripts/gdrive/
-          ./gdl.bash https://drive.google.com/drive/folders/1UEgWofLWzaNGACavUlvy3-h3Qx1oledE?usp=sharing
+          ./gdl https://drive.google.com/drive/folders/1UEgWofLWzaNGACavUlvy3-h3Qx1oledE?usp=sharing
           cd GooglePhotosTakeoutHelper-Assets/
           unzip sample-takeout.zip
       - name: Run the script 30 times
