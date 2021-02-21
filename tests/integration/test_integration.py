@@ -7,7 +7,6 @@ from loguru import logger
 
 from google_photos_takeout_helper import __main__ as helper
 
-# Run with `python3 -m unittest discover -s tests/integration`
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         integration_tests_dir = Path(__file__).resolve().parent
