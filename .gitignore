@@ -10,4 +10,4 @@ dist/
 .eggs/
 ALL_PHOTOS/
 *.log
-tests/integration/fixtures/output
+tests/integration/workbench
