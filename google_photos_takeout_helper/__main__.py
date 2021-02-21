@@ -96,7 +96,6 @@ def main(cli_args):
 
     TAG_DATE_TIME_ORIGINAL = _piexif.ExifIFD.DateTimeOriginal
     TAG_DATE_TIME_DIGITIZED = _piexif.ExifIFD.DateTimeDigitized
-    TAG_PREVIEW_DATE_TIME = 50971
     TAG_DATE_TIME = _piexif.ImageIFD.DateTime
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
