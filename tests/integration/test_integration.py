@@ -26,12 +26,22 @@ class TestIntegration(unittest.TestCase):
         test_name = self.id().split('.')[-1]    # `id()` returns something like `test_integration.TestIntegration.test_set1`
         data_dir = fixtures_dir / test_name
         shutil.copytree(data_dir / 'input', self.input_dir)
-        shutil.copytree(data_dir / 'reference', self.reference_dir)
+        reference_source_dir = data_dir / 'reference'
+        if reference_source_dir.exists():
+            shutil.copytree(data_dir / 'reference', self.reference_dir)
 
     def test_set1(self):
         helper.main(['-i', str(self.input_dir), '-o', str(self.output_dir)])
         for file in self.output_dir.rglob('*'):
             reference = self.reference_dir / file.name
+            self.assertFileMatches(file, reference)
+
+    def test_current_reference_collection(self):
+        helper.main(['-i', str(self.input_dir), '-o', str(self.output_dir), '--divide-to-dates'])
+        for file in self.output_dir.rglob('*'):
+            if not file.is_file():
+                continue
+            reference = self.reference_dir / file.relative_to(self.output_dir)
             self.assertFileMatches(file, reference)
 
     def assertFileMatches(self, file, reference):
