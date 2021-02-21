@@ -28,6 +28,12 @@ class TestIntegration(unittest.TestCase):
         shutil.copytree(data_dir / 'input', self.input_dir)
         shutil.copytree(data_dir / 'reference', self.reference_dir)
 
+    def test_set1(self):
+        helper.main(['-i', str(self.input_dir), '-o', str(self.output_dir)])
+        for file in self.output_dir.rglob('*'):
+            reference = self.reference_dir / file.name
+            self.assertFileMatches(file, reference)
+
     def assertFileMatches(self, file, reference):
         self.assertFileDates(file, reference)
         self.assertExifData(file, reference)
