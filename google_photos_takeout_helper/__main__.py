@@ -30,7 +30,7 @@ def main(cli_args):
     import functools as _functools
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
-    from pathlib import Path as Path
+    from pathlib import Path
 
     try:
         from google_photos_takeout_helper.__version__ import __version__
