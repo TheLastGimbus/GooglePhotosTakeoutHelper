@@ -719,7 +719,7 @@ def main():
             logger.info(f" - you have full list in {f.name}")
     logger.info(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
     if len(s_date_from_folder_files) > 0:
-        with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w') as f:
+        with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w',encoding="utf-8") as f:
             f.write("# This file contains list of files where date was set from name of the folder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_date_from_folder_files))
