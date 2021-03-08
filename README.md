@@ -57,6 +57,9 @@ If you have issues/questions, you can hit me up either by [Reddit](https://www.r
 I spent a lot of time fixing bugs and making standalone .exe file for Windows users :sparkling_heart: - would be
 super thankful for any donations
 
+You can also send me some Bitcoin: `3GezcSsZ6TWw1ug9Q8rK44y9goWa3vTmbk`, DOGE: `DTKFGSzPCDxZPQQtCTyUHbpRYy6n8fSpco`, or Monero: `43HorPVy1PTGVph3Qh3b6vVSfW2p3fH4ChjtiLVdLZw4Kw1vZUgCCcZSmfGCeEFq6bdeuF7zMutAcAcuuYFf8vEr6htBWTk`
+
+
 ##### But, be aware if you move your photos on you Android phone...
 Beware, that (99% of the times), if you move some files in Android, their creation and modification time is re-seted to current.
 
