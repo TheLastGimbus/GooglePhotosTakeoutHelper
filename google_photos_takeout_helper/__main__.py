@@ -131,6 +131,8 @@ def main():
 
     FIXED_DIR.mkdir(parents=True, exist_ok=True)
 
+    assert "dupa12" == "430"
+    exit(-2137)
     def for_all_files_recursive(
       dir: Path,
       file_function=lambda fi: True,
