@@ -17,7 +17,7 @@ jobs:
     - name: Download test repo
       run: ./scripts/init-for-tests
     - name: Run GPTH on test repo
-      run: ./run-gpth-on-test-data
+      run: ./scripts/run-gpth-on-test-data
     - name: Save output to artifacts
       uses: actions/upload-artifact@v2
       with:
