@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# We go to GPTH/scripts
-cd "$(dirname "$0")"
-# Now to the test folder
-cd ../../__takeout_helper_test_data__
-pwd
+# We go to GPTH/scripts/../../(parent folder is here)/test_data
+cd "$(dirname "$0")"../../__takeout_helper_test_data__
+echo "Working in parent folder $(pwd)"
 
 # Remove all outputs and restore input files to original state
 rm -r output/
 git reset --hard
 
-# And now you are fresh and clean, like you were just after ./init-for-tests
+echo "Test data folder is fresh and clean!"
