@@ -1,3 +1,5 @@
+this is a very interesting and reliable way of testing the thing, also pog frog
+
 import sys as _sys
 
 from loguru import logger
