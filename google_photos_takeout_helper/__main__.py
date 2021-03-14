@@ -1,3 +1,5 @@
+import sys as _sys
+
 from loguru import logger
 from tqdm import tqdm as _tqdm
 
@@ -20,7 +22,7 @@ logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instruc
     "to see if anyone has similar issue, or contact me other way:\n"
     "https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/blob/master/README.md#contacterrors \n",
     # Still tell the system that something bad happened
-    onerror=lambda e: exit(-1)
+    onerror=lambda e: _sys.exit(1)
 
 )  # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
 def main():
