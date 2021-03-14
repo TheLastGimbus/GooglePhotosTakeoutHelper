@@ -36,10 +36,9 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: gpth-test-output
-        path: art
-    - run: ls -R ..
+    - run: ls -R
     # actions/download-artifact downloads it into another GPTH folder, ignore it :facepalm:
-    - run: mv GooglePhotosTakeoutHelper/art ../__takeout_helper_test_data__/output
+    - run: mv art ../__takeout_helper_test_data__/output
     - run: ls -R ..
     - run: pip install pytest
     - name: Run pytest on test_file_modified.py
