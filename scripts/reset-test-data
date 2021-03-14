@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# We go to GPTH/scripts
+cd "$(dirname "$0")"
+# Now to the test folder
+cd ../../__takeout_helper_test_data__
+pwd
+
+# Remove all outputs and restore input files to original state
+rm -r output/
+git reset --hard
+
+# And now you are fresh and clean, like you were just after ./init-for-tests

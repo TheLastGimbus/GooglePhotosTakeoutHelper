@@ -4,6 +4,7 @@
 cd "$(dirname "$0")"
 # Now to the parent folder of GPTH
 cd ../..
+pwd
 
 # Download test repo at certain tag
 # Change this tag in future when test repo changes
