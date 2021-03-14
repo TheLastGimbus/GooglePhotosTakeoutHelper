@@ -8,7 +8,7 @@ on:
     
 jobs:
   run-tests:
-    name: Run GPTH on test repo
+    name: Run script on test repo and check output with pytest
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
