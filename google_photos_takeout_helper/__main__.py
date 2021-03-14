@@ -394,8 +394,8 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
-            print('hey so does this work or not')
-            _os.utime(file, (timestamp, timestamp))
+            print('break')
+            # _os.utime(file, (timestamp, timestamp))
             if _os.name == 'nt':
                 _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
