@@ -1,14 +1,11 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package
+name: Main tests
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
+    
 jobs:
   run-gpth:
     name: Run GPTH on test repo
@@ -27,6 +24,7 @@ jobs:
         name: gpth-test-output
         path: ../__takeout_helper_test_data__/output/
   test-file-modified:
+    needs: [run-gpth]
     name: 'Test "last modified" file properties'
     runs-on: ubuntu-latest
     steps:
