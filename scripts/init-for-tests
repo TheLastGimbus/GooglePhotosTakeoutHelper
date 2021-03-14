@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# We go to GPTH/scripts
+cd "$(dirname "$0")"
+# Now to the parent folder of GPTH
+cd ../..
+
+# Download test repo at certain tag
+# Change this tag in future when test repo changes
+git clone --depth 1 --branch v0.0.1 git@github.com:TheLastGimbus/__takeout_helper_test_data__.git
+
+# Now, run GPTH on it:
+python3 GooglePhotosTakeoutHelper/google_photos_takeout_helper/__main__.py \
+  -i "__takeout_helper_test_data__/Google Photos" \
+  -o "__takeout_helper_test_data__/output"
+
+# Tada! You have output data to test in __takeout_helper_test_data__/output,
+# and assert jsons in __takeout_helper_test_data__/asserts/
+#
+# Now, if you cd into GPTH, you can just run pytest and it will tell you te truth
