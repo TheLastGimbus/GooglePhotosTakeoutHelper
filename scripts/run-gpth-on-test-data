@@ -1,7 +1,8 @@
 #!/bin/bash
 # I know, this script is kinda boilerplate but it will look nicer in CI
 # Go to parent folder
-cd "$(dirname "$0")"../..
+cd "$(dirname "$0")"
+cd ../..
 echo "Working in parent folder $(pwd)"
 
 # Now, run GPTH on it:

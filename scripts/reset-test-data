@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # We go to GPTH/scripts/../../(parent folder is here)/test_data
-cd "$(dirname "$0")"../../__takeout_helper_test_data__
+cd "$(dirname "$0")"
+cd ../../__takeout_helper_test_data__
 echo "Working in parent folder $(pwd)"
 
 # Remove all outputs and restore input files to original state

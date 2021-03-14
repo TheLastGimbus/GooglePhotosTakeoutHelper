@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # We go to GPTH/scripts/../../(parent folder)
-cd "$(dirname "$0")"../..
+cd "$(dirname "$0")"
+cd ../..
 echo "Working in parent folder $(pwd)"
 
 # Download test repo at certain tag
