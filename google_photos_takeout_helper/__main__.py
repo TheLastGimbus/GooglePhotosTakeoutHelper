@@ -394,8 +394,7 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
-            # dupdfadsfdsafdsfasfsd
-            #_os.utime(file, (timestamp, timestamp))
+            _os.utime(file, (timestamp, timestamp))
             if _os.name == 'nt':
                 _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
