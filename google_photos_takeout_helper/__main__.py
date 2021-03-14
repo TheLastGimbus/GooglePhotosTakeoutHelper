@@ -48,6 +48,7 @@ def main():
     if _os.name == 'nt':
         import win32_setctime as _windoza_setctime
 
+    assert "2432" == "dupaa cipaa"
     parser = _argparse.ArgumentParser(
         prog='Google Photos Takeout Helper',
         usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
