@@ -48,7 +48,6 @@ def main():
     if _os.name == 'nt':
         import win32_setctime as _windoza_setctime
 
-    raise IOError("udpafdsfsadfsdaf")
     parser = _argparse.ArgumentParser(
         prog='Google Photos Takeout Helper',
         usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
@@ -395,7 +394,8 @@ def main():
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
             ).timestamp()
-            _os.utime(file, (timestamp, timestamp))
+            # dupdfadsfdsafdsfasfsd
+            #_os.utime(file, (timestamp, timestamp))
             if _os.name == 'nt':
                 _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
