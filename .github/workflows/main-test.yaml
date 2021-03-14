@@ -1,4 +1,4 @@
-name: Main tests
+name: pytest
 
 on:
   push:
@@ -7,41 +7,21 @@ on:
     branches: [ master ]
     
 jobs:
-  run-gpth:
+  run-tests:
     name: Run GPTH on test repo
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run: pip install -r requirements.txt
+      run: |
+        pip install -r requirements.txt
+        pip install pytest
     - name: Download test repo
       run: ./scripts/init-for-tests
     - name: Run GPTH on test repo
       run: |
         python google_photos_takeout_helper/__main__.py \
           -i "../__takeout_helper_test_data__/Google Photos" \
-          -o "art"
-    - name: Save output to artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: gpth-test-output
-        path: art
-  test-file-modified:
-    needs: [run-gpth]
-    name: 'Test "last modified" file properties'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Download test repo
-      run: ./scripts/init-for-tests
-    - name: Download output from artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: gpth-test-output
-        path: art/
-    - run: |
-        mv art ../__takeout_helper_test_data__/output
-        ls -R ..
-    - run: pip install pytest
-    - name: Run pytest on test_file_modified.py
-      run: pytest tests/test_file_modified.py
+          -o "../__takeout_helper_test_data__/output"
+    - name: Run pytest
+      run: pytest
