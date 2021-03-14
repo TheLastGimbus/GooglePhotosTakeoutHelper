@@ -9,4 +9,5 @@ dist/
 *.egg-info
 .eggs/
 ALL_PHOTOS/
+output/
 *.log

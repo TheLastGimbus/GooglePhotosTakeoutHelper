@@ -1,0 +1,15 @@
+#!/bin/bash
+# I know, this script is kinda boilerplate but it will look nicer in CI
+# Go to parent folder
+cd "$(dirname "$0")"
+cd ../..
+echo "Working in parent folder $(pwd)"
+
+# Now, run GPTH on it:
+echo "Running GPTH on test data repo"
+python3 GooglePhotosTakeoutHelper/google_photos_takeout_helper/__main__.py \
+  -i "__takeout_helper_test_data__/Google Photos" \
+  -o "__takeout_helper_test_data__/output"
+
+echo "=========================="
+echo "Now you can go to GPTH folder and run pytest :)"
