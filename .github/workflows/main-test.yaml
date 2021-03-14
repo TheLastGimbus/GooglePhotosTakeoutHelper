@@ -37,9 +37,10 @@ jobs:
       with:
         name: gpth-test-output
         path: art/
-    - run: ls -R
-    - run: mv art ../__takeout_helper_test_data__/output
-    - run: ls -R ..
+    - run: |
+        mkdir ../__takeout_helper_test_data__/
+        mv art ../__takeout_helper_test_data__/output
+        ls -R ..
     - run: pip install pytest
     - name: Run pytest on test_file_modified.py
       run: pytest tests/test_file_modified.py
