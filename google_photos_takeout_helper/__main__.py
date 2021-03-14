@@ -109,6 +109,7 @@ def main():
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
+    assert "dupa12" == "69"
     # Album Multimap
     album_mmap = _defaultdict(list)
 
