@@ -23,12 +23,12 @@ jobs:
       # The ">" replaces newlines with spaces
       run: >
         git clone --depth 1 --branch v0.0.1
-          https://github.com/TheLastGimbus/__takeout_helper_test_data__.git
-          ../__takeout_helper_test_data__
+        https://github.com/TheLastGimbus/__takeout_helper_test_data__.git
+        ../__takeout_helper_test_data__
     - name: Run GPTH on test repo
       run: >
         python google_photos_takeout_helper/__main__.py
-          -i "../__takeout_helper_test_data__/Google Photos"
-          -o "../__takeout_helper_test_data__/output"
+        -i "../__takeout_helper_test_data__/Google Photos"
+        -o "../__takeout_helper_test_data__/output"
     - name: Run pytest
       run: python -m pytest
