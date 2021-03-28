@@ -30,4 +30,4 @@ jobs:
           -i "../__takeout_helper_test_data__/Google Photos" \
           -o "../__takeout_helper_test_data__/output"
     - name: Run pytest
-      run: pytest
+      run: python -m pytest
