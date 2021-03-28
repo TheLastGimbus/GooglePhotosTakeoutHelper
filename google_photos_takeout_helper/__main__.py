@@ -6,7 +6,7 @@ from tqdm import tqdm as _tqdm
 logger.remove()  # removes the default console logger provided by Loguru.
 # I find it to be too noisy with details more appropriate for file logging.
 # INFO and messages of higher priority only shown on the console.
-logger.add(lambda msg: _tqdm.write(msg, end=""), format="{message}", level="INFO")
+logger.add(lambda msg: _tqdm.write(msg, end=""), format="{message}", level="INFO", encoding="utf8")
 # This creates a logging sink and handler that puts all messages at or above the TRACE level into a logfile for each run.
 logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instructions needed to avoid file write errors.
 
