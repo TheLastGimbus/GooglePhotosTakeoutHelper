@@ -152,8 +152,10 @@ def main():
             else:
                 logger.debug(f'Found something weird... {file}')
 
-    # This mayyy be a little faster than comparing it every time??
-    datetime_from_timestamp = lambda t: _datetime(1970, 1, 1) + _timedelta(seconds=int(t)) \
+    # This is required, because windoza crashes when timestamp is negative
+    # https://github.com/joke2k/faker/issues/460#issuecomment-308897287
+    # This (dynamic assigning a function) mayyy be a little faster than comparing it every time (?)
+    datetime_from_timestamp = (lambda t: _datetime(1970, 1, 1) + _timedelta(seconds=int(t))) \
         if _os.name == 'nt' \
         else _datetime.fromtimestamp
 
