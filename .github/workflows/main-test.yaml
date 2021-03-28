@@ -9,7 +9,10 @@ on:
 jobs:
   run-tests:
     name: Run script on test repo and check output with pytest
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -17,7 +20,10 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
     - name: Download test repo
-      run: ./scripts/init-for-tests
+      run: |
+        git clone --depth 1 --branch v0.0.1 \
+          https://github.com/TheLastGimbus/__takeout_helper_test_data__.git \
+          ../__takeout_helper_test_data__
     - name: Run GPTH on test repo
       run: |
         python google_photos_takeout_helper/__main__.py \
