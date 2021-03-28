@@ -22,7 +22,7 @@ jobs:
     - name: Download test repo
       # The ">" replaces newlines with spaces
       run: >
-        git clone --depth 1 --branch v0.0.1
+        git clone --depth 1 --branch v0.1.0
         https://github.com/TheLastGimbus/__takeout_helper_test_data__.git
         ../__takeout_helper_test_data__
     - name: Run GPTH on test repo
