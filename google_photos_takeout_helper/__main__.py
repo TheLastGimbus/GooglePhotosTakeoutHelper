@@ -159,6 +159,9 @@ def main():
     datetime_from_timestamp = (lambda t: _datetime(1970, 1, 1) + _timedelta(seconds=int(t))) \
         if _os.name == 'nt' \
         else _datetime.fromtimestamp
+    timestamp_from_datetime = (lambda dt: (dt - _datetime(1970, 1, 1)).total_seconds()) \
+        if _os.name == 'nt' \
+        else _datetime.timestamp
 
     def is_photo(file: Path):
         if file.suffix.lower() not in photo_formats:
@@ -400,16 +403,16 @@ def main():
             # It replaces the extra whitespace with a 0 for proper parsing
             str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':') \
                                .replace('\\', ':').replace(': ', ':0')[:19]
-            timestamp = _datetime.strptime(
-                str_datetime,
-                '%Y:%m:%d %H:%M:%S'
-            ).timestamp()
+            timestamp = timestamp_from_datetime(
+                _datetime.strptime(
+                    str_datetime,
+                    '%Y:%m:%d %H:%M:%S'
+                )
+            )
             _os.utime(file, (timestamp, timestamp))
             if _os.name == 'nt':
                 _windoza_setctime.setctime(str(file), timestamp)
         except Exception as e:
-            logger.debug('Error setting creation date from string:')
-            logger.debug(e)
             raise ValueError(f"Error setting creation date from string: {str_datetime}")
 
     def set_creation_date_from_exif(file: Path):
