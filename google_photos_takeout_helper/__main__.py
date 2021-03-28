@@ -35,6 +35,7 @@ def main():
     import functools as _functools
     from collections import defaultdict as  _defaultdict
     from datetime import datetime as _datetime
+    from datetime import timedelta as _timedelta
     from pathlib import Path as Path
 
     try:
@@ -150,6 +151,11 @@ def main():
                     file_function(file)
             else:
                 logger.debug(f'Found something weird... {file}')
+
+    # This mayyy be a little faster than comparing it every time??
+    datetime_from_timestamp = lambda t: _datetime(1970, 1, 1) + _timedelta(seconds=int(t)) \
+        if _os.name == 'nt' \
+        else _datetime.fromtimestamp
 
     def is_photo(file: Path):
         if file.suffix.lower() not in photo_formats:
@@ -359,7 +365,7 @@ def main():
                 album_dict = _json.load(fi)
                 # find_album_meta_json_file *should* give us "safe" file
                 time = int(album_dict["albumData"]["date"]["timestamp"])
-                return _datetime.fromtimestamp(time).strftime('%Y:%m:%d %H:%M:%S')
+                return datetime_from_timestamp(time).strftime('%Y:%m:%d %H:%M:%S')
         except KeyError:
             logger.error(
                 "get_date_from_folder_meta - json doesn't have required stuff "
@@ -389,7 +395,8 @@ def main():
             # God wish that americans won't have something like MM-DD-YYYY
             # The replace ': ' to ':0' fixes issues when it reads the string as 2006:11:09 10:54: 1.
             # It replaces the extra whitespace with a 0 for proper parsing
-            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':').replace('\\', ':').replace(': ', ':0')[:19]
+            str_datetime = str_datetime.replace('-', ':').replace('/', ':').replace('.', ':') \
+                               .replace('\\', ':').replace(': ', ':0')[:19]
             timestamp = _datetime.strptime(
                 str_datetime,
                 '%Y:%m:%d %H:%M:%S'
@@ -446,7 +453,7 @@ def main():
             s_cant_insert_exif_files.append(str(file.resolve()))
 
     def get_date_str_from_json(json):
-        return _datetime.fromtimestamp(
+        return datetime_from_timestamp(
             int(json['photoTakenTime']['timestamp'])
         ).strftime('%Y:%m:%d %H:%M:%S')
 
@@ -622,7 +629,7 @@ def main():
 
     def copy_to_target_and_divide(file: Path):
         creation_date = file.stat().st_mtime
-        date = _datetime.fromtimestamp(creation_date)
+        date = datetime_from_timestamp(creation_date)
 
         new_path = FIXED_DIR / f"{date.year}/{date.month:02}/"
         new_path.mkdir(parents=True, exist_ok=True)
@@ -723,7 +730,7 @@ def main():
             logger.info(f" - you have full list in {f.name}")
     logger.info(f"Files where date was set from name of the folder: {len(s_date_from_folder_files)}")
     if len(s_date_from_folder_files) > 0:
-        with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w',encoding="utf-8") as f:
+        with open(PHOTOS_DIR / 'date_from_folder_name.txt', 'w', encoding="utf-8") as f:
             f.write("# This file contains list of files where date was set from name of the folder\n")
             f.write("# You might find it useful, but you can safely delete this :)\n")
             f.write("\n".join(s_date_from_folder_files))
