@@ -1,4 +1,4 @@
-![PyPI](https://img.shields.io/pypi/v/google-photos-takeout-helper)
+[![PyPI](https://img.shields.io/pypi/v/google-photos-takeout-helper)](https://pypi.org/project/google-photos-takeout-helper/)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.me/TheLastGimbus)
 
 # Google Photos Takeout Helper
