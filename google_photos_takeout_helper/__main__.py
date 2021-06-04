@@ -64,7 +64,7 @@ def main():
         '-i', '--input-folder',
         type=str,
         required=True,
-        help='Input folder with all stuff form Google Photos takeout zip(s)'
+        help='Input folder with all stuff from Google Photos takeout zip(s)'
     )
     parser.add_argument(
         '-o', '--output-folder',
