@@ -8,6 +8,6 @@ echo "Working in parent folder $(pwd)"
 # Download test repo at certain tag
 # Change this tag in future when test repo changes
 echo "Cloning test data repo..."
-git clone --depth 1 --branch v0.0.1 https://github.com/TheLastGimbus/__takeout_helper_test_data__.git
+git clone --depth 1 --branch v0.1.0 https://github.com/TheLastGimbus/__takeout_helper_test_data__.git
 
 # Now, run GPTH on it!
