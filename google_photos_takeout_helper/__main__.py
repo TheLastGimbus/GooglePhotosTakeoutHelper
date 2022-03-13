@@ -28,13 +28,13 @@ logger.add("file_{time}.log", level="TRACE", encoding="utf8")  # Unicode instruc
 )  # wraps entire function in a trap to display enhanced error tracebaks after an exception occurs.
 def main():
     import argparse as _argparse
+    import functools as _functools
+    import hashlib as _hashlib
     import json as _json
     import os as _os
     import re as _re
     import shutil as _shutil
-    import hashlib as _hashlib
-    import functools as _functools
-    from collections import defaultdict as  _defaultdict
+    from collections import defaultdict as _defaultdict
     from datetime import datetime as _datetime
     from datetime import timedelta as _timedelta
     from pathlib import Path as Path
@@ -44,9 +44,11 @@ def main():
     except ModuleNotFoundError:
         from __version__ import __version__
 
-    import piexif as _piexif
-    from fractions import Fraction  # piexif requires some values to be stored as rationals
     import math
+    from fractions import \
+        Fraction  # piexif requires some values to be stored as rationals
+
+    import piexif as _piexif
     if _os.name == 'nt':
         import win32_setctime as _windoza_setctime
 
@@ -177,7 +179,7 @@ def main():
             search = r"\(\d+\)\."  # we leave the period in so it doesn't catch folders.
             if bool(_re.search(search, file.name)):
                 # PICT0003(5).jpg -> PICT0003.jpg      The regex would match "(5).", and replace it with a "."
-                plain_file = file.with_name(_re.sub(search, '.', str(file)))
+                plain_file = file.with_name(_re.sub(search, '.', file.name))
                 # if the original exists, it will ignore the (1) file, ensuring there is only one copy of each file.
                 if plain_file.is_file():
                     s_skipped_extra_files.append(str(file.resolve()))
