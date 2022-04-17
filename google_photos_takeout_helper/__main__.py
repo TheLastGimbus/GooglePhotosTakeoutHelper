@@ -332,7 +332,7 @@ def main():
 
         if potential_json.is_file():
             try:
-                with open(potential_json, 'r') as f:
+                with open(potential_json, 'r', encoding="utf-8") as f:
                     json_dict = _json.load(f)
                 return json_dict
             except:
@@ -343,7 +343,7 @@ def main():
         if file.parent not in _all_jsons_dict:
             for json_file in file.parent.rglob("*.json"):
                 try:
-                    with json_file.open('r') as f:
+                    with json_file.open('r', encoding="utf-8") as f:
                         json_dict = _json.load(f)
                         if "title" in json_dict:
                             # We found a JSON file with a proper title, store the file name
@@ -367,7 +367,7 @@ def main():
             logger.debug("Couldn't pull datetime from album meta")
             return None
         try:
-            with open(str(file), 'r') as fi:
+            with open(str(file), 'r', encoding="utf-8") as fi:
                 album_dict = _json.load(fi)
                 # find_album_meta_json_file *should* give us "safe" file
                 time = int(album_dict["albumData"]["date"]["timestamp"])
@@ -385,7 +385,7 @@ def main():
     def find_album_meta_json_file(dir: Path):
         for file in dir.rglob("*.json"):
             try:
-                with open(str(file), 'r') as f:
+                with open(str(file), 'r', encoding="utf-8") as f:
                     dict = _json.load(f)
                     if "albumData" in dict:
                         return file
