@@ -22,6 +22,7 @@ jobs:
     - name: Init for tests (download test repo)
       # The ">" replaces newlines with spaces
       run: ./scripts/init-for-tests
+      shell: bash
     - name: Run GPTH on test repo
       run: >
         python google_photos_takeout_helper/__main__.py
