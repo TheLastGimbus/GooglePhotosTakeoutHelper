@@ -106,6 +106,8 @@ def main():
     TAG_DATE_TIME = 306
     TAG_PREVIEW_DATE_TIME = 50971
 
+    EXIF_DATETIME_FORMAT = '%Y:%m:%d %H:%M:%S'
+
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v',
                      '.mts', '.m2ts']
@@ -371,7 +373,7 @@ def main():
                 album_dict = _json.load(fi)
                 # find_album_meta_json_file *should* give us "safe" file
                 time = int(album_dict["albumData"]["date"]["timestamp"])
-                return datetime_from_timestamp(time).strftime('%Y:%m:%d %H:%M:%S')
+                return datetime_from_timestamp(time).strftime(EXIF_DATETIME_FORMAT)
         except KeyError:
             logger.error(
                 "get_date_from_folder_meta - json doesn't have required stuff "
@@ -406,7 +408,7 @@ def main():
             timestamp = timestamp_from_datetime(
                 _datetime.strptime(
                     str_datetime,
-                    '%Y:%m:%d %H:%M:%S'
+                    EXIF_DATETIME_FORMAT
                 )
             )
             _os.utime(file, (timestamp, timestamp))
@@ -435,7 +437,7 @@ def main():
             except ValueError:
                 logger.debug("Wrong date format in exif!")
                 logger.debug(datetime_str)
-                logger.debug("does not match '%Y:%m:%d %H:%M:%S'")
+                logger.debug(f"does not match {EXIF_DATETIME_FORMAT}")
         if not date_set_success:
             raise IOError('No correct DateTime in given exif')
 
@@ -461,7 +463,7 @@ def main():
     def get_date_str_from_json(json):
         return datetime_from_timestamp(
             int(json['photoTakenTime']['timestamp'])
-        ).strftime('%Y:%m:%d %H:%M:%S')
+        ).strftime(EXIF_DATETIME_FORMAT)
 
     # ========= THIS IS ALL GPS STUFF =========
 
