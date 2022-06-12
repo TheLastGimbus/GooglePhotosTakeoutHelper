@@ -54,7 +54,7 @@ def main():
         prog='Google Photos Takeout Helper',
         usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
         description=
-        """This script takes all of your photos from Google Photos takeout, 
+        """This script takes all of your photos from Google Photos takeout,
         fixes their exif DateTime data (when they were taken) and file creation date,
         and then copies it all to one folder.
         """,
@@ -589,7 +589,8 @@ def main():
 
     def guess_date_from_filename(file: Path):
         for regex, extractor in COMMON_DATETIME_PATTERNS:
-            if m := regex.search(file.name):
+            m = regex.search(file.name)
+            if m:
                 return extractor(m).strftime(EXIF_DATETIME_FORMAT)
 
     # Fixes ALL metadata, takes just file and dir and figures it out
