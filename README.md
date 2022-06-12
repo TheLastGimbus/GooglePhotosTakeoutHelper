@@ -18,10 +18,13 @@ It will take all of your photos from those tiny folders, set their `exif` and `l
 2. Extract all contents from your Google Takeout to one folder
 3. Run `google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]`
 
-If you want your photos to be divided by a year and month, run it with `--divide-to-dates` flag.
+If you want your photos to be divided by a year and month, run it with the `--divide-to-dates` flag.
+
+Occasionally, Google Photos will not have stored any date/time information for some of your photos. If you'd like additional heuristics to be run on the filenames of those files, attempting to guess the date it was taken on, run it with the `--guess-timestamp-from-filename` flag.
+If you leave this off, or if no date can be guessed from the filename, those photos will be assigned the timestamp of when the script was run.
 
 ### How to use for dummies (non-programming people):
-This script is written in Python - but if you have Windows, and don't want to bother installing it, 
+This script is written in Python - but if you have Windows, and don't want to bother installing it,
 you can download a standalone .exe :tada:
 
 1. Go to [releases->latest release->assets](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) and
