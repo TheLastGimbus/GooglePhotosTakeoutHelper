@@ -112,6 +112,7 @@ def main():
     extra_formats = [
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
+        '-bearbeitet', # DE
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
