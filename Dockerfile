@@ -8,4 +8,5 @@ COPY tests  /usr/src/google_photos_takeout_helper/google_photos_takeout_helper/t
 ENV PYTHONPATH=.
 RUN ls -l
 RUN python3 setup.py install
-ENTRYPOINT [ "google-photos-takeout-helper" ]
+VOLUME [ "/input", "/output" ]
+ENTRYPOINT [ "google-photos-takeout-helper", "-i", "/input", "-o", "/output", "--divide-to-dates"]
