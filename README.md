@@ -72,7 +72,7 @@ Around december 2020, Google stopped putting photos in thousands of "yyyy-mm-dd"
   - `pip install -U google-photos-takeout-helper`
 - If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
   - `pip install -U google-photos-takeout-helper==1.2.0`
-Old version is... well, old, and I recommend you to just request the takeout against and run against newest version of script :+1:
+Old version is... well, old, and I recommend you to just request the takeout again and run against newest version of script :+1:
 
 #### Other Takeout projects
 I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
