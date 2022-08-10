@@ -54,7 +54,7 @@ def main():
         prog='Google Photos Takeout Helper',
         usage='google-photos-takeout-helper -i [INPUT TAKEOUT FOLDER] -o [OUTPUT FOLDER]',
         description=
-        """This script takes all of your photos from Google Photos takeout, 
+        """This script takes all of your photos from Google Photos takeout,
         fixes their exif DateTime data (when they were taken) and file creation date,
         and then copies it all to one folder.
         """,
@@ -84,6 +84,11 @@ def main():
         help='EXPERIMENTAL: Skips the extra photos like photos like pic(1). Also includes --skip-extras.'
     )
     parser.add_argument(
+        '--guess-timestamp-from-filename',
+        action='store_true',
+        help="EXPERIMENTAL: If all reliable methods of identifying a timestamp for a photo fail, also search the filename for common date/time patterns (e.g. 20220101_123456)."
+    )
+    parser.add_argument(
         "--divide-to-dates",
         action='store_true',
         help="Create folders and subfolders based on the date the photos were taken"
@@ -104,6 +109,8 @@ def main():
     TAG_DATE_TIME_ORIGINAL = _piexif.ExifIFD.DateTimeOriginal
     TAG_DATE_TIME_DIGITIZED = _piexif.ExifIFD.DateTimeDigitized
     TAG_DATE_TIME = 306
+
+    EXIF_DATETIME_FORMAT = '%Y:%m:%d %H:%M:%S'
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v',
@@ -371,7 +378,7 @@ def main():
                 album_dict = _json.load(fi)
                 # find_album_meta_json_file *should* give us "safe" file
                 time = int(album_dict["albumData"]["date"]["timestamp"])
-                return datetime_from_timestamp(time).strftime('%Y:%m:%d %H:%M:%S')
+                return datetime_from_timestamp(time).strftime(EXIF_DATETIME_FORMAT)
         except KeyError:
             logger.error(
                 "get_date_from_folder_meta - json doesn't have required stuff "
@@ -406,7 +413,7 @@ def main():
             timestamp = timestamp_from_datetime(
                 _datetime.strptime(
                     str_datetime,
-                    '%Y:%m:%d %H:%M:%S'
+                    EXIF_DATETIME_FORMAT
                 )
             )
             _os.utime(file, (timestamp, timestamp))
@@ -435,7 +442,7 @@ def main():
             except ValueError:
                 logger.debug("Wrong date format in exif!")
                 logger.debug(datetime_str)
-                logger.debug("does not match '%Y:%m:%d %H:%M:%S'")
+                logger.debug(f"does not match {EXIF_DATETIME_FORMAT}")
         if not date_set_success:
             raise IOError('No correct DateTime in given exif')
 
@@ -461,7 +468,7 @@ def main():
     def get_date_str_from_json(json):
         return datetime_from_timestamp(
             int(json['photoTakenTime']['timestamp'])
-        ).strftime('%Y:%m:%d %H:%M:%S')
+        ).strftime(EXIF_DATETIME_FORMAT)
 
     # ========= THIS IS ALL GPS STUFF =========
 
@@ -568,6 +575,24 @@ def main():
 
     # ============ END OF GPS STUFF ============
 
+    COMMON_DATETIME_PATTERNS = (
+        # example: Screenshot_20190919-053857_Camera-edited.jpg
+        (_re.compile(r'(?P<date>20\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d-\d{6})'),
+            lambda m: _datetime.strptime(m.group('date'), '%Y%m%d-%H%M%S'),),
+        # example: IMG_20190509_154733-edited.jpg, MVIMG_20190215_193501.MP4, IMG_20190221_112112042_BURST000_COVER_TOP.MP4
+        (_re.compile(r'(?P<date>20\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d_\d{6})'),
+            lambda m: _datetime.strptime(m.group('date'), '%Y%m%d_%H%M%S'),),
+        # example: Screenshot_2019-04-16-11-19-37-232_com.google.a.jpg
+        (_re.compile(r'(?P<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{2}-?\d{2}-?\d{2})'),
+            lambda m: _datetime.strptime(m.group('date'), '%Y-%m-%d-%H-%M-%S'),),
+    )
+
+    def guess_date_from_filename(file: Path):
+        for regex, extractor in COMMON_DATETIME_PATTERNS:
+            m = regex.search(file.name)
+            if m:
+                return extractor(m).strftime(EXIF_DATETIME_FORMAT)
+
     # Fixes ALL metadata, takes just file and dir and figures it out
     def fix_metadata(file: Path):
         # logger.info(file)
@@ -596,7 +621,7 @@ def main():
         if has_nice_date:
             return True
 
-        logger.debug(f'Last option, copying folder meta as date for {file}')
+        logger.debug(f'Try copying folder meta as date for {file}')
         date = get_date_from_folder_meta(file.parent)
         if date is not None:
             set_file_exif_date(file, date)
@@ -604,11 +629,18 @@ def main():
             nonlocal s_date_from_folder_files
             s_date_from_folder_files.append(str(file.resolve()))
             return True
-        else:
-            logger.warning(f'There was literally no option to set date on {file}')
-            nonlocal s_no_date_at_all
-            s_no_date_at_all.append(str(file.resolve()))
 
+        if args.guess_timestamp_from_filename:
+            logger.debug(f'Search the filename for common date/time patterns for {file}')
+            date = guess_date_from_filename(file)
+            if date is not None:
+                set_file_exif_date(file, date)
+                set_creation_date_from_str(file, date)
+                return True
+
+        logger.warning(f'There was literally no option to set date on {file}')
+        nonlocal s_no_date_at_all
+        s_no_date_at_all.append(str(file.resolve()))
         return False
 
     # PART 2: Copy all photos and videos to target folder
