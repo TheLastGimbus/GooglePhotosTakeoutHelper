@@ -104,7 +104,6 @@ def main():
     TAG_DATE_TIME_ORIGINAL = _piexif.ExifIFD.DateTimeOriginal
     TAG_DATE_TIME_DIGITIZED = _piexif.ExifIFD.DateTimeDigitized
     TAG_DATE_TIME = 306
-    TAG_PREVIEW_DATE_TIME = 50971
 
     photo_formats = ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tif', '.tiff', '.svg', '.heic']
     video_formats = ['.mp4', '.gif', '.mov', '.webm', '.avi', '.wmv', '.rm', '.mpg', '.mpe', '.mpeg', '.mkv', '.m4v',
@@ -467,7 +466,7 @@ def main():
     # ========= THIS IS ALL GPS STUFF =========
 
     def change_to_rational(number):
-        """convert a number to rantional
+        """convert a number to rational
         Keyword arguments: number
         return: tuple like (1, 2), (numerator, denominator)
         """

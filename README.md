@@ -40,7 +40,7 @@ takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ```
 // Ps note: Don't use the "[ ]" in the command above.
 
-**// PS 2: YOU NEED TO WRAP YOUR PATHS IN - " - ASPECIALLY IF THEY HAVE SPACES**
+**// PS 2: YOU NEED TO WRAP YOUR PATHS IN - " - ESPECIALLY IF THEY HAVE SPACES**
 
 ### Contact/errors
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
@@ -53,7 +53,7 @@ You can also send me some Bitcoin: `3GezcSsZ6TWw1ug9Q8rK44y9goWa3vTmbk`, DOGE: `
 
 
 ### But, be aware if you move your photos on you Android phone...
-Beware, that (99% of the times), if you move some files in Android, their creation and modification time is re-seted to current.
+Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reset to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out: https://github.com/SimpleMobileTools/Simple-Gallery
 
@@ -72,7 +72,7 @@ Around december 2020, Google stopped putting photos in thousands of "yyyy-mm-dd"
   - `pip install -U google-photos-takeout-helper`
 - If you have old "date folders" (that is, ton of folders named like "2012-06-23") - use version `1.2.0`
   - `pip install -U google-photos-takeout-helper==1.2.0`
-Old version is... well, old, and I recommend you to just request the takeout again and run agains newest version of script :+1:
+Old version is... well, old, and I recommend you to just request the takeout again and run against newest version of script :+1:
 
 #### Other Takeout projects
 I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
