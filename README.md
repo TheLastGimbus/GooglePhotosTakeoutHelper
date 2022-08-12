@@ -3,7 +3,7 @@
 
 # Google Photos Takeout Helper
 ## What is this for?
-If you ever want to move from Google Photos to other platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
+If you ever want to move from Google Photos to another platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
 
 But when you download it, you will find yourself with hundreds of little folders with few photos and weird `.json` files inside.
 What if you want to just have one folder with all photos, in chronological order? Good luck copying all of that :confused:
@@ -35,27 +35,27 @@ download `takeout-helper.exe`
 If your Takeout was divided into multiple `.zip`s, you will need to extract them, and move their contents into one
 folder
 
-3. Open cmd, and type:
+3. Open `cmd`, and type:
 
 ```bash
 cd C:\Folder\Where\You\Downloaded\takeout-helper
 takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ```
-// Ps note: Don't use the "[ ]" in the command above.
+// PS note: Don't use the `[ ]` in the command above.
 
-**// PS 2: YOU NEED TO WRAP YOUR PATHS IN - " - ESPECIALLY IF THEY HAVE SPACES**
+**// PS 2: YOU NEED TO WRAP YOUR PATHS IN `"` ESPECIALLY IF THEY HAVE SPACES**
 
 ### Contact/errors
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
-### If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+### If I helped you, you can consider donating to me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
 I spent a lot of time fixing bugs and making standalone .exe file for Windows users :sparkling_heart: - would be
 super thankful for any donations
 
 You can also send me some Bitcoin: `3GezcSsZ6TWw1ug9Q8rK44y9goWa3vTmbk`, DOGE: `DTKFGSzPCDxZPQQtCTyUHbpRYy6n8fSpco`, or Monero: `43HorPVy1PTGVph3Qh3b6vVSfW2p3fH4ChjtiLVdLZw4Kw1vZUgCCcZSmfGCeEFq6bdeuF7zMutAcAcuuYFf8vEr6htBWTk`
 
 
-### But, be aware if you move your photos on you Android phone...
+### But, be aware if you move your photos on your Android phone...
 Beware, that (99% of the times), if you move some files in Android, their creation and modification time is reset to current.
 
 "Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool and you can check it out: https://github.com/SimpleMobileTools/Simple-Gallery
@@ -68,7 +68,7 @@ Beware, that (99% of the times), if you move some files in Android, their creati
  - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress. (I will edit this when they are done, but can't promise :P ) 
 
 ### Google has changed folder structure
-Around december 2020, Google stopped putting photos in thousands of "yyyy-mm-dd" folders, and started putting them in tens of "Photos form yyyy" folders instead 🙄
+Around december 2020, Google stopped putting photos in thousands of "yyyy-mm-dd" folders, and started putting them in tens of "Photos from yyyy" folders instead 🙄
 
 - If you have new "year folders" (that is, few folders named like "Photos from 2012") (+albums) - use the newest
   version
@@ -88,6 +88,6 @@ https://github.com/HardFork/KeepToText
 
 ### TODO (Pull Requests welcome):
 - [ ] Videos' Exif data - probably impossible to do :confused:
-- [x] Gps data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
+- [x] GPS data: from JSON to Exif - Thank you @DalenW :sparkling_heart:
 - [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing:
 - [X] Windoza standalone `.exe` file - Thank you, _me_ :kissing_heart:
