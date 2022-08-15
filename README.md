@@ -3,7 +3,7 @@
 
 # Google Photos Takeout Helper
 ## What is this for?
-If you ever want to move from Google Photos to another platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
+If you ever want to move from Google Photos to other platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
 
 But when you download it, you will find yourself with hundreds of little folders with few photos and weird `.json` files inside.
 What if you want to just have one folder with all photos, in chronological order? Good luck copying all of that :confused:
