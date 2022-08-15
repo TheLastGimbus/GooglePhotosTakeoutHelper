@@ -43,7 +43,7 @@ takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ```
 // PS note: Don't use the `[ ]` in the command above.
 
-**// PS 2: YOU NEED TO WRAP YOUR PATHS IN `"` ESPECIALLY IF THEY HAVE SPACES**
+**// PS 2: YOU NEED TO WRAP YOUR PATHS IN - `"` - ESPECIALLY IF THEY HAVE SPACES**
 
 ### Contact/errors
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
