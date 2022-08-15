@@ -41,7 +41,7 @@ folder
 cd C:\Folder\Where\You\Downloaded\takeout-helper
 takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ```
-// PS note: Don't use the `[ ]` in the command above.
+// PS note: Don't use the "`[ ]`" in the command above.
 
 **// PS 2: YOU NEED TO WRAP YOUR PATHS IN - `"` - ESPECIALLY IF THEY HAVE SPACES**
 
