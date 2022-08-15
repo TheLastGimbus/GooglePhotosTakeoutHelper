@@ -48,7 +48,7 @@ takeout-helper.exe -i [C:\INPUT\TAKEOUT\FOLDER] -o [C:\OUTPUT\FOLDER]
 ### Contact/errors
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
-### If I helped you, you can consider donating to me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+### If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
 I spent a lot of time fixing bugs and making standalone .exe file for Windows users :sparkling_heart: - would be
 super thankful for any donations
 
