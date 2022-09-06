@@ -89,11 +89,6 @@ def main():
         help="EXPERIMENTAL: If all reliable methods of identifying a timestamp for a photo fail, also search the filename for common date/time patterns (e.g. 20220101_123456)."
     )
     parser.add_argument(
-        "--divide-to-dates",
-        action='store_true',
-        help="Create folders and subfolders based on the date the photos were taken"
-    )
-    parser.add_argument(
         '--albums',
         type=str,
         help="EXPERIMENTAL, MAY NOT WORK FOR EVERYONE: What kind of 'albums solution' you would like:\n"
