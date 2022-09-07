@@ -119,6 +119,7 @@ def main():
         '-edited', '-effects', '-smile', '-mix',  # EN/US
         '-edytowane',  # PL
         '-bearbeitet', # DE
+        '-bewerkt',    # NL
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
