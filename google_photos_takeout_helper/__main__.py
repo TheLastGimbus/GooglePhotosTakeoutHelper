@@ -120,6 +120,7 @@ def main():
         '-edytowane',  # PL
         '-bearbeitet', # DE
         '-bewerkt',    # NL
+        '-編集済み',    # JA
         # Add more "edited" flags in more languages if you want. They need to be lowercase.
     ]
 
