@@ -1,13 +1,15 @@
 .idea/
 .vscode/
-poetry.lock
-pyproject.toml
-venv/
-__pycache__/
+
+# Files and directories created by pub.
+.dart_tool/
+.packages
+
+# Conventional directory for build output.
 build/
-dist/
-*.egg-info
-.eggs/
+
+photos/
+
 ALL_PHOTOS/
 output/
 *.log
