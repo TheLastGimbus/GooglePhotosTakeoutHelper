@@ -170,12 +170,17 @@ void main(List<String> arguments) async {
 
   /// ##### Find all photos/videos and add to list #####
 
-  await for (final f in input.list().whereType<Directory>()) {
-    // TODO: Find folders even if input is not exactly best
-    if (p.basename(f.path).startsWith('Photos from ')) {
-      yearFolders.add(f);
-    } else {
-      albumFolders.add(f);
+  // recursive=true makes it find everything nicely even if user id dumb 😋
+  await for (final d in input.list(recursive: true).whereType<Directory>()) {
+    isYear(Directory dir) => p.basename(dir.path).startsWith('Photos from ');
+    if (isYear(d)) {
+      yearFolders.add(d);
+    } // if not year but got any year brothers
+    else if (await d.parent
+        .list()
+        .whereType<Directory>()
+        .any((e) => isYear(e))) {
+      albumFolders.add(d);
     }
   }
   await for (final f in Stream.fromIterable(yearFolders)) {
