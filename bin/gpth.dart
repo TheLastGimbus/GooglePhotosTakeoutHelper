@@ -33,26 +33,26 @@ void main(List<String> arguments) async {
       help: 'Try to guess file dates from their names',
       defaultsTo: false,
     );
-  late final ArgResults res;
+  late final ArgResults args;
   try {
-    res = parser.parse(arguments);
+    args = parser.parse(arguments);
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
     exit(1);
   } catch (e) {
-    // any other exceptions (res must not be null)
+    // any other exceptions (args must not be null)
     error('$e');
     exit(100);
   }
 
-  if (res.arguments.isEmpty) {
+  if (args.arguments.isEmpty) {
     print('GooglePhotosTakeoutHelper v3.0.0');
     print('type --help for more info about usage');
     return;
   }
 
-  if (res['help']) {
+  if (args['help']) {
     print(helpText);
     print(parser.usage);
     return;
@@ -64,15 +64,15 @@ void main(List<String> arguments) async {
   final dateExtractors = <DateTimeExtractor>[
     jsonExtractor,
     exifExtractor,
-    if (res['guess-from-name']) guessExtractor,
+    if (args['guess-from-name']) guessExtractor,
   ];
 
-  if (res['fix'] != null) {
+  if (args['fix'] != null) {
     print('========== FIX MODE ==========');
     print('I will go through all files in folder that you gave me');
-    print('(${res['fix']})');
+    print('(${args['fix']})');
     print('and try to set each file to correct lastModified value');
-    final dir = Directory(res['fix']);
+    final dir = Directory(args['fix']);
     if (!dir.existsSync()) {
       error("directory to fix doesn't exist :/");
       exit(11);
@@ -97,16 +97,16 @@ void main(List<String> arguments) async {
     return;
   }
 
-  if (res['input'] == null) {
+  if (args['input'] == null) {
     error("No --input folder specified :/");
     exit(10);
   }
-  if (res['output'] == null) {
+  if (args['output'] == null) {
     error("No --output folder specified :/");
     exit(10);
   }
-  final input = Directory(res['input']);
-  final output = Directory(res['output']);
+  final input = Directory(args['input']);
+  final output = Directory(args['output']);
   if (!input.existsSync()) {
     error("Input folder does not exist :/");
     exit(11);
