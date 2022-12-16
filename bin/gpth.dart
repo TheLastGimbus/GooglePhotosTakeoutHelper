@@ -105,6 +105,17 @@ void main(List<String> arguments) async {
 
   /// ##### Parse all options and check if alright #####
 
+  if (!args['copy']) {
+    print(
+      "WARNING: Script will *move* files from input to output - not *copy* \n"
+      "- this is faster, and doesn't use extra space, but will break your \n"
+      "input folder (it will be, well, empty)\n"
+      "If you want copy instead of move, exit script (ctrl-c) and use --copy flag\n"
+      "Otherwise, press enter to agree with that",
+    );
+    stdin.readLineSync();
+  }
+
   if (args['input'] == null) {
     error("No --input folder specified :/");
     exit(10);
