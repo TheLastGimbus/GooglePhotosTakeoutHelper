@@ -51,7 +51,6 @@ void main(List<String> arguments) async {
     print('type --help for more info about usage');
     return;
   }
-
   if (args['help']) {
     print(helpText);
     print(parser.usage);
@@ -59,7 +58,7 @@ void main(List<String> arguments) async {
   }
 
   // elastic list of extractors - can add/remove with cli flags
-  // those are in order of reliability
+  // those are in order of reliability -
   // if one fails, only then later ones will be used
   final dateExtractors = <DateTimeExtractor>[
     jsonExtractor,
@@ -67,10 +66,12 @@ void main(List<String> arguments) async {
     if (args['guess-from-name']) guessExtractor,
   ];
 
+  /// ##### Occasional Fix mode #####
+
   if (args['fix'] != null) {
+    // i was thing if not to move this to outside file, but let's leave for now
     print('========== FIX MODE ==========');
     print('I will go through all files in folder that you gave me');
-    print('(${args['fix']})');
     print('and try to set each file to correct lastModified value');
     final dir = Directory(args['fix']);
     if (!dir.existsSync()) {
@@ -96,6 +97,10 @@ void main(List<String> arguments) async {
     print('$notSet not set❌');
     return;
   }
+
+  /// ###############################
+
+  /// ##### Parse all options and check if alright #####
 
   if (args['input'] == null) {
     error("No --input folder specified :/");
@@ -144,6 +149,8 @@ void main(List<String> arguments) async {
   }
   output.createSync(recursive: true);
 
+  /// ##################################################
+
   // Okay, time to explain the structure of things here
   // We create a list of Media objects, and fill it with everything we find
   // in "year folders". Then, we play *mutably* with this list - fill Media's
@@ -162,9 +169,10 @@ void main(List<String> arguments) async {
   /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
 
-  // TODO: Find folders even if input is not exactly best
   /// ##### Find all photos/videos and add to list #####
+
   for (final f in input.listSync().whereType<Directory>()) {
+    // TODO: Find folders even if input is not exactly best
     if (p.basename(f.path).startsWith('Photos from ')) {
       yearFolders.add(f);
     } else {
@@ -214,14 +222,18 @@ void main(List<String> arguments) async {
 
   /// #######################
 
-  // TODO: --move mode
+  /// ##### Copy/move files to actual output folder #####
+
   for (final m in media) {
     // TODO: Prevent filling the output folder over and over
     final freeFile =
         findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
+    // TODO: --move mode
     final c = m.file.copySync(freeFile.path);
     c.setLastModifiedSync(m.dateTaken ?? DateTime.now());
   }
+
+  /// ###################################################
 
   print('DONE! FREEEEEDOOOOM!!!');
 }
