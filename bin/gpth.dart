@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:gpth/album.dart';
 import 'package:gpth/datetime_extractors.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 
 // elastic list of extractors - can add/remove more in future
 // for example, with cli flags
@@ -69,25 +68,31 @@ void main(List<String> arguments) async {
     return;
   }
 
-  // TODO: check args and run
   if (res['input'] == null) {
     error("No --input folder specified :/");
     exit(10);
   }
+  if (res['output'] == null) {
+    error("No --output folder specified :/");
+    exit(10);
+  }
   final input = Directory(res['input']);
+  final output = Directory(res['output']);
   if (!input.existsSync()) {
     error("Input folder does not exist :/");
     exit(11);
   }
+  output.createSync(recursive: true);
 
   final media = <Media>[];
 
   final yearFolders = <Directory>[];
   final albumFolders = <Directory>[];
 
+  // TODO: Find folders even if input is not exactly best
   /// ##### Find all photos/videos and add to list #####
   for (final f in input.listSync().whereType<Directory>()) {
-    if (basename(f.path).startsWith('Photos from ')) {
+    if (p.basename(f.path).startsWith('Photos from ')) {
       yearFolders.add(f);
     } else {
       albumFolders.add(f);
@@ -132,9 +137,15 @@ void main(List<String> arguments) async {
   // we can find albums without a problem, but we have no idea what
   // to do about it 🤷
   // so just print it now (flex)
-  print(findAlbums(albumFolders, media));
+  // findAlbums(albumFolders, media).forEach(print);
 
   /// #######################
 
-  print(media);
+  // TODO: --move mode
+  for (final m in media) {
+    final c = m.file.copySync(p.join(output.path, p.basename(m.file.path)));
+    c.setLastModifiedSync(m.dateTaken ?? DateTime.now());
+  }
+
+  print('DONE! FREEEEEDOOOOM!!!');
 }
