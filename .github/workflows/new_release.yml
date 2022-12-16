@@ -1,0 +1,56 @@
+name: Build and publish new release on version tag
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  make-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Clean tag name
+        id: clean_tag
+        run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/refs\/tags\///')"
+      #        Fuck this
+      #      If you ever get this to work, please let me know
+      #      - name: Check if tag is on master
+      #        run: |
+      #          echo $(git branch --contains ${{ github.ref }} | xargs)
+      #          if [[ $(git branch --contains ${{ github.ref }} --format="%(refname:short)" | xargs)  != *"master"* ]]; then
+      #            echo "Tag is not on master branch, exiting"
+      #            exit 1
+      #          fi
+      #        Changelogs can be more rich than tag message (where # is a comment, not a header :/)
+      - name: Get changelog
+        run: python scripts/get_changelog.py --version ${{ steps.clean_tag.outputs.tag }} > ./body-file.txt
+      #        Just in case changelogs won't work out
+      #      - name: Get tag message
+      #        id: tag_message
+      #        run: echo ::set-output name=message::$(git tag -l --format='%(contents)' ${{ github.ref }})
+      - name: Create GH-Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ./body-file.txt
+          fail_on_unmatched_files: true
+
+  build:
+    needs: make-release
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      # Note: This workflow uses the latest stable version of the Dart SDK.
+      # You can specify other versions if desired, see documentation here:
+      # https://github.com/dart-lang/setup-dart/blob/main/README.md
+      - uses: dart-lang/setup-dart@v1
+      - name: Build exe
+        run: dart compile exe bin/gpth.dart -o ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
+      - name: Add files to GH-Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
+          fail_on_unmatched_files: true
+
