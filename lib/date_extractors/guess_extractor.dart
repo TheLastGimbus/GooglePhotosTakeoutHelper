@@ -34,8 +34,11 @@ Future<DateTime?> guessExtractor(File file) async {
     final dateStr = match?.group(0);
     if (dateStr == null) continue;
     // parse it with given pattern
-    final date = FixedDateTimeFormatter(pat.last as String, isUtc: false)
-        .tryDecode(dateStr);
+    DateTime? date;
+    try {
+      date = FixedDateTimeFormatter(pat.last as String, isUtc: false)
+          .tryDecode(dateStr);
+    } on RangeError catch (_) {}
     if (date == null) continue;
     return date; // success!
   }
