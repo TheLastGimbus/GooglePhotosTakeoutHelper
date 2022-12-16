@@ -185,6 +185,8 @@ void main(List<String> arguments) async {
 
   /// ##### Find all photos/videos and add to list #####
 
+  print('Okay, running... searching for everything in input folder...');
+
   // recursive=true makes it find everything nicely even if user id dumb 😋
   await for (final d in input.list(recursive: true).whereType<Directory>()) {
     isYear(Directory dir) => p.basename(dir.path).startsWith('Photos from ');
@@ -204,9 +206,14 @@ void main(List<String> arguments) async {
     }
   }
 
+  print('Found ${media.length} photos/videos in input folder');
+
   /// ##################################################
 
   /// ##### Extracting/predicting dates using given extractors #####
+
+  print('Extracting dates from files...');
+
   var q = 0;
   for (final extractor in dateExtractors) {
     for (var i = 0; i < media.length; i++) {
@@ -227,13 +234,17 @@ void main(List<String> arguments) async {
 
   /// ##### Find duplicates #####
 
-  removeDuplicates(media);
+  // TODO: Check if we even need to print this if it's maybe fast enough
+  print('Finding duplicates...');
+
+  final countDuplicates = removeDuplicates(media);
 
   /// ###########################
 
   /// ##### Potentially skip extras #####
 
-  if (args['skip-extras']) removeExtras(media);
+  if (args['skip-extras']) print('Finding "extra" photos (-edited etc)');
+  final countExtras = args['skip-extras'] ? removeExtras(media) : 0;
 
   /// ###################################
 
@@ -249,6 +260,8 @@ void main(List<String> arguments) async {
 
   /// ##### Copy/move files to actual output folder #####
 
+  print("${args['copy'] ? 'Coping' : 'Moving'} files to output folder...");
+
   await for (final m in Stream.fromIterable(media)) {
     final freeFile =
         findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
@@ -261,4 +274,12 @@ void main(List<String> arguments) async {
   /// ###################################################
 
   print('DONE! FREEEEEDOOOOM!!!');
+  print('Found ${media.length} photos/videos in "${input.path}"');
+  print('Left out $countDuplicates duplicates');
+  if (args['skip-extras']) print('Left out $countExtras extras');
+  print(
+    '${args['copy'] ? 'Copied' : 'Moved'} '
+    '${media.length - countDuplicates - countExtras} '
+    'files to "${output.path}"',
+  );
 }
