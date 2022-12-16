@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:gpth/album.dart';
-import 'package:gpth/datetime_extractors.dart';
+import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/media.dart';
 import 'package:path/path.dart';
