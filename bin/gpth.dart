@@ -68,8 +68,32 @@ void main(List<String> arguments) async {
   ];
 
   if (res['fix'] != null) {
-    print('FIX MODE');
-    // TODO: fix mode
+    print('========== FIX MODE ==========');
+    print('I will go through all files in folder that you gave me');
+    print('(${res['fix']})');
+    print('and try to set each file to correct lastModified value');
+    final dir = Directory(res['fix']);
+    if (!dir.existsSync()) {
+      error("directory to fix doesn't exist :/");
+      exit(11);
+    }
+    var set = 0;
+    var notSet = 0;
+    for (final file in dir.listSync(recursive: true).wherePhotoVideo()) {
+      DateTime? date;
+      for (final extractor in dateExtractors) {
+        date = await extractor(file);
+        if (date != null) {
+          file.setLastModifiedSync(date);
+          set++;
+          break;
+        }
+      }
+      if (date == null) notSet++;
+    }
+    print('FINISHED!');
+    print('$set set✅');
+    print('$notSet not set❌');
     return;
   }
 
