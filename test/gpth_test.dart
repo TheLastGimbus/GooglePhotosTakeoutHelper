@@ -28,9 +28,11 @@ void main() {
     jsonFile2
         .writeAsStringSync('{"photoTakenTime": {"timestamp": "1683078832"}}');
   });
-  test('test json extractor', () {
-    expect(jsonExtractor(imgFile1)?.millisecondsSinceEpoch, 1599078832 * 1000);
-    expect(jsonExtractor(imgFile2)?.millisecondsSinceEpoch, 1683078832 * 1000);
+  test('test json extractor', () async {
+    expect((await jsonExtractor(imgFile1))?.millisecondsSinceEpoch,
+        1599078832 * 1000);
+    expect((await jsonExtractor(imgFile2))?.millisecondsSinceEpoch,
+        1683078832 * 1000);
   });
 
   test('test duplicate removal', () {

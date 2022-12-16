@@ -106,7 +106,7 @@ void main(List<String> arguments) async {
     for (var i = 0; i < media.length; i++) {
       // if already has date then skip
       if (media[i].dateTaken == null) {
-        final date = extractor(media[i].file);
+        final date = await extractor(media[i].file);
         if (date != null) {
           media[i].dateTaken = date;
           media[i].dateTakenAccuracy = q;

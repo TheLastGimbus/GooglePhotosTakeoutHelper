@@ -3,7 +3,9 @@ import 'dart:io';
 
 typedef DateTimeExtractor = DateTime? Function(File);
 
-DateTime? jsonExtractor(File file) {
+typedef DateTimeExtractor = Future<DateTime?> Function(File);
+
+Future<DateTime?> jsonExtractor(File file) async {
   final jsonFile = _jsonForFile(file);
   if (jsonFile == null) return null;
   try {
