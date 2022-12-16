@@ -31,7 +31,11 @@ void main(List<String> arguments) async {
         abbr: 'o', help: 'Output folder where all photos will land')
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
     ..addFlag('guess-from-name',
-        help: 'Try to guess file dates from their names');
+        help: 'Try to guess file dates from their names')
+    ..addFlag('copy',
+        help: "Copy files instead of moving them.\n"
+            "This is usually slower, and uses extra space, "
+            "but doesn't break your input folder");
   late final ArgResults args;
   try {
     args = parser.parse(arguments);
@@ -234,12 +238,12 @@ void main(List<String> arguments) async {
 
   /// ##### Copy/move files to actual output folder #####
 
-  for (final m in media) {
-    // TODO: Prevent filling the output folder over and over
+  await for (final m in Stream.fromIterable(media)) {
     final freeFile =
         findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
-    // TODO: --move mode
-    final c = await m.file.copy(freeFile.path);
+    final c = args['copy']
+        ? await m.file.copy(freeFile.path)
+        : await m.file.rename(freeFile.path);
     await c.setLastModified(m.dateTaken ?? DateTime.now());
   }
 
