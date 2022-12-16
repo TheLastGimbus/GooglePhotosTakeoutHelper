@@ -74,18 +74,18 @@ void main(List<String> arguments) async {
     print('I will go through all files in folder that you gave me');
     print('and try to set each file to correct lastModified value');
     final dir = Directory(args['fix']);
-    if (!dir.existsSync()) {
+    if (!await dir.exists()) {
       error("directory to fix doesn't exist :/");
       exit(11);
     }
     var set = 0;
     var notSet = 0;
-    for (final file in dir.listSync(recursive: true).wherePhotoVideo()) {
+    await for (final file in dir.list(recursive: true).wherePhotoVideo()) {
       DateTime? date;
       for (final extractor in dateExtractors) {
         date = await extractor(file);
         if (date != null) {
-          file.setLastModifiedSync(date);
+          await file.setLastModified(date);
           set++;
           break;
         }
@@ -112,13 +112,13 @@ void main(List<String> arguments) async {
   }
   final input = Directory(args['input']);
   final output = Directory(args['output']);
-  if (!input.existsSync()) {
+  if (!await input.exists()) {
     error("Input folder does not exist :/");
     exit(11);
   }
   // all of this logic is to prevent user easily blowing output folder
   // by running command two times
-  if (output.existsSync() && output.listSync().isNotEmpty) {
+  if (await output.exists() && !await output.list().isEmpty) {
     print('Output folder exists, and IS NOT EMPTY! What to do? Type either:');
     print('[delete] - delete *all* files inside output folder and continue');
     print('[ignore] - continue as usual - put output files alongside existing');
@@ -147,7 +147,7 @@ void main(List<String> arguments) async {
         exit(1);
     }
   }
-  output.createSync(recursive: true);
+  await output.create(recursive: true);
 
   /// ##################################################
 
@@ -171,7 +171,7 @@ void main(List<String> arguments) async {
 
   /// ##### Find all photos/videos and add to list #####
 
-  for (final f in input.listSync().whereType<Directory>()) {
+  await for (final f in input.list().whereType<Directory>()) {
     // TODO: Find folders even if input is not exactly best
     if (p.basename(f.path).startsWith('Photos from ')) {
       yearFolders.add(f);
@@ -179,8 +179,8 @@ void main(List<String> arguments) async {
       albumFolders.add(f);
     }
   }
-  for (final f in yearFolders) {
-    for (final file in f.listSync().wherePhotoVideo()) {
+  await for (final f in Stream.fromIterable(yearFolders)) {
+    await for (final file in f.list().wherePhotoVideo()) {
       media.add(Media(file));
     }
   }
@@ -229,8 +229,8 @@ void main(List<String> arguments) async {
     final freeFile =
         findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
     // TODO: --move mode
-    final c = m.file.copySync(freeFile.path);
-    c.setLastModifiedSync(m.dateTaken ?? DateTime.now());
+    final c = await m.file.copy(freeFile.path);
+    await c.setLastModified(m.dateTaken ?? DateTime.now());
   }
 
   /// ###################################################

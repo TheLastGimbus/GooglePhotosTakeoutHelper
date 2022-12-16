@@ -3,10 +3,10 @@ import 'dart:io';
 
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
 Future<DateTime?> jsonExtractor(File file) async {
-  final jsonFile = _jsonForFile(file);
+  final jsonFile = await _jsonForFile(file);
   if (jsonFile == null) return null;
   try {
-    final data = jsonDecode(jsonFile.readAsStringSync());
+    final data = jsonDecode(await jsonFile.readAsString());
     final epoch = int.parse(data['photoTakenTime']['timestamp'].toString());
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   } on FormatException catch (_) {
@@ -16,13 +16,13 @@ Future<DateTime?> jsonExtractor(File file) async {
   }
 }
 
-File? _jsonForFile(File file, [bool goDumb = true]) {
+Future<File?> _jsonForFile(File file, [bool goDumb = true]) async {
   final correspondingJson = _normalJsonForFile(file);
-  if (correspondingJson.existsSync()) {
+  if (await correspondingJson.exists()) {
     return correspondingJson;
   } else if (goDumb) {
     final dumbJson = _dumbJsonForFile(file);
-    return dumbJson.existsSync() ? dumbJson : null;
+    return (await dumbJson.exists()) ? dumbJson : null;
   }
   return null;
 }
