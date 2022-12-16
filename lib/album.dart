@@ -36,8 +36,8 @@ List<Album> findAlbums(List<Directory> albumFolders, List<Media> allMedia) {
     final album = Album(basename(dir.path), []);
     final media = allMedia.toList(); // .copy()
     // add all media from this albumFolder
-    for (final _f in dir.listSync().wherePhotoVideo()) {
-      media.add(Media(_f, dateTakenAccuracy: -1));
+    for (final f in dir.listSync().wherePhotoVideo()) {
+      media.add(Media(f, dateTakenAccuracy: -1));
     }
     // we'll effectively do the same as duplicates
     final bySize = media.groupListsBy((e) => e.size);
