@@ -7,15 +7,6 @@ import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
-// elastic list of extractors - can add/remove more in future
-// for example, with cli flags
-// those are in order of reliability
-// if one fails, only then later ones will be used
-final List<DateTimeExtractor> dateExtractors = [
-  jsonExtractor,
-  exifExtractor,
-];
-
 const helpText = """GooglePhotosTakeoutHelper v3.0.0 - The Dart successor
 
 gpth is ment to help you with exporting your photos from Google Photos.
@@ -36,7 +27,12 @@ void main(List<String> arguments) async {
     ..addOption('input',
         abbr: 'i', help: 'Input folder with *all* takeouts extracted')
     ..addOption('output',
-        abbr: 'o', help: 'Output folder where all photos will land');
+        abbr: 'o', help: 'Output folder where all photos will land')
+    ..addFlag(
+      'guess-from-name',
+      help: 'Try to guess file dates from their names',
+      defaultsTo: false,
+    );
   late final ArgResults res;
   try {
     res = parser.parse(arguments);
@@ -61,6 +57,15 @@ void main(List<String> arguments) async {
     print(parser.usage);
     return;
   }
+
+  // elastic list of extractors - can add/remove with cli flags
+  // those are in order of reliability
+  // if one fails, only then later ones will be used
+  final dateExtractors = <DateTimeExtractor>[
+    jsonExtractor,
+    exifExtractor,
+    if (res['guess-from-name']) guessExtractor,
+  ];
 
   if (res['fix'] != null) {
     print('FIX MODE');

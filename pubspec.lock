@@ -58,7 +58,7 @@ packages:
     source: hosted
     version: "1.17.0"
   convert:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: convert
       url: "https://pub.dartlang.org"
