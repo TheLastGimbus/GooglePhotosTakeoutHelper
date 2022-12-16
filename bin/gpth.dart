@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:console_bars/console_bars.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
@@ -18,6 +19,7 @@ When ready, download all .zips, and extract them into *one* folder.
 Then, run: gpth --input "folder/with/all/takeouts" --output "your/output/folder"
 ...and gpth will parse and organize all photos into one big chronological folder
 """;
+const barWidth = 60;
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
@@ -212,8 +214,11 @@ void main(List<String> arguments) async {
 
   /// ##### Extracting/predicting dates using given extractors #####
 
-  print('Extracting dates from files...');
-
+  final barExtract = FillingBar(
+    total: media.length,
+    desc: "Guessing dates from files",
+    width: barWidth,
+  );
   var q = 0;
   for (final extractor in dateExtractors) {
     for (var i = 0; i < media.length; i++) {
@@ -223,12 +228,14 @@ void main(List<String> arguments) async {
         if (date != null) {
           media[i].dateTaken = date;
           media[i].dateTakenAccuracy = q;
+          barExtract.increment();
         }
       }
     }
     // increase this every time - indicate the extraction gets more shitty
     q++;
   }
+  print('');
 
   /// ##############################################################
 
@@ -260,8 +267,11 @@ void main(List<String> arguments) async {
 
   /// ##### Copy/move files to actual output folder #####
 
-  print("${args['copy'] ? 'Coping' : 'Moving'} files to output folder...");
-
+  final barCopy = FillingBar(
+    total: media.length,
+    desc: "${args['copy'] ? 'Coping' : 'Moving'} files to output folder",
+    width: 60,
+  );
   await for (final m in Stream.fromIterable(media)) {
     final freeFile =
         findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
@@ -269,7 +279,9 @@ void main(List<String> arguments) async {
         ? await m.file.copy(freeFile.path)
         : await m.file.rename(freeFile.path);
     await c.setLastModified(m.dateTaken ?? DateTime.now());
+    barCopy.increment();
   }
+  print('');
 
   /// ###################################################
 
