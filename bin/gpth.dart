@@ -185,7 +185,10 @@ void main(List<String> arguments) async {
 
   // TODO: --move mode
   for (final m in media) {
-    final c = m.file.copySync(p.join(output.path, p.basename(m.file.path)));
+    // TODO: Prevent filling the output folder over and over
+    final freeFile =
+        findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
+    final c = m.file.copySync(freeFile.path);
     c.setLastModifiedSync(m.dateTaken ?? DateTime.now());
   }
 
