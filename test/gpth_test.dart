@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:gpth/album.dart';
@@ -8,7 +9,27 @@ import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
+  /// this is 1x1 green jg image, with exif:
+  /// DateTime Original: 2022:12:16 16:06:47
+  const greenImgBase64 = """
+/9j/4AAQSkZJRgABAQAAAQABAAD/4QC4RXhpZgAATU0AKgAAAAgABQEaAAUAAAABAAAASgEbAAUA
+AAABAAAAUgEoAAMAAAABAAEAAAITAAMAAAABAAEAAIdpAAQAAAABAAAAWgAAAAAAAAABAAAAAQAA
+AAEAAAABAAWQAAAHAAAABDAyMzKQAwACAAAAFAAAAJyRAQAHAAAABAECAwCgAAAHAAAABDAxMDCg
+AQADAAAAAf//AAAAAAAAMjAyMjoxMjoxNiAxNjowNjo0NwD/2wBDAAMCAgICAgMCAgIDAwMDBAYE
+BAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQD
+BAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ
+EBD/wAARCAABAAEDAREAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QA
+tRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkK
+FhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJ
+ipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx
+8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcF
+BAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygp
+KjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJma
+oqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oA
+DAMBAAIRAxEAPwCKv5yP4XP/2Q==""";
+
   final albumDir = Directory('Vacation');
+  final imgFileGreen = File('green.jpg');
   final imgFile1 = File('image.jpg');
   final jsonFile1 = File('image.jpg.json');
   final imgFile2 = File('verylongverylong.jpg');
@@ -19,6 +40,10 @@ void main() {
   ];
   setUpAll(() {
     albumDir.createSync(recursive: true);
+    imgFileGreen.createSync();
+    imgFileGreen.writeAsBytesSync(
+      base64.decode(greenImgBase64.replaceAll('\n', '')),
+    );
     imgFile1.createSync();
     imgFile1.copySync('${albumDir.path}/${basename(imgFile1.path)}');
     imgFile2.createSync();
@@ -34,6 +59,12 @@ void main() {
     expect((await jsonExtractor(imgFile2))?.millisecondsSinceEpoch,
         1683078832 * 1000);
   });
+  test('test exif extractor', () async {
+    expect(
+      (await exifExtractor(imgFileGreen)),
+      DateTime.parse('2022-12-16 16:06:47'),
+    );
+  });
 
   test('test duplicate removal', () {
     expect(removeDuplicates(media), 1);
@@ -47,6 +78,7 @@ void main() {
   });
   tearDownAll(() {
     albumDir.deleteSync(recursive: true);
+    imgFileGreen.deleteSync();
     imgFile1.deleteSync();
     imgFile2.deleteSync();
     jsonFile1.deleteSync();

@@ -14,6 +14,7 @@ import 'package:path/path.dart';
 // if one fails, only then later ones will be used
 final List<DateTimeExtractor> dateExtractors = [
   jsonExtractor,
+  exifExtractor,
 ];
 
 const helpText = """GooglePhotosTakeoutHelper v3.0.0 - The Dart successor
