@@ -25,6 +25,9 @@ final _commonDatetimePatterns = [
   ],
 ];
 
+
+/// Guesses DateTime from [file]s name
+/// - for example Screenshot_20190919-053857.jpg - we can guess this 😎
 Future<DateTime?> guessExtractor(File file) async {
   for (final pat in _commonDatetimePatterns) {
     // extract date str with regex

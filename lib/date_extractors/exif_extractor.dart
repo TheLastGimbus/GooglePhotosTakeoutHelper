@@ -3,6 +3,9 @@ import 'dart:math';
 
 import 'package:exif/exif.dart';
 
+/// DateTime from exif data *potentially* hidden within a [file]
+///
+/// You can try this with *any* file, it either works or not 🤷
 Future<DateTime?> exifExtractor(File file) async {
   final bytes = await file.readAsBytes();
   // this returns empty {} if file doesn't have exif so don't worry

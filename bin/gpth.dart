@@ -89,9 +89,22 @@ void main(List<String> arguments) async {
   }
   output.createSync(recursive: true);
 
+  // Okay, time to explain the structure of things here
+  // We create a list of Media objects, and fill it with everything we find
+  // in "year folders". Then, we play *mutably* with this list - fill Media's
+  // with guess DateTime's, remove duplicates from this list.
+  //
+  // No shitheads, you did not overhear - we *mutate* the whole list and objects
+  // inside it. This his not Flutter-ish, but it's not Flutter - it's a small
+  // simple script, and this the best solution 😎💯
+  /// Big global media list that we'll work on
   final media = <Media>[];
 
+  /// All "year folders" that we found
   final yearFolders = <Directory>[];
+
+  /// All album folders - that is, folders that were aside yearFolders and were
+  /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
 
   // TODO: Find folders even if input is not exactly best
@@ -138,7 +151,7 @@ void main(List<String> arguments) async {
 
   /// ##### Find albums #####
 
-  // Now, this is akward...
+  // Now, this is awkward...
   // we can find albums without a problem, but we have no idea what
   // to do about it 🤷
   // so just print it now (flex)

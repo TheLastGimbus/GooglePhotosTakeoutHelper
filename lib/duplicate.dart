@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:gpth/media.dart';
 
 /// Removes duplicate media from list of media
-/// Uses sha256 hash to distinct
+/// Uses file size, then sha256 hash to distinct
 ///
 /// Returns count of removed
 int removeDuplicates(List<Media> media) {

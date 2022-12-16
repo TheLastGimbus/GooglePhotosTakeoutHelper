@@ -32,6 +32,9 @@ AQACEQMRAD8AIcgXf//Z""";
     Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
     Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
   ];
+
+  /// Set up test stuff - create test shitty files in wherever pwd is
+  /// We don't worry because we'll delete them later
   setUpAll(() {
     albumDir.createSync(recursive: true);
     imgFileGreen.createSync();
@@ -80,6 +83,8 @@ AQACEQMRAD8AIcgXf//Z""";
       Album('Vacation', [media.first])
     ]);
   });
+
+  /// Delete all shitty files as we promised
   tearDownAll(() {
     albumDir.deleteSync(recursive: true);
     imgFileGreen.deleteSync();
