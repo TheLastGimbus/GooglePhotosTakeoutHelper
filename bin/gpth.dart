@@ -16,15 +16,68 @@ final List<DateTimeExtractor> dateExtractors = [
   jsonExtractor,
 ];
 
+const helpText = """GooglePhotosTakeoutHelper v3.0.0 - The Dart successor
+
+gpth is ment to help you with exporting your photos from Google Photos.
+
+First, go to https://takeout.google.com/ , deselect all and select only Photos.
+When ready, download all .zips, and extract them into *one* folder.
+
+Then, run: gpth --input "folder/with/all/takeouts" --output "your/output/folder"
+...and gpth will parse and organize all photos into one big chronological folder
+""";
+
 void main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addOption('input', abbr: 'i', help: 'Input folder', mandatory: true)
-    ..addOption('output', abbr: 'o', help: 'Output folder');
-  final res = parser.parse(arguments);
+    ..addFlag('help', abbr: 'h', help: 'Print help', negatable: false)
+    ..addOption('fix',
+        help: 'Folder with any photos to fix dates. '
+            'This skips whole "GoogleTakeout" procedure')
+    ..addOption('input',
+        abbr: 'i', help: 'Input folder with *all* takeouts extracted')
+    ..addOption('output',
+        abbr: 'o', help: 'Output folder where all photos will land');
+  late final ArgResults res;
+  try {
+    res = parser.parse(arguments);
+  } on FormatException catch (e) {
+    // don't print big ass trace
+    stderr.write('$e\n');
+    exit(1);
+  } catch (e) {
+    // any other exceptions (res must not be null)
+    stderr.write('$e\n');
+    exit(100);
+  }
 
-  final cliInput = res['input'] as String;
+  if (res.arguments.isEmpty) {
+    print('GooglePhotosTakeoutHelper v3.0.0');
+    print('type --help for more info about usage');
+    return;
+  }
 
-  final input = Directory(cliInput);
+  if (res['help']) {
+    print(helpText);
+    print(parser.usage);
+    return;
+  }
+
+  if (res['fix'] != null) {
+    print('FIX MODE');
+    // TODO: fix mode
+    return;
+  }
+
+  // TODO: check args and run
+  if (res['input'] == null) {
+    stderr.write("No --input folder specified :/\n");
+    exit(10);
+  }
+  final input = Directory(res['input']);
+  if (!input.existsSync()) {
+    stderr.write("Input folder does not exist :/\n");
+    exit(11);
+  }
 
   final media = <Media>[];
 
