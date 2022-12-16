@@ -27,8 +27,9 @@ AQACEQMRAD8AIcgXf//Z""";
   final imgFileGreen = File('green.jpg');
   final imgFile1 = File('image-edited.jpg');
   final jsonFile1 = File('image-edited.jpg.json');
-  final imgFile2 = File('verylongverylong.jpg');
-  final jsonFile2 = File('verylongverylon.json');
+  // these names are from good old #8 issue...
+  final imgFile2 = File('Urlaub in Knaufspesch in der Schneifel (38).JPG');
+  final jsonFile2 = File('Urlaub in Knaufspesch in der Schneifel (38).JP.json');
   final media = [
     Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
     Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),

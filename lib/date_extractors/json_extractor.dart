@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
 Future<DateTime?> jsonExtractor(File file) async {
   final jsonFile = await _jsonForFile(file);
@@ -31,5 +33,8 @@ File _normalJsonForFile(File file) => File('${file.path}.json');
 
 // this resolves years of bugs and head-scratches 😆
 // f.e: https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/8#issuecomment-736539592
-File _dumbJsonForFile(File file) =>
-    File('${file.path.substring(0, file.path.length - 5)}.json');
+File _dumbJsonForFile(File file) {
+  var base = p.basename(file.path);
+  if ('$base.json'.length > 51) base = base.substring(0, 51 - '.json'.length);
+  return File('$base.json');
+}
