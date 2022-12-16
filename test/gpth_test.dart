@@ -68,7 +68,8 @@ AQACEQMRAD8AIcgXf//Z""";
       final files = [
         ['Screenshot_20190919-053857_Camera-edited.jpg', '2019-09-19 05:38:57'],
         ['MVIMG_20190215_193501.MP4', '2019-02-15 19:35:01'],
-        ['Screenshot_2019-04-16-11-19-37-232_com.go.jpg', '2019-04-16 11:19:37']
+        ['Screenshot_2019-04-16-11-19-37-232_com.jpg', '2019-04-16 11:19:37'],
+        ['signal-2020-10-26-163832.jpg', '2020-10-26 16:38:32'],
       ];
       for (final f in files) {
         expect((await guessExtractor(File(f.first))), DateTime.parse(f.last));

@@ -23,6 +23,11 @@ final _commonDatetimePatterns = [
         r'(?<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{2}-\d{2}-\d{2})'),
     'YYYY-MM-DD-hh-mm-ss',
   ],
+  // example: signal-2020-10-26-163832.jpg
+  [
+    RegExp(r'(?<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{6})'),
+    'YYYY-MM-DD-hhmmss',
+  ]
 ];
 
 /// Guesses DateTime from [file]s name
