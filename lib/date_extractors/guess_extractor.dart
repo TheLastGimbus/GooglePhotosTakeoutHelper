@@ -20,11 +20,10 @@ final _commonDatetimePatterns = [
   // example: Screenshot_2019-04-16-11-19-37-232_com.google.a.jpg
   [
     RegExp(
-        r'(?<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{2}-?\d{2}-?\d{2})'),
+        r'(?<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{2}-\d{2}-\d{2})'),
     'YYYY-MM-DD-hh-mm-ss',
   ],
 ];
-
 
 /// Guesses DateTime from [file]s name
 /// - for example Screenshot_20190919-053857.jpg - we can guess this 😎
