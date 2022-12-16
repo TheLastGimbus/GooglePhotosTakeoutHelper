@@ -111,6 +111,37 @@ void main(List<String> arguments) async {
     error("Input folder does not exist :/");
     exit(11);
   }
+  // all of this logic is to prevent user easily blowing output folder
+  // by running command two times
+  if (output.existsSync() && output.listSync().isNotEmpty) {
+    print('Output folder exists, and IS NOT EMPTY! What to do? Type either:');
+    print('[delete] - delete *all* files inside output folder and continue');
+    print('[ignore] - continue as usual - put output files alongside existing');
+    print('[cancel] - exit program to examine situation yourself');
+    final answer = stdin
+        .readLineSync()!
+        .replaceAll('[', '')
+        .replaceAll(']', '')
+        .toLowerCase()
+        .trim();
+    switch (answer) {
+      case 'delete':
+        print('Okay, deleting all files inside output folder...');
+        await for (final file in output.list()) {
+          await file.delete(recursive: true);
+        }
+        break;
+      case 'ignore':
+        print('Okay, continuing as usual...');
+        break;
+      case 'cancel':
+        print('Okay, exiting...');
+        exit(0);
+      default:
+        print('Unknown answer, exiting...');
+        exit(1);
+    }
+  }
   output.createSync(recursive: true);
 
   // Okay, time to explain the structure of things here
