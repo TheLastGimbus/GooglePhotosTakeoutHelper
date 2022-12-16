@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
+import 'package:gpth/extras.dart';
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -28,11 +29,9 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts extracted')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
-    ..addFlag(
-      'guess-from-name',
-      help: 'Try to guess file dates from their names',
-      defaultsTo: false,
-    );
+    ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
+    ..addFlag('guess-from-name',
+        help: 'Try to guess file dates from their names');
   late final ArgResults args;
   try {
     args = parser.parse(arguments);
@@ -211,6 +210,12 @@ void main(List<String> arguments) async {
   removeDuplicates(media);
 
   /// ###########################
+
+  /// ##### Potentially skip extras #####
+
+  if (args['skip-extras']) removeExtras(media);
+
+  /// ###################################
 
   /// ##### Find albums #####
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:gpth/album.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
+import 'package:gpth/extras.dart';
 import 'package:gpth/media.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
@@ -24,8 +25,8 @@ AQACEQMRAD8AIcgXf//Z""";
 
   final albumDir = Directory('Vacation');
   final imgFileGreen = File('green.jpg');
-  final imgFile1 = File('image.jpg');
-  final jsonFile1 = File('image.jpg.json');
+  final imgFile1 = File('image-edited.jpg');
+  final jsonFile1 = File('image-edited.jpg.json');
   final imgFile2 = File('verylongverylong.jpg');
   final jsonFile2 = File('verylongverylon.json');
   final media = [
@@ -80,6 +81,11 @@ AQACEQMRAD8AIcgXf//Z""";
     expect(removeDuplicates(media), 1);
     expect(media.length, 1);
     expect(media.first.file, imgFile1);
+  });
+  test('test extras removal', () {
+    final m = [Media(imgFile1), Media(imgFile2)];
+    expect(removeExtras(m), 1);
+    expect(m.length, 1);
   });
   test('test album finding', () {
     expect(findAlbums([albumDir], media), [
