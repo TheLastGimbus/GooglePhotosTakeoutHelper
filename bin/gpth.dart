@@ -42,11 +42,11 @@ void main(List<String> arguments) async {
     res = parser.parse(arguments);
   } on FormatException catch (e) {
     // don't print big ass trace
-    stderr.write('$e\n');
+    error('$e');
     exit(1);
   } catch (e) {
     // any other exceptions (res must not be null)
-    stderr.write('$e\n');
+    error('$e');
     exit(100);
   }
 
@@ -70,12 +70,12 @@ void main(List<String> arguments) async {
 
   // TODO: check args and run
   if (res['input'] == null) {
-    stderr.write("No --input folder specified :/\n");
+    error("No --input folder specified :/");
     exit(10);
   }
   final input = Directory(res['input']);
   if (!input.existsSync()) {
-    stderr.write("Input folder does not exist :/\n");
+    error("Input folder does not exist :/");
     exit(11);
   }
 
