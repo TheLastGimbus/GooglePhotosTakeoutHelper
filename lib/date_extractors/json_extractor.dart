@@ -36,5 +36,5 @@ File _normalJsonForFile(File file) => File('${file.path}.json');
 File _dumbJsonForFile(File file) {
   var base = p.basename(file.path);
   if ('$base.json'.length > 51) base = base.substring(0, 51 - '.json'.length);
-  return File('$base.json');
+  return File('${p.dirname(file.path)}/$base.json');
 }
