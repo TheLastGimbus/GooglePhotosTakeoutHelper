@@ -1,3 +1,7 @@
+## 3.1.0
+
+- Added `--divide-to-dates` 🎉
+
 ## 3.0.0
 
 - Dart!

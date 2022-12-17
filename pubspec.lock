@@ -63,7 +63,7 @@ packages:
       name: console_bars
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.5"
+    version: "1.1.0"
   convert:
     dependency: "direct main"
     description:
