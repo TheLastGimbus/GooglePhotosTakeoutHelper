@@ -19,7 +19,7 @@ When ready, download all .zips, and extract them into *one* folder.
 Then, run: gpth --input "folder/with/all/takeouts" --output "your/output/folder"
 ...and gpth will parse and organize all photos into one big chronological folder
 """;
-const barWidth = 60;
+const barWidth = 40;
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
@@ -274,7 +274,7 @@ void main(List<String> arguments) async {
   final barCopy = FillingBar(
     total: media.length,
     desc: "${args['copy'] ? 'Coping' : 'Moving'} files to output folder",
-    width: 60,
+    width: barWidth,
   );
   await for (final m in Stream.fromIterable(media)) {
     final freeFile =
