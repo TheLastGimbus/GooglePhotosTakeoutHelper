@@ -31,6 +31,7 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts extracted')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
+    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
     ..addFlag(
       'guess-from-name',
@@ -277,8 +278,17 @@ void main(List<String> arguments) async {
     width: barWidth,
   );
   await for (final m in Stream.fromIterable(media)) {
+    final date = m.dateTaken;
+    final folder = args['divide-to-dates']
+        ? Directory(
+            date == null
+                ? p.join(output.path, 'date-unknown')
+                : p.join(output.path, '${date.year}', '${date.month}'),
+          )
+        : output;
+    if (args['divide-to-dates']) await folder.create(recursive: true);
     final freeFile =
-        findNotExistingName(File(p.join(output.path, p.basename(m.file.path))));
+        findNotExistingName(File(p.join(folder.path, p.basename(m.file.path))));
     final c = args['copy']
         ? await m.file.copy(freeFile.path)
         : await m.file.rename(freeFile.path);
