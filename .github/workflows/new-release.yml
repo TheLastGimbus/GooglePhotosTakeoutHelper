@@ -44,4 +44,18 @@ jobs:
         with:
           files: ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
           fail_on_unmatched_files: true
-
+      # if linux, upload to aur
+      - name: Generate PKGBUILD
+        if: matrix.os == 'ubuntu-latest'
+        run: ./scripts/gen-pkgbuild.bash ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe > ./PKGBUILD
+      - name: Upload to AUR
+        if: matrix.os == 'ubuntu-latest'
+        uses: KSXGitHub/github-actions-deploy-aur@v2
+        with:
+          pkgname: gpth-bin
+          pkgbuild: ./PKGBUILD
+          commit_username: 'TheLastGimbus'
+          commit_emai: 'mateusz.soszynski@tuta.io'
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{ steps.clean_tag.outputs.tag }}
+          test: true
