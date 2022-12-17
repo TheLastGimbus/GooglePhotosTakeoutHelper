@@ -219,21 +219,22 @@ void main(List<String> arguments) async {
     desc: "Guessing dates from files",
     width: barWidth,
   );
-  var q = 0;
-  for (final extractor in dateExtractors) {
-    for (var i = 0; i < media.length; i++) {
-      // if already has date then skip
-      if (media[i].dateTaken == null) {
-        final date = await extractor(media[i].file);
-        if (date != null) {
-          media[i].dateTaken = date;
-          media[i].dateTakenAccuracy = q;
-          barExtract.increment();
-        }
+  for (var i = 0; i < media.length; i++) {
+    var q = 0;
+    for (final extractor in dateExtractors) {
+      final date = await extractor(media[i].file);
+      if (date != null) {
+        media[i].dateTaken = date;
+        media[i].dateTakenAccuracy = q;
+        barExtract.increment();
+        break;
       }
+      // increase this every time - indicate the extraction gets more shitty
+      q++;
     }
-    // increase this every time - indicate the extraction gets more shitty
-    q++;
+    if (media[i].dateTaken == null) {
+      print("\nCan't get date on ${media[i].file.path}");
+    }
   }
   print('');
 
@@ -287,8 +288,15 @@ void main(List<String> arguments) async {
 
   print('DONE! FREEEEEDOOOOM!!!');
   print('Found ${media.length} photos/videos in "${input.path}"');
-  print('Left out $countDuplicates duplicates');
+  if (countDuplicates > 0) print('Left out $countDuplicates duplicates');
   if (args['skip-extras']) print('Left out $countExtras extras');
+  final countPoop = media.where((e) => e.dateTaken == null).length;
+  if (countPoop > 0) {
+    print(
+      "Couldn't find date for $countPoop "
+      "photos/videos :/",
+    );
+  }
   print(
     '${args['copy'] ? 'Copied' : 'Moved'} '
     '${media.length - countDuplicates - countExtras} '
