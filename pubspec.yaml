@@ -1,7 +1,7 @@
 name: gpth
-description: GooglePhotosTakeoutHelper
+description: 'Tool to help you with exporting stuff from Google Photos'
 version: 3.0.0
-# homepage: https://www.example.com
+homepage: 'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper'
 
 environment:
   sdk: '>=2.18.5 <3.0.0'
