@@ -55,7 +55,7 @@ jobs:
           pkgname: gpth-bin
           pkgbuild: ./PKGBUILD
           commit_username: 'TheLastGimbus'
-          commit_emai: 'mateusz.soszynski@tuta.io'
+          commit_email: 'mateusz.soszynski@tuta.io'
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           commit_message: ${{ steps.clean_tag.outputs.tag }}
           test: true
