@@ -12,11 +12,11 @@ depends=()
 provides=('gpth')
 conflicts=('gpth')
 options=('!strip')
-source=('\${url}/releases/download/v\${pkgver}/gpth-v\${pkgver}-Linux.exe')
+source=(\"\${url}/releases/download/v\${pkgver}/gpth-v\${pkgver}-Linux.exe\")
 sha256sums=('$(sha256sum "$1" | cut -d " " -f 1)')
 
 package() {
-    install -Dm755 gpth-v\${pkgver}-Linux.exe '\$pkgdir/usr/bin/gpth'
+    install -Dm755 \"gpth-v\${pkgver}-Linux.exe\" \"\${pkgdir}/usr/bin/gpth\"
 }"
 
 echo "$txt" >PKGBUILD
