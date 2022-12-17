@@ -7,3 +7,6 @@
 - [Testing!](https://youtu.be/UGSgpvjHp9o?t=292)
 - Better json matching
 - `--guess-from-name` is now a default
+- `--skip-extras-harder` is missing for now
+- `--divide-to-dates` is missing for now
+- End-to-end tests are gone, but they're not as required since we have a lod of Units instead 👍
