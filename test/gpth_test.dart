@@ -30,9 +30,12 @@ AQACEQMRAD8AIcgXf//Z""";
   // these names are from good old #8 issue...
   final imgFile2 = File('Urlaub in Knaufspesch in der Schneifel (38).JPG');
   final jsonFile2 = File('Urlaub in Knaufspesch in der Schneifel (38).JP.json');
+  final imgFile3 = File('Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg');
+  final jsonFile3 = File('Screenshot_2022-10-28-09-31-43-118_com.snapcha.json');
   final media = [
     Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
     Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
+    Media(imgFile3, dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -43,14 +46,16 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFileGreen.writeAsBytesSync(
       base64.decode(greenImgBase64.replaceAll('\n', '')),
     );
-    imgFile1.createSync();
+    // apparently you don't need to .create() before writing 👍
+    imgFile1.writeAsBytesSync([1, 2, 3]); // those two...
     imgFile1.copySync('${albumDir.path}/${basename(imgFile1.path)}');
-    imgFile2.createSync();
-    jsonFile1.createSync();
-    jsonFile1
-        .writeAsStringSync('{"photoTakenTime": {"timestamp": "1599078832"}}');
-    jsonFile2
-        .writeAsStringSync('{"photoTakenTime": {"timestamp": "1683078832"}}');
+    imgFile2.writeAsBytesSync([1, 2, 3]); // are actual duplicates
+    imgFile3.writeAsBytesSync([3, 2, 1]); // and this one is different
+    writeJson(File file, int time) =>
+        file.writeAsStringSync('{"photoTakenTime": {"timestamp": "$time"}}');
+    writeJson(jsonFile1, 1599078832);
+    writeJson(jsonFile2, 1683078832);
+    writeJson(jsonFile3, 1666942303);
   });
 
   group('DateTime extractors', () {
@@ -59,6 +64,8 @@ AQACEQMRAD8AIcgXf//Z""";
           1599078832 * 1000);
       expect((await jsonExtractor(imgFile2))?.millisecondsSinceEpoch,
           1683078832 * 1000);
+      expect((await jsonExtractor(imgFile3))?.millisecondsSinceEpoch,
+          1666942303 * 1000);
     });
     test('test exif extractor', () async {
       expect(
@@ -80,7 +87,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
   test('test duplicate removal', () {
     expect(removeDuplicates(media), 1);
-    expect(media.length, 1);
+    expect(media.length, 2);
     expect(media.first.file, imgFile1);
   });
   test('test extras removal', () {
@@ -100,7 +107,9 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFileGreen.deleteSync();
     imgFile1.deleteSync();
     imgFile2.deleteSync();
+    imgFile3.deleteSync();
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
+    jsonFile3.deleteSync();
   });
 }
