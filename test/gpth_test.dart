@@ -79,6 +79,7 @@ AQACEQMRAD8AIcgXf//Z""";
         ['MVIMG_20190215_193501.MP4', '2019-02-15 19:35:01'],
         ['Screenshot_2019-04-16-11-19-37-232_com.jpg', '2019-04-16 11:19:37'],
         ['signal-2020-10-26-163832.jpg', '2020-10-26 16:38:32'],
+        ['VID_20220107_113306.mp4', '2022-01-07 11:33:06'],
       ];
       for (final f in files) {
         expect((await guessExtractor(File(f.first))), DateTime.parse(f.last));

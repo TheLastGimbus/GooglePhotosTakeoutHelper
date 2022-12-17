@@ -32,8 +32,11 @@ void main(List<String> arguments) async {
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
-    ..addFlag('guess-from-name',
-        help: 'Try to guess file dates from their names')
+    ..addFlag(
+      'guess-from-name',
+      help: 'Try to guess file dates from their names',
+      defaultsTo: true,
+    )
     ..addFlag('copy',
         help: "Copy files instead of moving them.\n"
             "This is usually slower, and uses extra space, "
