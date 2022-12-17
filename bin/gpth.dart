@@ -216,6 +216,32 @@ void main(List<String> arguments) async {
 
   /// ##################################################
 
+  /// ##### Find duplicates #####
+
+  // TODO: Check if we even need to print this if it's maybe fast enough
+  print('Finding duplicates...');
+
+  final countDuplicates = removeDuplicates(media);
+
+  /// ###########################
+
+  /// ##### Potentially skip extras #####
+
+  if (args['skip-extras']) print('Finding "extra" photos (-edited etc)');
+  final countExtras = args['skip-extras'] ? removeExtras(media) : 0;
+
+  /// ###################################
+
+  /// ##### Find albums #####
+
+  // Now, this is awkward...
+  // we can find albums without a problem, but we have no idea what
+  // to do about it 🤷
+  // so just print it now (flex)
+  // findAlbums(albumFolders, media).forEach(print);
+
+  /// #######################
+
   /// ##### Extracting/predicting dates using given extractors #####
 
   final barExtract = FillingBar(
@@ -243,32 +269,6 @@ void main(List<String> arguments) async {
   print('');
 
   /// ##############################################################
-
-  /// ##### Find duplicates #####
-
-  // TODO: Check if we even need to print this if it's maybe fast enough
-  print('Finding duplicates...');
-
-  final countDuplicates = removeDuplicates(media);
-
-  /// ###########################
-
-  /// ##### Potentially skip extras #####
-
-  if (args['skip-extras']) print('Finding "extra" photos (-edited etc)');
-  final countExtras = args['skip-extras'] ? removeExtras(media) : 0;
-
-  /// ###################################
-
-  /// ##### Find albums #####
-
-  // Now, this is awkward...
-  // we can find albums without a problem, but we have no idea what
-  // to do about it 🤷
-  // so just print it now (flex)
-  // findAlbums(albumFolders, media).forEach(print);
-
-  /// #######################
 
   /// ##### Copy/move files to actual output folder #####
 
