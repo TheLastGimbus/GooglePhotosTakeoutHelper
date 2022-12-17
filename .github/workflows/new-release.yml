@@ -46,6 +46,7 @@ jobs:
       # You can specify other versions if desired, see documentation here:
       # https://github.com/dart-lang/setup-dart/blob/main/README.md
       - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
       - name: Build exe
         run: dart compile exe bin/gpth.dart -o ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
       - name: Add files to GH-Release
