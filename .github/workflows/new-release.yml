@@ -39,6 +39,16 @@ jobs:
       - run: dart pub get
       - name: Build exe
         run: dart compile exe bin/gpth.dart -o ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
+      - name: Code sign a windoza exe file
+        if: matrix.os == 'windows-latest'
+        uses: dlemstra/code-sign-action@v1
+        with:
+          # Note: this is a self-signed certificate that i generated on my computer
+          # This is worthless i think, since windoza still get angry, but best i can do,
+          # because proper certificates cost money (a lot :/ )
+          certificate: ${{ secrets.WINDOZA_CERT_BASE64 }}
+          password: ${{ secrets.WINDOZA_CERT_PASSWORD }}
+          folder: '.'
       - name: Add files to GH-Release
         uses: softprops/action-gh-release@v1
         with:
@@ -48,14 +58,15 @@ jobs:
       - name: Generate PKGBUILD
         if: matrix.os == 'ubuntu-latest'
         run: ./scripts/gen-pkgbuild.bash ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe > ./PKGBUILD
-      - name: Upload to AUR
-        if: matrix.os == 'ubuntu-latest'
-        uses: KSXGitHub/github-actions-deploy-aur@v2
-        with:
-          pkgname: gpth-bin
-          pkgbuild: ./PKGBUILD
-          commit_username: 'TheLastGimbus'
-          commit_email: 'mateusz.soszynski@tuta.io'
-          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: ${{ steps.clean_tag.outputs.tag }}
-          test: true
+        # Disable for a moment
+#      - name: Upload to AUR
+#        if: matrix.os == 'ubuntu-latest'
+#        uses: KSXGitHub/github-actions-deploy-aur@v2
+#        with:
+#          pkgname: gpth-bin
+#          pkgbuild: ./PKGBUILD
+#          commit_username: 'TheLastGimbus'
+#          commit_email: 'mateusz.soszynski@tuta.io'
+#          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+#          commit_message: ${{ steps.clean_tag.outputs.tag }}
+#          test: true

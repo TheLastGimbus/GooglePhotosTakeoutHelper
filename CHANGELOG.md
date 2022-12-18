@@ -1,3 +1,7 @@
+## 3.1.1
+
+- Code sign windoza exe with self-made cert
+
 ## 3.1.0
 
 - Added `--divide-to-dates` 🎉
