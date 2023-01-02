@@ -5,6 +5,7 @@ import 'package:console_bars/console_bars.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
+import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -31,20 +32,22 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts extracted')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
-    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
-    ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
-    ..addFlag(
+    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')..addFlag(
+        'skip-extras', help: 'Skip extra images (like -edited etc)')..addFlag(
       'guess-from-name',
       help: 'Try to guess file dates from their names',
       defaultsTo: true,
-    )
-    ..addFlag('copy',
+    )..addFlag('copy',
         help: "Copy files instead of moving them.\n"
             "This is usually slower, and uses extra space, "
             "but doesn't break your input folder");
-  late final ArgResults args;
+  final args = <String, dynamic>{};
   try {
-    args = parser.parse(arguments);
+    final res = parser.parse(arguments);
+    for (final key in res.options) {
+      args[key] = res[key];
+    }
+    interactive.indeed = res.arguments.isEmpty;
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
@@ -55,7 +58,7 @@ void main(List<String> arguments) async {
     exit(100);
   }
 
-  if (args.arguments.isEmpty) {
+  if (args.isEmpty && !interactive.indeed) {
     print('GooglePhotosTakeoutHelper v3.0.0');
     print('type --help for more info about usage');
     return;
@@ -65,6 +68,12 @@ void main(List<String> arguments) async {
     print(parser.usage);
     return;
   }
+
+  if (interactive.indeed) await interactive.greet();
+
+  // TODO: flow of this
+  final List<File>? zips =
+      interactive.indeed ? await interactive.getZips() : null;
 
   // elastic list of extractors - can add/remove with cli flags
   // those are in order of reliability -

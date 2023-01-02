@@ -16,6 +16,7 @@ dependencies:
   crypto: ^3.0.2
   exif: ^3.1.2
   console_bars: ^1.1.0
+  file_picker_desktop: ^1.1.1
 
 dev_dependencies:
   lints: ^2.0.1
