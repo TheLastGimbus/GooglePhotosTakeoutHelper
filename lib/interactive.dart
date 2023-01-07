@@ -14,6 +14,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:archive/archive_io.dart';
 import 'package:file_picker_desktop/file_picker_desktop.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -84,7 +85,6 @@ Future<Directory> getOutput() async {
   print('Now, select output folder - all photos will be extracted there');
   await sleep(1);
   pressEnterToContinue();
-  stdin.readLineSync();
   final dir = await getDirectoryPath(dialogTitle: 'Select output folder:');
   if (dir == null) {
     error('Duh, something went wrong with selecting - try again!');
@@ -101,7 +101,7 @@ Future<void> freeSpaceNotice(int required, Directory dir) async {
   final freeSpace = await getDiskFree(dir.path);
   if (freeSpace == null) {
     print(
-      'Note: this will use ~${filesize(required)} - '
+      'Note: everything will take ~${filesize(required)} of disk space - '
       'make sure you have that available on ${dir.path} - otherwise, '
       'Ctrl-C to exit, and make some free space!\n'
       'Or: unzip manually, remove the zips and use gpth with cmd options',
@@ -109,19 +109,15 @@ Future<void> freeSpaceNotice(int required, Directory dir) async {
   } else if (freeSpace < required) {
     print(
       '!!! WARNING !!!\n'
-      'Whole process needs ${filesize(required)} of space, but you '
+      'Whole process requires ${filesize(required)} of space, but you '
       'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
-      'Press Ctrl-C to exit and make some free space.\n'
-      'Or: unzip manually, remove the zips, and use gpth with cmd options\n'
-      '(or, type "i know what i am doing" to continue)',
+      'Go make some free space!\n'
+      '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
     );
-    if (stdin.readLineSync() != 'i know what i am doing') {
-      print('Exiting, go make some free space!');
-      quit(69);
-    }
+    quit(69);
   } else {
     print(
-      '(Note: this will use ~${filesize(required)} of disk space - '
+      '(Note: everything will take ~${filesize(required)} of disk space - '
       'you have ${filesize(freeSpace)} free so should be fine :)',
     );
   }
@@ -131,10 +127,14 @@ Future<void> freeSpaceNotice(int required, Directory dir) async {
 
 /// Unzips all zips to given folder (creates it if needed)
 Future<void> unzip(List<File> zips, Directory dir) async {
+  if (await dir.exists()) await dir.delete(recursive: true);
   await dir.create(recursive: true);
   print('gpth will now unzip all of that, process it and put everything in '
       'the output folder :)');
   await sleep(2);
   pressEnterToContinue();
-  // TODO: Unzip
+  for (final zip in zips) {
+    print('Unzipping ${p.basename(zip.path)}...');
+    await extractFileToDisk(zip.path, dir.path);
+  }
 }

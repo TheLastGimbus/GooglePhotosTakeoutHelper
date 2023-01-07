@@ -87,17 +87,13 @@ void main(List<String> arguments) async {
     await interactive.freeSpaceNotice(requiredSpace, out); // and notify this
     print('');
 
-    args['unzip-dir'] = Directory(p.join(out.path, 'gpth-unzipped'));
-    args['input'] = args['unzip-dir'].path;
+    final unzipDir = Directory(p.join(out.path, '.gpth-unzipped'));
+    args['input'] = unzipDir.path;
     args['output'] = out.path;
 
-    await interactive.unzip(zips, args['unzip-dir']);
+    await interactive.unzip(zips, unzipDir);
     print('');
   }
-  // TODO: flow of this
-  // ignore: unused_local_variable
-  final List<File>? zips =
-      interactive.indeed ? await interactive.getZips() : null;
 
   // elastic list of extractors - can add/remove with cli flags
   // those are in order of reliability -
@@ -339,6 +335,12 @@ void main(List<String> arguments) async {
     barCopy.increment();
   }
   print('');
+
+  // remove unzipped folder if was created
+  if (interactive.indeed) {
+    print('Removing unzipped folder...');
+    await input.delete(recursive: true);
+  }
 
   /// ###################################################
 
