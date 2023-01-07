@@ -140,18 +140,6 @@ void main(List<String> arguments) async {
 
   /// ##### Parse all options and check if alright #####
 
-  // In interactive, everything is done in /tmp behind the scenes
-  if (!args['copy'] && !interactive.indeed) {
-    print(
-      "WARNING: Script will *move* files from input to output - not *copy* \n"
-      "- this is faster, and doesn't use extra space, but will break your \n"
-      "input folder (it will be, well, empty)\n"
-      "If you want copy instead of move, exit script (ctrl-c) and use --copy flag\n"
-      "Otherwise, press enter to agree with that",
-    );
-    stdin.readLineSync();
-  }
-
   if (args['input'] == null) {
     error("No --input folder specified :/");
     quit(10);
@@ -345,20 +333,13 @@ void main(List<String> arguments) async {
   /// ###################################################
 
   print('DONE! FREEEEEDOOOOM!!!');
-  print('Found ${media.length} photos/videos in "${input.path}"');
-  if (countDuplicates > 0) print('Left out $countDuplicates duplicates');
-  if (args['skip-extras']) print('Left out $countExtras extras');
+  if (countDuplicates > 0) print('Skipped $countDuplicates duplicates');
+  if (args['skip-extras']) print('Skipped $countExtras extras');
   final countPoop = media.where((e) => e.dateTaken == null).length;
   if (countPoop > 0) {
-    print(
-      "Couldn't find date for $countPoop "
-      "photos/videos :/",
-    );
+    print("Couldn't find date for $countPoop photos/videos :/");
   }
-  print(
-    '${args['copy'] ? 'Copied' : 'Moved'} '
-    '${media.length - countDuplicates - countExtras} '
-    'files to "${output.path}"',
-  );
+  print('${args['copy'] ? 'Copied' : 'Moved'} ${media.length} '
+      'files to "${output.path}"');
   quit(0);
 }
