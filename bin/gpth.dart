@@ -49,7 +49,7 @@ void main(List<String> arguments) async {
     for (final key in res.options) {
       args[key] = res[key];
     }
-    interactive.indeed = res.arguments.isEmpty;
+    interactive.indeed = res.arguments.isEmpty && stdin.hasTerminal;
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
