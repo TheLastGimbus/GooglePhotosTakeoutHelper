@@ -1,12 +1,22 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:gpth/interactive.dart' as interactive;
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
 /// convenient print for errors
 void error(Object? object) => stderr.write('$object\n');
+
+void quit([int code = 1]) {
+  if (interactive.indeed) {
+    print('[gpth exited ${code != 1 ? '(code $code)' : ''} - '
+        'press enter to close]');
+    stdin.readLineSync();
+  }
+  exit(code);
+}
 
 extension X on Iterable<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video

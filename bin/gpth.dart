@@ -53,11 +53,11 @@ void main(List<String> arguments) async {
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
-    exit(1);
+    quit(2);
   } catch (e) {
     // any other exceptions (args must not be null)
     error('$e');
-    exit(100);
+    quit(100);
   }
 
   if (args.isEmpty && !interactive.indeed) {
@@ -104,7 +104,7 @@ void main(List<String> arguments) async {
     final dir = Directory(args['fix']);
     if (!await dir.exists()) {
       error("directory to fix doesn't exist :/");
-      exit(11);
+      quit(11);
     }
     var set = 0;
     var notSet = 0;
@@ -144,17 +144,17 @@ void main(List<String> arguments) async {
 
   if (args['input'] == null) {
     error("No --input folder specified :/");
-    exit(10);
+    quit(10);
   }
   if (args['output'] == null) {
     error("No --output folder specified :/");
-    exit(10);
+    quit(10);
   }
   final input = Directory(args['input']);
   final output = Directory(args['output']);
   if (!await input.exists()) {
     error("Input folder does not exist :/");
-    exit(11);
+    quit(11);
   }
   // all of this logic is to prevent user easily blowing output folder
   // by running command two times
@@ -181,10 +181,11 @@ void main(List<String> arguments) async {
         break;
       case 'cancel':
         print('Okay, exiting...');
-        exit(0);
+        quit(0);
+        break;
       default:
         print('Unknown answer, exiting...');
-        exit(1);
+        quit(3);
     }
   }
   await output.create(recursive: true);

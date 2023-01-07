@@ -26,11 +26,11 @@ Future<List<File>> getZips() async {
   );
   if (files == null) {
     error('Duh, something went wrong with selecting - try again!');
-    exit(69);
+    quit(69);
   }
-  if (files.count == 0) {
+  if (files!.count == 0) {
     error('No files selected - try again :/');
-    exit(6969);
+    quit(6969);
   }
   if (files.count == 1) {
     print("You selected only one zip - if that's only one you have, it's cool, "
@@ -44,7 +44,7 @@ Future<List<File>> getZips() async {
       e.path!.endsWith('.zip'))) {
     print('Files: [${files.files.map((e) => p.basename(e.path!)).join(', ')}]');
     error('Not all files you selected are zips :/ please do this again');
-    exit(6969);
+    quit(6969);
   }
   print('Cool!\n');
   return files.files.map((e) => File(e.path!)).toList();
@@ -57,10 +57,10 @@ Future<Directory> getOutput() async {
   final dir = await getDirectoryPath(dialogTitle: 'Select output folder:');
   if (dir == null) {
     error('Duh, something went wrong with selecting - try again!');
-    exit(69);
+    quit(69);
   }
   print('Cool!\n');
-  return Directory(dir);
+  return Directory(dir!);
 }
 
 Future<void> unzip(List<File> zips, Directory dir) async {
@@ -88,7 +88,7 @@ Future<void> unzip(List<File> zips, Directory dir) async {
     );
     if (stdin.readLineSync() != 'i know what i am doing') {
       print('Exiting, go make some free space!');
-      exit(69);
+      quit(69);
     }
   } else {
     print(
