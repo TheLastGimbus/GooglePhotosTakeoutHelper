@@ -38,7 +38,6 @@ File findNotExistingName(File initialFile) {
   return file;
 }
 
-// TODO: Other OSes
 Future<int?> getDiskFree([String? path]) async {
   path ??= Directory.current.path;
   if (Platform.isLinux) {
@@ -63,7 +62,18 @@ Future<int?> _dfLinux(String path) async {
 }
 
 Future<int?> _dfWindoza(String path) async {
-  return null;
+  final res = await Process.run('wmic', [
+    'LogicalDisk',
+    'Where',
+    'DeviceID="${p.rootPrefix(p.absolute(path)).replaceAll('\\', '')}"',
+    'Get',
+    'FreeSpace'
+  ]);
+  return res.exitCode != 0
+      ? null
+      : int.tryParse(
+          res.stdout.toString().split('\n').elementAtOrNull(1) ?? '',
+        );
 }
 
 Future<int?> _dfMcOS(String path) async {
