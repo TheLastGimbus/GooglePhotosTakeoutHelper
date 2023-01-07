@@ -72,13 +72,27 @@ void main(List<String> arguments) async {
   }
 
   if (interactive.indeed) {
+    // greet user
     await interactive.greet();
+    print('');
+    // ask for everything
     final zips = await interactive.getZips();
+    print('');
     final out = await interactive.getOutput();
-    final unzipDir = Directory(p.join(out.path, 'gpth-unzipped'));
-    await interactive.unzip(zips, unzipDir);
-    args['input'] = unzipDir.path;
+    print('');
+
+    // calculate approx space required for everything
+    final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
+    final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
+    await interactive.freeSpaceNotice(requiredSpace, out); // and notify this
+    print('');
+
+    args['unzip-dir'] = Directory(p.join(out.path, 'gpth-unzipped'));
+    args['input'] = args['unzip-dir'].path;
     args['output'] = out.path;
+
+    await interactive.unzip(zips, args['unzip-dir']);
+    print('');
   }
   // TODO: flow of this
   // ignore: unused_local_variable
