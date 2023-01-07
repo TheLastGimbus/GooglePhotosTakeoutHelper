@@ -336,4 +336,5 @@ void main(List<String> arguments) async {
     '${media.length - countDuplicates - countExtras} '
     'files to "${output.path}"',
   );
+  quit(0);
 }
