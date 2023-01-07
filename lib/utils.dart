@@ -11,7 +11,7 @@ void error(Object? object) => stderr.write('$object\n');
 
 void quit([int code = 1]) {
   if (interactive.indeed) {
-    print('[gpth exited ${code != 1 ? '(code $code)' : ''} - '
+    print('[gpth ${code != 0 ? 'quitted :(' : 'finished :)'} (code $code) - '
         'press enter to close]');
     stdin.readLineSync();
   }
