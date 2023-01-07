@@ -6,18 +6,18 @@
 If you ever want to move from Google Photos to other platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
 
 But when you download it, you will find yourself with hundreds of little folders with few photos and weird `.json` files inside.
-What if you want to just have one folder with all photos, in chronological order? Good luck copying all of that :confused:
+What if you want to just have one folder with all photos, in chronological order? Good luck copying all of that 😕
 
-This script does just that - it organizes and cleans up your Takeout for you :+1:
+This script does just that - it organizes and cleans up your Takeout for you 👍
 
-It will take all of your photos from those tiny folders, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month)
+It will take all of your photos from those tiny folders, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month) ❤
 
 ## How to use:
 0. Get all your photos in [Google Takeout](https://takeout.google.com/)
     - "deselect all" and then select only Google Photos
     - deselect all "album folders" - folders with name of some album, and select *only* "year folders" - folders named like "`Photos from 20..`" - don't worry, all of your photos are in "year folders anyway".
 1. Download the script from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases)
-    - [also available on AUR :smirk:](https://aur.archlinux.org/packages/gpth-bin)
+    - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
 2. Merge all contents from all Google Takeout zips to *one folder*
 3. Run `gpth -i "your/input/folder" -o "your/output/folder"`
 
@@ -39,7 +39,7 @@ download `gpth-vX.X.X-windoza.exe`
 If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
 
 ## If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
-I spent a lot of time fixing bugs and making this work stable :sparkling_heart: - would be super thankful for any donations
+I spent a lot of time fixing bugs and making this work stable 💖 - would be super thankful for any donations
 
 ## After exporting
 ### Be aware if you move your photos on your Android phone...
@@ -63,6 +63,6 @@ https://github.com/vHanda/google-keep-exporter
 Yeah, the whole thing got re-written in Dart, and now it's way more stable and faster. If you still want Python for some reason, check out v2.x - in releases/tags
 
 ### TODO (Pull Requests welcome):
-- [ ] GPS data: from JSON to Exif - ~~Thank you @DalenW :sparkling_heart:~~ still thank you, but it is now missing in the Dart version
+- [ ] GPS data: from JSON to Exif - ~~Thank you @DalenW 💖~~ still thank you, but it is now missing in the Dart version
 - [ ] Writing data from `.json`s back to `EXIF` data
-- [x] Some way to handle albums - THANK YOU @bitsondatadev :kissing_heart: :tada: :woman_dancing:
+- [x] Some way to handle albums - THANK YOU @bitsondatadev 😘 🎉 💃
