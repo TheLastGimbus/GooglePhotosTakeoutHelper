@@ -197,7 +197,7 @@ void main(List<String> arguments) async {
   // with guess DateTime's, remove duplicates from this list.
   //
   // No shitheads, you did not overhear - we *mutate* the whole list and objects
-  // inside it. This his not Flutter-ish, but it's not Flutter - it's a small
+  // inside it. This is not Flutter-ish, but it's not Flutter - it's a small
   // simple script, and this the best solution 😎💯
   /// Big global media list that we'll work on
   final media = <Media>[];
