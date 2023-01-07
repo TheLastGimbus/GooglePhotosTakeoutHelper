@@ -40,14 +40,43 @@ File findNotExistingName(File initialFile) {
 
 // TODO: Other OSes
 Future<int?> getDiskFree([String? path]) async {
-  final res =
-      await Process.run('df', ['-B1', '--output=avail', path ?? p.current]);
+  path ??= Directory.current.path;
+  if (Platform.isLinux) {
+    return _dfLinux(path);
+  } else if (Platform.isWindows) {
+    return _dfWindoza(path);
+  } else if (Platform.isMacOS) {
+    return _dfMcOS(path);
+  } else {
+    return null;
+  }
+}
+
+Future<int?> _dfLinux(String path) async {
+  final res = await Process.run('df', ['-B1', '--output=avail', path]);
   return res.exitCode != 0
       ? null
       : int.tryParse(
           res.stdout.toString().split('\n').elementAtOrNull(1) ?? '',
           radix: 10, // to be sure
         );
+}
+
+Future<int?> _dfWindoza(String path) async {
+  return null;
+}
+
+Future<int?> _dfMcOS(String path) async {
+  final res = await Process.run('df', ['-k', path]);
+  if (res.exitCode != 0) return null;
+  final line2 = res.stdout.toString().split('\n').elementAtOrNull(1);
+  if (line2 == null) return null;
+  final elements = line2.split(' ')..removeWhere((e) => e.isEmpty);
+  final macSays = int.tryParse(
+    elements.elementAtOrNull(3) ?? '',
+    radix: 10, // to be sure
+  );
+  return macSays != null ? macSays * 1024 : null;
 }
 
 String filesize(int bytes) => ProperFilesize.generateHumanReadableFilesize(
