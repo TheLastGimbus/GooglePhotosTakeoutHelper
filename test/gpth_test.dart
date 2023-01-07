@@ -6,6 +6,7 @@ import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
 import 'package:gpth/media.dart';
+import 'package:gpth/utils.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
 
@@ -100,6 +101,36 @@ AQACEQMRAD8AIcgXf//Z""";
     expect(findAlbums([albumDir], media), [
       Album('Vacation', [media.first])
     ]);
+  });
+  group('utils test', () {
+    test('test Stream.whereType()', () {
+      final stream = Stream.fromIterable([1, 'a', 2, 'b', 3, 'c']);
+      expect(stream.whereType<int>(), emitsInOrder([1, 2, 3, emitsDone]));
+    });
+    test('test Stream<FileSystemEntity>.wherePhotoVideo()', () {
+      //    check if stream with random list of files is emitting only photos and videos
+      //   use standard formats as jpg and mp4 but also rare ones like 3gp and eps
+      final stream = Stream.fromIterable(<FileSystemEntity>[
+        File('a.jpg'),
+        File('lol.json'),
+        File('b.mp4'),
+        File('c.3gp'),
+        File('e.png'),
+        File('f.txt'),
+      ]);
+      expect(
+        // looked like File()'s couldn't compare correctly :/
+        stream.wherePhotoVideo().map((event) => event.path),
+        emitsInOrder(['a.jpg', 'b.mp4', 'c.3gp', 'e.png', emitsDone]),
+      );
+    });
+    test('test findNotExistingName()', () {
+      expect(findNotExistingName(imgFileGreen).path, 'green(1).jpg');
+      expect(findNotExistingName(File('not-here.jpg')).path, 'not-here.jpg');
+    });
+    test('test getDiskFree()', () async {
+      expect(await getDiskFree('.'), isNotNull);
+    });
   });
 
   /// Delete all shitty files as we promised

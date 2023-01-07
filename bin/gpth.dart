@@ -5,6 +5,7 @@ import 'package:console_bars/console_bars.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
+import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -42,20 +43,24 @@ void main(List<String> arguments) async {
         help: "Copy files instead of moving them.\n"
             "This is usually slower, and uses extra space, "
             "but doesn't break your input folder");
-  late final ArgResults args;
+  final args = <String, dynamic>{};
   try {
-    args = parser.parse(arguments);
+    final res = parser.parse(arguments);
+    for (final key in res.options) {
+      args[key] = res[key];
+    }
+    interactive.indeed = res.arguments.isEmpty && stdin.hasTerminal;
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
-    exit(1);
+    quit(2);
   } catch (e) {
     // any other exceptions (args must not be null)
     error('$e');
-    exit(100);
+    quit(100);
   }
 
-  if (args.arguments.isEmpty) {
+  if (args.isEmpty && !interactive.indeed) {
     print('GooglePhotosTakeoutHelper v3.0.0');
     print('type --help for more info about usage');
     return;
@@ -64,6 +69,30 @@ void main(List<String> arguments) async {
     print(helpText);
     print(parser.usage);
     return;
+  }
+
+  if (interactive.indeed) {
+    // greet user
+    await interactive.greet();
+    print('');
+    // ask for everything
+    final zips = await interactive.getZips();
+    print('');
+    final out = await interactive.getOutput();
+    print('');
+
+    // calculate approx space required for everything
+    final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
+    final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
+    await interactive.freeSpaceNotice(requiredSpace, out); // and notify this
+    print('');
+
+    final unzipDir = Directory(p.join(out.path, '.gpth-unzipped'));
+    args['input'] = unzipDir.path;
+    args['output'] = out.path;
+
+    await interactive.unzip(zips, unzipDir);
+    print('');
   }
 
   // elastic list of extractors - can add/remove with cli flags
@@ -85,7 +114,7 @@ void main(List<String> arguments) async {
     final dir = Directory(args['fix']);
     if (!await dir.exists()) {
       error("directory to fix doesn't exist :/");
-      exit(11);
+      quit(11);
     }
     var set = 0;
     var notSet = 0;
@@ -111,7 +140,8 @@ void main(List<String> arguments) async {
 
   /// ##### Parse all options and check if alright #####
 
-  if (!args['copy']) {
+  // In interactive, everything is done in /tmp behind the scenes
+  if (!args['copy'] && !interactive.indeed) {
     print(
       "WARNING: Script will *move* files from input to output - not *copy* \n"
       "- this is faster, and doesn't use extra space, but will break your \n"
@@ -124,22 +154,27 @@ void main(List<String> arguments) async {
 
   if (args['input'] == null) {
     error("No --input folder specified :/");
-    exit(10);
+    quit(10);
   }
   if (args['output'] == null) {
     error("No --output folder specified :/");
-    exit(10);
+    quit(10);
   }
   final input = Directory(args['input']);
   final output = Directory(args['output']);
   if (!await input.exists()) {
     error("Input folder does not exist :/");
-    exit(11);
+    quit(11);
   }
   // all of this logic is to prevent user easily blowing output folder
   // by running command two times
-  if (await output.exists() && !await output.list().isEmpty) {
-    print('Output folder exists, and IS NOT EMPTY! What to do? Type either:');
+  if (await output.exists() &&
+      !await output
+          .list()
+          // allow input folder to be inside output
+          .where((e) => p.absolute(e.path) != p.absolute(args['input']))
+          .isEmpty) {
+    print('Output folder IS NOT EMPTY! What to do? Type either:');
     print('[delete] - delete *all* files inside output folder and continue');
     print('[ignore] - continue as usual - put output files alongside existing');
     print('[cancel] - exit program to examine situation yourself');
@@ -152,7 +187,10 @@ void main(List<String> arguments) async {
     switch (answer) {
       case 'delete':
         print('Okay, deleting all files inside output folder...');
-        await for (final file in output.list()) {
+        await for (final file in output
+            .list()
+            // delete everything except input folder if there
+            .where((e) => p.absolute(e.path) != p.absolute(args['input']))) {
           await file.delete(recursive: true);
         }
         break;
@@ -161,10 +199,11 @@ void main(List<String> arguments) async {
         break;
       case 'cancel':
         print('Okay, exiting...');
-        exit(0);
+        quit(0);
+        break;
       default:
         print('Unknown answer, exiting...');
-        exit(1);
+        quit(3);
     }
   }
   await output.create(recursive: true);
@@ -177,7 +216,7 @@ void main(List<String> arguments) async {
   // with guess DateTime's, remove duplicates from this list.
   //
   // No shitheads, you did not overhear - we *mutate* the whole list and objects
-  // inside it. This his not Flutter-ish, but it's not Flutter - it's a small
+  // inside it. This is not Flutter-ish, but it's not Flutter - it's a small
   // simple script, and this the best solution 😎💯
   /// Big global media list that we'll work on
   final media = <Media>[];
@@ -297,6 +336,12 @@ void main(List<String> arguments) async {
   }
   print('');
 
+  // remove unzipped folder if was created
+  if (interactive.indeed) {
+    print('Removing unzipped folder...');
+    await input.delete(recursive: true);
+  }
+
   /// ###################################################
 
   print('DONE! FREEEEEDOOOOM!!!');
@@ -315,4 +360,5 @@ void main(List<String> arguments) async {
     '${media.length - countDuplicates - countExtras} '
     'files to "${output.path}"',
   );
+  quit(0);
 }

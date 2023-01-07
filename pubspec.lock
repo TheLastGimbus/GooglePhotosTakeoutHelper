@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.3.1"
+  archive:
+    dependency: "direct main"
+    description:
+      name: archive
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.3.5"
   args:
     dependency: "direct main"
     description:
@@ -42,7 +49,7 @@ packages:
       name: async_task
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.19"
+    version: "1.0.18"
   boolean_selector:
     dependency: transitive
     description:
@@ -98,7 +105,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "1.2.1"
   file:
     dependency: transitive
     description:
@@ -106,6 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.4"
+  file_picker_desktop:
+    dependency: "direct main"
+    description:
+      name: file_picker_desktop
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -225,6 +239,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.3"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.6.2"
   pool:
     dependency: transitive
     description:
@@ -232,6 +253,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.1"
+  proper_filesize:
+    dependency: "direct main"
+    description:
+      name: proper_filesize
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   pub_semver:
     dependency: transitive
     description:
