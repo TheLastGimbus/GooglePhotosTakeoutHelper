@@ -172,8 +172,13 @@ void main(List<String> arguments) async {
   }
   // all of this logic is to prevent user easily blowing output folder
   // by running command two times
-  if (await output.exists() && !await output.list().isEmpty) {
-    print('Output folder exists, and IS NOT EMPTY! What to do? Type either:');
+  if (await output.exists() &&
+      !await output
+          .list()
+          // allow input folder to be inside output
+          .where((e) => p.absolute(e.path) != p.absolute(args['input']))
+          .isEmpty) {
+    print('Output folder IS NOT EMPTY! What to do? Type either:');
     print('[delete] - delete *all* files inside output folder and continue');
     print('[ignore] - continue as usual - put output files alongside existing');
     print('[cancel] - exit program to examine situation yourself');
@@ -186,7 +191,10 @@ void main(List<String> arguments) async {
     switch (answer) {
       case 'delete':
         print('Okay, deleting all files inside output folder...');
-        await for (final file in output.list()) {
+        await for (final file in output
+            .list()
+            // delete everything except input folder if there
+            .where((e) => p.absolute(e.path) != p.absolute(args['input']))) {
           await file.delete(recursive: true);
         }
         break;
