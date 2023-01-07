@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker_desktop/file_picker_desktop.dart';
-import 'package:filesize/filesize.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
@@ -65,11 +64,39 @@ Future<Directory> getOutput() async {
 }
 
 Future<void> unzip(List<File> zips, Directory dir) async {
-  final cumSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
-  print('gpth will now unzip all of that, and then do smart stuff - note that '
-      'this will use *${filesize(cumSize)}* - make sure you have that much '
-      'available - otherwise, Ctrl-C to exit, unzip manually and use cmd '
-      'options');
+  await dir.create(recursive: true);
+  final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
+  // *2 because zips+unzipped, +256mb for safety
+  final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
+  final freeSpace = await getDiskFree(dir.path);
+  print('gpth will now unzip all of that, and then do smart stuff');
+  if (freeSpace == null) {
+    print(
+      'Note: this will use ~${filesize(requiredSpace)} - '
+      'make sure you have that available on ${dir.path} - otherwise, '
+      'Ctrl-C to exit, and make some free space!\n'
+      'Or: unzip manually, remove the zips and use gpth with cmd options',
+    );
+  } else if (freeSpace < requiredSpace) {
+    print(
+      '!!! WARNING !!!\n'
+      'Whole process needs ${filesize(requiredSpace)} of space, but you '
+      'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
+      'Press Ctrl-C to exit and make some free space.\n'
+      'Or: unzip manually, remove the zips, and use gpth with cmd options\n'
+      '(or, type "i know what i am doing" to continue)',
+    );
+    if (stdin.readLineSync() != 'i know what i am doing') {
+      print('Exiting, go make some free space!');
+      exit(69);
+    }
+  } else {
+    print(
+      '(Note: this will use ~${filesize(requiredSpace)} of disk space - '
+      'you have ${filesize(freeSpace)} free so should be fine :)',
+    );
+  }
   print('Press enter to continue');
   stdin.readLineSync();
+  // TODO: Unzip
 }

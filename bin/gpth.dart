@@ -73,11 +73,11 @@ void main(List<String> arguments) async {
 
   if (interactive.indeed) {
     await interactive.greet();
-    final dir = Directory(p.join(Directory.systemTemp.path, 'gpth-unzip'));
     final zips = await interactive.getZips();
     final out = await interactive.getOutput();
-    await interactive.unzip(zips, dir);
-    args['input'] = dir.path;
+    final unzipDir = Directory(p.join(out.path, 'gpth-unzipped'));
+    await interactive.unzip(zips, unzipDir);
+    args['input'] = unzipDir.path;
     args['output'] = out.path;
   }
   // TODO: flow of this

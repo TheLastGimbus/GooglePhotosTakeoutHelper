@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
+import 'package:proper_filesize/proper_filesize.dart';
 
 /// convenient print for errors
 void error(Object? object) => stderr.write('$object\n');
@@ -37,6 +38,7 @@ File findNotExistingName(File initialFile) {
   return file;
 }
 
+// TODO: Other OSes
 Future<int?> getDiskFree([String? path]) async {
   final res =
       await Process.run('df', ['-B1', '--output=avail', path ?? p.current]);
@@ -47,3 +49,9 @@ Future<int?> getDiskFree([String? path]) async {
           radix: 10, // to be sure
         );
 }
+
+String filesize(int bytes) => ProperFilesize.generateHumanReadableFilesize(
+      bytes,
+      base: Bases.Binary,
+      decimals: 2,
+    );
