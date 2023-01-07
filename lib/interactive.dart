@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker_desktop/file_picker_desktop.dart';
+import 'package:filesize/filesize.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
@@ -25,13 +26,11 @@ Future<List<File>> getZips() async {
     allowMultiple: true,
   );
   if (files == null) {
-    error('Duh, something went wrong with selecting - try again or extract '
-        'all your zips manually, and use this script with cli options - '
-        'sorry for inconvenience!');
+    error('Duh, something went wrong with selecting - try again!');
     exit(69);
   }
   if (files.count == 0) {
-    error('No files selected - try again :/ exitting for now...');
+    error('No files selected - try again :/');
     exit(6969);
   }
   if (files.count == 1) {
@@ -50,4 +49,27 @@ Future<List<File>> getZips() async {
   }
   print('Cool!\n');
   return files.files.map((e) => File(e.path!)).toList();
+}
+
+Future<Directory> getOutput() async {
+  print('Now, select output folder - all photos will be extracted there '
+      '(press enter)');
+  stdin.readLineSync();
+  final dir = await getDirectoryPath(dialogTitle: 'Select output folder:');
+  if (dir == null) {
+    error('Duh, something went wrong with selecting - try again!');
+    exit(69);
+  }
+  print('Cool!\n');
+  return Directory(dir);
+}
+
+Future<void> unzip(List<File> zips, Directory dir) async {
+  final cumSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
+  print('gpth will now unzip all of that, and then do smart stuff - note that '
+      'this will use *${filesize(cumSize)}* - make sure you have that much '
+      'available - otherwise, Ctrl-C to exit, unzip manually and use cmd '
+      'options');
+  print('Press enter to continue');
+  stdin.readLineSync();
 }

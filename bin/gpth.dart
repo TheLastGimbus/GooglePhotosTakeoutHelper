@@ -32,12 +32,14 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts extracted')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
-    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')..addFlag(
-        'skip-extras', help: 'Skip extra images (like -edited etc)')..addFlag(
+    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
+    ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
+    ..addFlag(
       'guess-from-name',
       help: 'Try to guess file dates from their names',
       defaultsTo: true,
-    )..addFlag('copy',
+    )
+    ..addFlag('copy',
         help: "Copy files instead of moving them.\n"
             "This is usually slower, and uses extra space, "
             "but doesn't break your input folder");
@@ -69,9 +71,17 @@ void main(List<String> arguments) async {
     return;
   }
 
-  if (interactive.indeed) await interactive.greet();
-
+  if (interactive.indeed) {
+    await interactive.greet();
+    final dir = Directory(p.join(Directory.systemTemp.path, 'gpth-unzip'));
+    final zips = await interactive.getZips();
+    final out = await interactive.getOutput();
+    await interactive.unzip(zips, dir);
+    args['input'] = dir.path;
+    args['output'] = out.path;
+  }
   // TODO: flow of this
+  // ignore: unused_local_variable
   final List<File>? zips =
       interactive.indeed ? await interactive.getZips() : null;
 
@@ -120,7 +130,8 @@ void main(List<String> arguments) async {
 
   /// ##### Parse all options and check if alright #####
 
-  if (!args['copy']) {
+  // In interactive, everything is done in /tmp behind the scenes
+  if (!args['copy'] && !interactive.indeed) {
     print(
       "WARNING: Script will *move* files from input to output - not *copy* \n"
       "- this is faster, and doesn't use extra space, but will break your \n"

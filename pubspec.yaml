@@ -17,6 +17,8 @@ dependencies:
   exif: ^3.1.2
   console_bars: ^1.1.0
   file_picker_desktop: ^1.1.1
+  archive: ^3.3.5
+  filesize: ^2.0.1
 
 dev_dependencies:
   lints: ^2.0.1
