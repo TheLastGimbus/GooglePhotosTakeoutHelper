@@ -131,7 +131,7 @@ Future<void> unzip(List<File> zips, Directory dir) async {
   await dir.create(recursive: true);
   print('gpth will now unzip all of that, process it and put everything in '
       'the output folder :)');
-  await sleep(2);
+  await sleep(1);
   pressEnterToContinue();
   for (final zip in zips) {
     print('Unzipping ${p.basename(zip.path)}...');
