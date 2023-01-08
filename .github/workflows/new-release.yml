@@ -35,10 +35,24 @@ jobs:
       - name: Get clean tag name
         id: clean_tag
         run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/refs\/tags\///')"
+      - name: Get exe name
+        id: exe_name
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            echo "::set-output name=name::gpth-linux"
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            echo "::set-output name=name::gpth-windoza.exe"
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            echo "::set-output name=name::gpth-macos"
+          else
+            echo "Unknown OS: $RUNNER_OS"
+            exit 69
+          fi
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
       - name: Build exe
-        run: dart compile exe bin/gpth.dart -o ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
+        run: dart compile exe bin/gpth.dart -o ./${{ steps.exe_name.outputs.name }}
       - name: Code sign a windoza exe file
         if: matrix.os == 'windows-latest'
         uses: dlemstra/code-sign-action@v1
@@ -52,7 +66,8 @@ jobs:
       - name: Add files to GH-Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe
+          # this supports globs :>
+          files: ./gpth-*
           fail_on_unmatched_files: true
       # if linux, upload to aur
       - name: Generate PKGBUILD
