@@ -168,9 +168,9 @@ void main(List<String> arguments) async {
           .where((e) => p.absolute(e.path) != p.absolute(args['input']))
           .isEmpty) {
     print('Output folder IS NOT EMPTY! What to do? Type either:');
-    print('[delete] - delete *all* files inside output folder and continue');
-    print('[ignore] - continue as usual - put output files alongside existing');
-    print('[cancel] - exit program to examine situation yourself');
+    print('[1] - delete *all* files inside output folder and continue');
+    print('[2] - continue as usual - put output files alongside existing');
+    print('[3] - exit program to examine situation yourself');
     final answer = stdin
         .readLineSync()!
         .replaceAll('[', '')
@@ -178,7 +178,7 @@ void main(List<String> arguments) async {
         .toLowerCase()
         .trim();
     switch (answer) {
-      case 'delete':
+      case '1':
         print('Okay, deleting all files inside output folder...');
         await for (final file in output
             .list()
@@ -187,10 +187,10 @@ void main(List<String> arguments) async {
           await file.delete(recursive: true);
         }
         break;
-      case 'ignore':
+      case '2':
         print('Okay, continuing as usual...');
         break;
-      case 'cancel':
+      case '3':
         print('Okay, exiting...');
         quit(0);
         break;
