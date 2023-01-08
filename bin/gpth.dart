@@ -16,6 +16,7 @@ gpth is ment to help you with exporting your photos from Google Photos.
 
 First, go to https://takeout.google.com/ , deselect all and select only Photos.
 When ready, download all .zips, and extract them into *one* folder.
+(Auto-extracting works only in interactive mode)
 
 Then, run: gpth --input "folder/with/all/takeouts" --output "your/output/folder"
 ...and gpth will parse and organize all photos into one big chronological folder

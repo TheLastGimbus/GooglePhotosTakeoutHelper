@@ -20,6 +20,8 @@ If you want, you can still use it with args (for scripts etc) - run `--help` to 
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
     - "deselect all" and then select only Google Photos
     - deselect all "album folders" - folders with name of some album, and select *only* "year folders" - folders named like "`Photos from 20..`" - don't worry, all of your photos are in "year folders" anyway.
+   
+   (Note: don't unzip them, gpth will do it for you 😉)
 1. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
     - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
 2. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
