@@ -10,7 +10,7 @@ import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
-const helpText = """GooglePhotosTakeoutHelper v3.0.0 - The Dart successor
+const helpText = """GooglePhotosTakeoutHelper v$version - The Dart successor
 
 gpth is ment to help you with exporting your photos from Google Photos.
 
@@ -24,12 +24,19 @@ const barWidth = 40;
 
 void main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addFlag('help', abbr: 'h', help: 'Print help', negatable: false)
-    ..addOption('fix',
-        help: 'Folder with any photos to fix dates. '
-            'This skips whole "GoogleTakeout" procedure')
+    ..addFlag('help', abbr: 'h', negatable: false)
+    ..addOption(
+      'fix',
+      help: 'Folder with any photos to fix dates. '
+          'This skips whole "GoogleTakeout" procedure.'
+          'It is here because gpth has some cool heuristics to determine date '
+          'of a photo, and this can be handy in many situations :)',
+    )
+    ..addFlag('interactive',
+        help: 'Use interactive mode. Type this in case auto-detection fails, '
+            'or you *really* want to combine advanced options with prompts')
     ..addOption('input',
-        abbr: 'i', help: 'Input folder with *all* takeouts extracted')
+        abbr: 'i', help: 'Input folder with *all* takeouts *extracted*. ')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
     ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
@@ -39,17 +46,20 @@ void main(List<String> arguments) async {
       help: 'Try to guess file dates from their names',
       defaultsTo: true,
     )
-    ..addFlag('copy',
-        help: "Copy files instead of moving them.\n"
-            "This is usually slower, and uses extra space, "
-            "but doesn't break your input folder");
+    ..addFlag(
+      'copy',
+      help: "Copy files instead of moving them.\n"
+          "This is usually slower, and uses extra space, "
+          "but doesn't break your input folder",
+    );
   final args = <String, dynamic>{};
   try {
     final res = parser.parse(arguments);
     for (final key in res.options) {
       args[key] = res[key];
     }
-    interactive.indeed = res.arguments.isEmpty && stdin.hasTerminal;
+    interactive.indeed =
+        args['interactive'] || (res.arguments.isEmpty && stdin.hasTerminal);
   } on FormatException catch (e) {
     // don't print big ass trace
     error('$e');
@@ -60,11 +70,6 @@ void main(List<String> arguments) async {
     quit(100);
   }
 
-  if (args.isEmpty && !interactive.indeed) {
-    print('GooglePhotosTakeoutHelper v3.0.0');
-    print('type --help for more info about usage');
-    return;
-  }
   if (args['help']) {
     print(helpText);
     print(parser.usage);

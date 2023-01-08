@@ -32,6 +32,8 @@ void pressEnterToContinue() {
 }
 
 Future<void> greet() async {
+  print('GooglePhotosTakeoutHelper v$version');
+  await sleep(1);
   print('Hi there! This tool will help you to get all of your photos from '
       'Google Takeout to one nice tidy folder\n');
   await sleep(3);

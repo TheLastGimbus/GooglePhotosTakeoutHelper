@@ -6,6 +6,9 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
+// remember to bump this
+const version = '3.2.0';
+
 /// convenient print for errors
 void error(Object? object) => stderr.write('$object\n');
 
