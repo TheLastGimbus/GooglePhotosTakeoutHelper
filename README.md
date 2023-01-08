@@ -38,8 +38,12 @@ If `gpth` crashes or smth, look up the [Issues](https://github.com/TheLastGimbus
  
 I could also help you individually for a small tip 💸, on: [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) or email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com)
 
-## If I helped you, you can consider donating me ☕: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
+- https://ko-fi.com/thelastgimbus <-- (best)
+- https://www.buymeacoffee.com/TheLastGimbus
+- https://liberapay.com/TheLastGimbus/
+- https://www.paypal.me/TheLastGimbus
 
 ## After exporting 🤔
 ### Be aware if you move your photos on your Android phone... ☝
