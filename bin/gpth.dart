@@ -337,6 +337,7 @@ void main(List<String> arguments) async {
 
   /// ###################################################
 
+  print('=' * barWidth);
   print('DONE! FREEEEEDOOOOM!!!');
   if (countDuplicates > 0) print('Skipped $countDuplicates duplicates');
   if (args['skip-extras']) print('Skipped $countExtras extras');
@@ -346,5 +347,13 @@ void main(List<String> arguments) async {
   }
   print('${args['copy'] ? 'Copied' : 'Moved'} ${media.length} '
       'files to "${output.path}"');
+  print('');
+  print(
+    "Last thing - I've spent *a ton* of time on this script - \n"
+    "if I saved your time and you want to say thanks, you can send me a tip:\n"
+    "https://paypal.me/TheLastGimbus\n"
+    "Thank you ❤",
+  );
+  print('=' * barWidth);
   quit(0);
 }
