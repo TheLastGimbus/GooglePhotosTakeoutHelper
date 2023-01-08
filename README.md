@@ -1,45 +1,45 @@
-[![AUR](https://img.shields.io/aur/version/gpth-bin)](https://aur.archlinux.org/packages/gpth-bin)
+[![AUR](https://img.shields.io/aur/version/gpth-bin?logo=arch-linux)](https://aur.archlinux.org/packages/gpth-bin)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.me/TheLastGimbus)
 
 # Google Photos Takeout Helper
 ## What is this for?
 If you ever want to move from Google Photos to other platform/solution, your fastest choice to export all photos is [Google Takeout](https://takeout.google.com/)
 
-But when you download it, you will find yourself with hundreds of little folders with few photos and weird `.json` files inside.
+But when you download it, you will find yourself with zips with hundreds of little folders with weird `.json` files inside.
 What if you want to just have one folder with all photos, in chronological order? Good luck copying all of that 😕
 
 This script does just that - it organizes and cleans up your Takeout for you 👍
 
-It will take all of your photos from those tiny folders, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month) ❤
+It will take those zips, extrac everything from them, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month) ❤
 
 ## How to use:
+Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complicated arguments - just get your zips, run it, and follow prompted instructions 💃
+
+If you want, you can still use it with args (for scripts etc) - run `--help` to see them
+
 0. Get all your photos in [Google Takeout](https://takeout.google.com/)
     - "deselect all" and then select only Google Photos
-    - deselect all "album folders" - folders with name of some album, and select *only* "year folders" - folders named like "`Photos from 20..`" - don't worry, all of your photos are in "year folders anyway".
-1. Download the script from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases)
+    - deselect all "album folders" - folders with name of some album, and select *only* "year folders" - folders named like "`Photos from 20..`" - don't worry, all of your photos are in "year folders" anyway.
+1. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases)
     - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
-2. Merge all contents from all Google Takeout zips to *one folder*
-3. Run `gpth -i "your/input/folder" -o "your/output/folder"`
-
-If you want your photos to be divided by a year and month, run it with the `--divide-to-dates` flag.
-
-### How to use for dummies (non-programming people):
-1. Go to [releases->latest release->assets](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) and
-download `gpth-vX.X.X-windoza.exe`
-2. Prepare your Takeout:
-    If your Takeout was divided into multiple `.zip`s, you will need to extract them, and move their contents into **one folder**
-3. Open `cmd`, and type:
-    ```bash
-    cd C:\Folder\Where\You\Downloaded\takeout-helper
-    gpth-vX.X.X-windoza.exe -i "C:\INPUT\TAKEOUT\FOLDER" -o "C:\OUTPUT\FOLDER"
-    ```
-    **// PS 2: YOU NEED TO WRAP YOUR PATHS IN - `"` - ESPECIALLY IF THEY HAVE SPACES**
+2. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions
+   - On Mac/Linux: open terminal, `cd` to the folder with downloaded executable and run it:
+     ```bash
+     cd Downloads # probably
+     # add execute permission for file
+     chmod +x gpth-macos # or gpth-linux
+     # run it 🏃
+     ./gpth-macos # or ./gpth-linux
+     # follow prompted instructions 🥰
+     ```
 
 ## Contact/errors
-If you have issues/questions, you can hit me up either by [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) Email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com), or if you think your issue is common: [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) tab
+If `gpth` crashes or smth, look up the [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) if it's already there (and may have a solution) - otherwise, report a new one 👍
+ 
+I could also help you individually for a small tip 💸, on: [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) or email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com)
 
-## If I helped you, you can consider donating me: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
-I spent a lot of time fixing bugs and making this work stable 💖 - would be super thankful for any donations
+## If I helped you, you can consider donating me ☕: [https://www.paypal.me/TheLastGimbus](https://www.paypal.me/TheLastGimbus)
+I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
 
 ## After exporting
 ### Be aware if you move your photos on your Android phone...
