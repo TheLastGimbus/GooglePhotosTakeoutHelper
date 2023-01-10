@@ -170,36 +170,13 @@ void main(List<String> arguments) async {
           // allow input folder to be inside output
           .where((e) => p.absolute(e.path) != p.absolute(args['input']))
           .isEmpty) {
-    print('Output folder IS NOT EMPTY! What to do? Type either:');
-    print('[1] - delete *all* files inside output folder and continue');
-    print('[2] - continue as usual - put output files alongside existing');
-    print('[3] - exit program to examine situation yourself');
-    final answer = stdin
-        .readLineSync()!
-        .replaceAll('[', '')
-        .replaceAll(']', '')
-        .toLowerCase()
-        .trim();
-    switch (answer) {
-      case '1':
-        print('Okay, deleting all files inside output folder...');
-        await for (final file in output
-            .list()
-            // delete everything except input folder if there
-            .where((e) => p.absolute(e.path) != p.absolute(args['input']))) {
-          await file.delete(recursive: true);
-        }
-        break;
-      case '2':
-        print('Okay, continuing as usual...');
-        break;
-      case '3':
-        print('Okay, exiting...');
-        quit(0);
-        break;
-      default:
-        print('Unknown answer, exiting...');
-        quit(3);
+    if (await interactive.askForCleanOutput()) {
+      await for (final file in output
+          .list()
+          // delete everything except input folder if there
+          .where((e) => p.absolute(e.path) != p.absolute(args['input']))) {
+        await file.delete(recursive: true);
+      }
     }
   }
   await output.create(recursive: true);

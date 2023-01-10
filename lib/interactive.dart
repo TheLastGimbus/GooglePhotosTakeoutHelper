@@ -31,6 +31,15 @@ void pressEnterToContinue() {
   stdin.readLineSync();
 }
 
+// this can't return null on error because it would be same for blank
+// (pure enter) and "fdsfsdafs" - and we want to detect enters
+Future<String> askForInt() async => stdin
+    .readLineSync()!
+    .replaceAll('[', '')
+    .replaceAll(']', '')
+    .toLowerCase()
+    .trim();
+
 Future<void> greet() async {
   print('GooglePhotosTakeoutHelper v$version');
   await sleep(1);
@@ -104,12 +113,7 @@ Future<bool> askDivideDates() async {
   print('[1] (default) - one big folder');
   print('[2] - year/month folders');
   print('(Type 1 or 2 or press enter for default):');
-  final answer = stdin
-      .readLineSync()!
-      .replaceAll('[', '')
-      .replaceAll(']', '')
-      .toLowerCase()
-      .trim();
+  final answer = await askForInt();
   switch (answer) {
     case '1':
     case '':
@@ -122,6 +126,36 @@ Future<bool> askDivideDates() async {
       error('Invalid answer - try again');
       return askDivideDates();
   }
+}
+
+// this is used in cli mode as well
+Future<bool> askForCleanOutput() async {
+  print('Output folder IS NOT EMPTY! What to do? Type either:');
+  print('[1] - delete *all* files inside output folder and continue');
+  print('[2] - continue as usual - put output files alongside existing');
+  print('[3] - exit program to examine situation yourself');
+  final answer = stdin
+      .readLineSync()!
+      .replaceAll('[', '')
+      .replaceAll(']', '')
+      .toLowerCase()
+      .trim();
+  switch (answer) {
+    case '1':
+      print('Okay, deleting all files inside output folder...');
+      return true;
+    case '2':
+      print('Okay, continuing as usual...');
+      return false;
+    case '3':
+      print('Okay, exiting...');
+      quit(0);
+      break;
+    default:
+      error('Invalid answer - try again');
+      return askForCleanOutput();
+  }
+  throw 'WTF this should never happen - go tell @TheLastGimbus';
 }
 
 /// Checks free space on disk and notifies user accordingly
