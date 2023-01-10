@@ -98,6 +98,32 @@ Future<Directory> getOutput() async {
   return Directory(dir!);
 }
 
+Future<bool> askDivideDates() async {
+  print('Do you want your photos in one big chronological folder, '
+      'or divided to folders by year/month?');
+  print('[1] (default) - one big folder');
+  print('[2] - year/month folders');
+  print('(Type 1 or 2 or press enter for default):');
+  final answer = stdin
+      .readLineSync()!
+      .replaceAll('[', '')
+      .replaceAll(']', '')
+      .toLowerCase()
+      .trim();
+  switch (answer) {
+    case '1':
+    case '':
+      print('Okay, one big it is!');
+      return false;
+    case '2':
+      print('Okay, will divide to folders!');
+      return true;
+    default:
+      error('Invalid answer - try again');
+      return askDivideDates();
+  }
+}
+
 /// Checks free space on disk and notifies user accordingly
 Future<void> freeSpaceNotice(int required, Directory dir) async {
   final freeSpace = await getDiskFree(dir.path);

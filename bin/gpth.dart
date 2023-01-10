@@ -86,6 +86,8 @@ void main(List<String> arguments) async {
     print('');
     final out = await interactive.getOutput();
     print('');
+    args['divide-to-dates'] = await interactive.askDivideDates();
+    print('');
 
     // calculate approx space required for everything
     final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
