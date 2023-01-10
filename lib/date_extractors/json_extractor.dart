@@ -12,8 +12,15 @@ Future<DateTime?> jsonExtractor(File file) async {
     final epoch = int.parse(data['photoTakenTime']['timestamp'].toString());
     return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
   } on FormatException catch (_) {
+    // this is when json is bad
+    return null;
+  } on FileSystemException catch (_) {
+    // this happens for issue #143
+    // "Failed to decode data using encoding 'utf-8'"
+    // maybe this will self-fix when dart itself support more encodings
     return null;
   } on NoSuchMethodError catch (_) {
+    // this is when tags like photoTakenTime aren't there
     return null;
   }
 }
