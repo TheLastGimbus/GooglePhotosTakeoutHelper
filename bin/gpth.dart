@@ -226,14 +226,6 @@ void main(List<String> arguments) async {
       media.add(Media(file));
     }
   }
-  await for (final file
-      in (archiveFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isArchived: true));
-  }
-  await for (final file
-      in (trashFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isTrashed: true));
-  }
 
   print('Found ${media.length} photos/videos in input folder');
   if (media.isEmpty) {
@@ -243,6 +235,20 @@ void main(List<String> arguments) async {
       await input.delete(recursive: true);
     }
     quit(13);
+  }
+
+  await for (final file
+      in (archiveFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
+    media.add(Media(file, isArchived: true));
+  }
+  await for (final file
+      in (trashFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
+    media.add(Media(file, isTrashed: true));
+  }
+  final archiveTrashCount =
+      media.where((e) => e.isArchived || e.isTrashed).length;
+  if (archiveTrashCount > 0) {
+    print('Also found $archiveTrashCount photos/videos in archive/trash :)');
   }
 
   /// ##################################################
