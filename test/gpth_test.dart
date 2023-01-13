@@ -5,6 +5,7 @@ import 'package:gpth/album.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
+import 'package:gpth/folder_classify.dart';
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart';
@@ -130,6 +131,32 @@ AQACEQMRAD8AIcgXf//Z""";
     });
     test('test getDiskFree()', () async {
       expect(await getDiskFree('.'), isNotNull);
+    });
+    test('test isArchived() and isTrashed() on jsons', () {
+      final normalJson = '''{ "title": "example.jpg",
+        "photoTakenTime": {"timestamp": "1663252650"},
+        "photoLastModifiedTime": {"timestamp": "1673339757"} 
+      }''';
+      final archivedJson = '''{ "title": "example.jpg",
+        "photoTakenTime": {"timestamp": "1663252650"},
+        "archived": true,
+        "photoLastModifiedTime": {"timestamp": "1673339757"} 
+      }''';
+      final trashedJson = '''{ "title": "example.jpg",
+        "photoTakenTime": {"timestamp": "1663252650"},
+        "trashed": true,
+        "photoLastModifiedTime": {"timestamp": "1673339757"} 
+      }''';
+      final albumJson =
+          '{"title": "Green", "description": "","access": "protected"}';
+      expect(jsonIsArchived(normalJson), false);
+      expect(jsonIsTrashed(normalJson), false);
+      expect(jsonIsArchived(archivedJson), true);
+      expect(jsonIsTrashed(archivedJson), false);
+      expect(jsonIsArchived(trashedJson), false);
+      expect(jsonIsTrashed(trashedJson), true);
+      expect(jsonIsArchived(albumJson), null);
+      expect(jsonIsTrashed(albumJson), null);
     });
   });
 

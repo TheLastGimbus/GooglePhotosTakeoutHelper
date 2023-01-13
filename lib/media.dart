@@ -26,13 +26,23 @@ class Media {
   /// higher the worse
   int? dateTakenAccuracy;
 
+  // if those are true, we put them in separate folder
+  bool isArchived = false;
+  bool isTrashed = false;
+
   //cache
   Digest? _hash;
 
   /// will be used for finding duplicates/albums
   Digest get hash => _hash ??= sha256.convert(file.readAsBytesSync());
 
-  Media(this.file, {this.dateTaken, this.dateTakenAccuracy});
+  Media(
+    this.file, {
+    this.dateTaken,
+    this.dateTakenAccuracy,
+    this.isArchived = false,
+    this.isTrashed = false,
+  });
 
   @override
   String toString() => 'Media($file, dateTaken: $dateTaken)';
