@@ -273,6 +273,19 @@ void main(List<String> arguments) async {
 
   /// #######################
 
+  // NOTE FOR MYSELF/whatever:
+  // I placed extracting dates *after* removing duplicates.
+  // Today i thought to myself - shouldn't this be reversed?
+  // Finding correct date is our *biggest* priority, and duplicate that we just
+  // removed might have been the chosen one
+  //
+  // But on the other hand, duplicates must be hash-perfect, so they contain
+  // same exifs, and we can just compare length of their names - in 9999% cases,
+  // one with shorter name will have json and others will not 🤷
+  // ...and we would potentially waste a lot of time searching for all of their
+  //    jsons
+  // ...so i'm leaving this like that 😎
+
   /// ##### Extracting/predicting dates using given extractors #####
 
   final barExtract = FillingBar(
