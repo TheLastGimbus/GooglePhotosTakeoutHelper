@@ -34,6 +34,9 @@ AQACEQMRAD8AIcgXf//Z""";
   final jsonFile2 = File('Urlaub in Knaufspesch in der Schneifel (38).JP.json');
   final imgFile3 = File('Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg');
   final jsonFile3 = File('Screenshot_2022-10-28-09-31-43-118_com.snapcha.json');
+  final imgFile4 = File('simple_file_20200101-edited.jpg');
+  final imgFile4_1 = File('simple_file_20200101-edited(1).jpg');
+  final jsonFile4 = File('simple_file_20200101.jpg.json');
   final media = [
     Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
     Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
@@ -58,6 +61,7 @@ AQACEQMRAD8AIcgXf//Z""";
     writeJson(jsonFile1, 1599078832);
     writeJson(jsonFile2, 1683078832);
     writeJson(jsonFile3, 1666942303);
+    writeJson(jsonFile4, 1683074444);
   });
 
   group('DateTime extractors', () {
@@ -68,6 +72,10 @@ AQACEQMRAD8AIcgXf//Z""";
           1683078832 * 1000);
       expect((await jsonExtractor(imgFile3))?.millisecondsSinceEpoch,
           1666942303 * 1000);
+      expect((await jsonExtractor(imgFile4))?.millisecondsSinceEpoch,
+          1683074444 * 1000);
+      expect((await jsonExtractor(imgFile4_1))?.millisecondsSinceEpoch,
+          1683074444 * 1000);
     });
     test('test exif extractor', () async {
       expect(
@@ -170,5 +178,6 @@ AQACEQMRAD8AIcgXf//Z""";
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
     jsonFile3.deleteSync();
+    jsonFile4.deleteSync();
   });
 }

@@ -25,23 +25,35 @@ Future<DateTime?> jsonExtractor(File file) async {
   }
 }
 
-Future<File?> _jsonForFile(File file, [bool goDumb = true]) async {
-  final correspondingJson = _normalJsonForFile(file);
-  if (await correspondingJson.exists()) {
-    return correspondingJson;
-  } else if (goDumb) {
-    final dumbJson = _dumbJsonForFile(file);
-    return (await dumbJson.exists()) ? dumbJson : null;
+Future<File?> _jsonForFile(File file) async {
+  final dir = Directory(p.dirname(file.path));
+  var name = p.basename(file.path);
+  // will try all methods to strip name to find json
+  for (final method in [
+    (s) => s, // none
+    _shortenName,
+    _removeExtra,
+    _removeDigit, // most files with '(digit)' have jsons, so it's last
+  ]) {
+    final jsonFile = File(p.join(dir.path, '${method(name)}.json'));
+    if (await jsonFile.exists()) return jsonFile;
   }
   return null;
 }
 
-File _normalJsonForFile(File file) => File('${file.path}.json');
+String _removeDigit(String filename) =>
+    filename.replaceAll(RegExp(r'\(\d\)\.'), '.');
+
+// this matches anything like
+// 'some_photo_name-edited' or 'some_photo_name-edited(1)'
+// but also!
+// 'some_photo_name-literallyanything(1).notreally_whatiwant.jpg'
+// so it's slightly dangerous but i'll allow it
+String _removeExtra(String filename) =>
+    filename.replaceAll(RegExp(r'-\w+(\(\d\))?\.'), '.');
 
 // this resolves years of bugs and head-scratches 😆
 // f.e: https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/8#issuecomment-736539592
-File _dumbJsonForFile(File file) {
-  var base = p.basename(file.path);
-  if ('$base.json'.length > 51) base = base.substring(0, 51 - '.json'.length);
-  return File('${p.dirname(file.path)}/$base.json');
-}
+String _shortenName(String filename) => '$filename.json'.length > 51
+    ? filename.substring(0, 51 - '.json'.length)
+    : filename;
