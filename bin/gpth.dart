@@ -5,6 +5,7 @@ import 'package:console_bars/console_bars.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
+import 'package:gpth/folder_classify.dart';
 import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
@@ -197,6 +198,9 @@ void main(List<String> arguments) async {
   /// All "year folders" that we found
   final yearFolders = <Directory>[];
 
+  Directory? archiveFolder;
+  Directory? trashFolder;
+
   /// All album folders - that is, folders that were aside yearFolders and were
   /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
@@ -207,14 +211,13 @@ void main(List<String> arguments) async {
 
   // recursive=true makes it find everything nicely even if user id dumb 😋
   await for (final d in input.list(recursive: true).whereType<Directory>()) {
-    isYear(Directory dir) => p.basename(dir.path).startsWith('Photos from ');
-    if (isYear(d)) {
+    if (isYearFolder(d)) {
       yearFolders.add(d);
-    } // if not year but got any year brothers
-    else if (await d.parent
-        .list()
-        .whereType<Directory>()
-        .any((e) => isYear(e))) {
+    } else if (archiveFolder == null && await isArchiveFolder(d)) {
+      archiveFolder = d;
+    } else if (trashFolder == null && await isTrashFolder(d)) {
+      trashFolder = d;
+    } else if (await isAlbumFolder(d)) {
       albumFolders.add(d);
     }
   }
@@ -222,6 +225,14 @@ void main(List<String> arguments) async {
     await for (final file in f.list().wherePhotoVideo()) {
       media.add(Media(file));
     }
+  }
+  await for (final file
+      in (archiveFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
+    media.add(Media(file, isArchived: true));
+  }
+  await for (final file
+      in (trashFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
+    media.add(Media(file, isTrashed: true));
   }
 
   print('Found ${media.length} photos/videos in input folder');
@@ -291,14 +302,19 @@ void main(List<String> arguments) async {
   );
   await for (final m in Stream.fromIterable(media)) {
     final date = m.dateTaken;
-    final folder = args['divide-to-dates']
-        ? Directory(
-            date == null
-                ? p.join(output.path, 'date-unknown')
-                : p.join(output.path, '${date.year}', '${date.month}'),
-          )
-        : output;
-    if (args['divide-to-dates']) await folder.create(recursive: true);
+    final folder = Directory(
+      m.isArchived || m.isTrashed
+          ? p.join(output.path, m.isArchived ? 'Archive' : 'Trash')
+          : args['divide-to-dates']
+              ? date == null
+                  ? p.join(output.path, 'date-unknown')
+                  : p.join(output.path, '${date.year}', '${date.month}')
+              : output.path,
+    );
+    // i think checking vars like this is bit faster than calling fs every time
+    if (args['divide-to-dates'] || m.isArchived || m.isTrashed) {
+      await folder.create(recursive: true);
+    }
     final freeFile =
         findNotExistingName(File(p.join(folder.path, p.basename(m.file.path))));
     final c = args['copy']
