@@ -42,7 +42,16 @@ bool isYearFolder(Directory dir) =>
 Future<bool> isAlbumFolder(Directory dir) =>
     dir.parent.list().whereType<Directory>().any((e) => isYearFolder(e));
 
+// Those two are so complicated because their names are 🥳localized🥳
+// Those silly lists are an attempt to sometimes make it faster 👍
+
+const _archiveNames = [
+  'Archive', // EN
+  'Archiwum', // PL
+];
+
 Future<bool> isArchiveFolder(Directory dir) async {
+  if (_archiveNames.contains(p.basename(dir.path))) return true;
   var one = false; // there is at least one element (every() is true with empty)
   final logic = await dir
       .list()
@@ -56,7 +65,13 @@ Future<bool> isArchiveFolder(Directory dir) async {
   return one && logic;
 }
 
+const _trashNames = [
+  'Trash', // EN
+  'Kosz', // PL
+];
+
 Future<bool> isTrashFolder(Directory dir) async {
+  if (_trashNames.contains(p.basename(dir.path))) return true;
   var one = false; // there is at least one element (every() is true with empty)
   final logic = await dir
       .list()
