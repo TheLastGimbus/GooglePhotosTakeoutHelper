@@ -236,6 +236,14 @@ void main(List<String> arguments) async {
   }
 
   print('Found ${media.length} photos/videos in input folder');
+  if (media.isEmpty) {
+    await interactive.nothingFoundMessage();
+    if (interactive.indeed) {
+      print('([interactive] removing unzipped folder...)');
+      await input.delete(recursive: true);
+    }
+    quit(13);
+  }
 
   /// ##################################################
 

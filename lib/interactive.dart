@@ -51,6 +51,25 @@ Future<void> greet() async {
   await sleep(3);
 }
 
+/// does not quit explicitly - do it yourself
+Future<void> nothingFoundMessage() async {
+  print('...oh :(');
+  print('...');
+  print("I couldn't find any D: reasons for this may be:");
+  if (indeed) {
+    print(
+      "- you've already ran gpth and it moved all photos to output -\n"
+      "  delete the input folder and re-extract the zip",
+    );
+  }
+  print(
+    "- your Takeout doesn't have any 'year folders' -\n"
+    "  visit https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper\n"
+    "  again and request new, correct Takeout",
+  );
+  print('After fixing this, go ahead and try again :)');
+}
+
 /// Asks user for zip files with ui dialogs
 Future<List<File>> getZips() async {
   print('First, select all .zips from Google Takeout '
