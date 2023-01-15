@@ -352,11 +352,6 @@ void main(List<String> arguments) async {
   }
   print('');
 
-  // remove unzipped folder if was created
-  if (interactive.indeed) {
-    print('Removing unzipped folder...');
-    await input.delete(recursive: true);
-  }
 
   /// ###################################################
 
