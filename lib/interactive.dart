@@ -216,6 +216,6 @@ Future<void> unzip(List<File> zips, Directory dir) async {
   pressEnterToContinue();
   for (final zip in zips) {
     print('Unzipping ${p.basename(zip.path)}...');
-    await extractFileToDisk(zip.path, dir.path);
+    await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
   }
 }
