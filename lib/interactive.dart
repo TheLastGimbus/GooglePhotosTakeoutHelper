@@ -100,7 +100,7 @@ Future<List<File>> getZips() async {
   }
   if (!files.files.every((e) =>
       File(e.path!).statSync().type == FileSystemEntityType.file &&
-      e.path!.endsWith('.zip'))) {
+      RegExp(r'\.(zip|tgz)$').hasMatch(e.path!))) {
     print('Files: [${files.files.map((e) => p.basename(e.path!)).join(', ')}]');
     error('Not all files you selected are zips :/ please do this again');
     quit(6969);
