@@ -140,31 +140,19 @@ AQACEQMRAD8AIcgXf//Z""";
     test('test getDiskFree()', () async {
       expect(await getDiskFree('.'), isNotNull);
     });
-    test('test isArchived() and isTrashed() on jsons', () {
-      final normalJson = '''{ "title": "example.jpg",
-        "photoTakenTime": {"timestamp": "1663252650"},
-        "photoLastModifiedTime": {"timestamp": "1673339757"} 
-      }''';
-      final archivedJson = '''{ "title": "example.jpg",
-        "photoTakenTime": {"timestamp": "1663252650"},
-        "archived": true,
-        "photoLastModifiedTime": {"timestamp": "1673339757"} 
-      }''';
-      final trashedJson = '''{ "title": "example.jpg",
-        "photoTakenTime": {"timestamp": "1663252650"},
-        "trashed": true,
-        "photoLastModifiedTime": {"timestamp": "1673339757"} 
-      }''';
-      final albumJson =
-          '{"title": "Green", "description": "","access": "protected"}';
-      expect(jsonIsArchived(normalJson), false);
-      expect(jsonIsTrashed(normalJson), false);
-      expect(jsonIsArchived(archivedJson), true);
-      expect(jsonIsTrashed(archivedJson), false);
-      expect(jsonIsArchived(trashedJson), false);
-      expect(jsonIsTrashed(trashedJson), true);
-      expect(jsonIsArchived(albumJson), null);
-      expect(jsonIsTrashed(albumJson), null);
+  });
+  group('folder_classify test', () {
+    test('is archive/trash (fast name only)', () async {
+      expect(await isArchiveFolder(Directory('Takeout/Photos/Archive/')), true);
+      expect(await isArchiveFolder(Directory.current), false);
+      expect(
+        // you must do it because Dart 🤷
+        // https://github.com/flutter/flutter/issues/71183#issuecomment-882213036
+        () async => await isArchiveFolder(Directory('Photos/lol-album')),
+        throwsA(isA<FileSystemException>()),
+      );
+      expect(await isTrashFolder(Directory('Takeout/Photos/Trash')), true);
+      expect(await isTrashFolder(Directory.current), false);
     });
   });
 
