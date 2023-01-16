@@ -347,7 +347,16 @@ void main(List<String> arguments) async {
     final c = args['copy']
         ? await m.file.copy(freeFile.path)
         : await m.file.rename(freeFile.path);
-    await c.setLastModified(m.dateTaken ?? DateTime.now());
+    var time = m.dateTaken ?? DateTime.now();
+    if (Platform.isWindows && time.isBefore(DateTime(1970))) {
+      print('WARNING: ${m.file.path} has date $time, which is before 1970 '
+          '(not supported on Windows) - will be set to 1970-01-01');
+      time = DateTime(1970);
+    }
+    await c.setLastModified(time);
+    // on windows, there is also file creation - but it's not supported by dart
+    // i tried this, and kinda works, but is extra slow :(
+    // await Process.run('Powershell.exe', ['-command', '(Get-Item "${c.path}").CreationTime=("${time.toLocal().toIso8601String()}")']);
     barCopy.increment();
   }
   print('');
