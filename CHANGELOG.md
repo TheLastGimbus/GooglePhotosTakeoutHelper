@@ -1,3 +1,12 @@
+## 3.3.1
+
+### Fix bugs introduced in `v3.3.0` 🤓
+
+- #147 Support `.tgz` files too
+- #145 **DON'T** use ram memory equal to zip file thanks to `asyncWrite: true` flag 🙃
+- #143 don't crash when encoding is other than `utf8` 🍰
+- #136 #144 - On windzoa, set time to 1970 if it's before that - would love to *actually* fix this, but Dart doesn't let me :/
+
 ## 3.3.0
 
 - Fix #143 - issues when encoding is not utf8 - sadly, others are still not supported, just skipped
