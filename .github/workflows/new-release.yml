@@ -11,13 +11,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get clean tag name
         id: clean_tag
-        run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/refs\/tags\///')"
+        run: echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_OUTPUT
       - name: Get changelog
         run: python scripts/get_changelog.py --version ${{ steps.clean_tag.outputs.tag }} > ./body-file.txt
       #        Just in case changelogs won't work out
       #      - name: Get tag message
       #        id: tag_message
-      #        run: echo ::set-output name=message::$(git tag -l --format='%(contents)' ${{ github.ref }})
+      #        run: echo "name=message=$(git tag -l --format='%(contents)' ${{ github.ref }})" >> $GITHUB_OUTPUT
       - name: Create GH-Release
         uses: softprops/action-gh-release@v1
         with:
@@ -34,17 +34,17 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get clean tag name
         id: clean_tag
-        run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/refs\/tags\///')"
+        run: echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_OUTPUT
       - name: Get exe name
         id: exe_name
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            echo "::set-output name=name::gpth-linux"
+            echo "name=gpth-linux" >> $GITHUB_OUTPUT
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            echo "::set-output name=name::gpth-windoza.exe"
+            echo "name=gpth-windoza.exe" >> $GITHUB_OUTPUT
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            echo "::set-output name=name::gpth-macos"
+            echo "name=gpth-macos" >> $GITHUB_OUTPUT
           else
             echo "Unknown OS: $RUNNER_OS"
             exit 69
