@@ -34,6 +34,13 @@ If you want, you can still use it with args (for scripts etc) - run `--help` to 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
+## Apple Silicon users
+You must install Rosetta 2 before running the application.
+
+Run in Terminal:
+```
+softwareupdate --install-rosetta
+```
 
 ## Contact/errors 📞
 If `gpth` crashes or smth, look up the [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) if it's already there (and may have a solution) - otherwise, report a new one 👍
