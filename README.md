@@ -27,6 +27,10 @@ If you want, you can still use it with args (for scripts etc) - run `--help` to 
 2. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
    - On Mac/Linux: open terminal, `cd` to the folder with downloaded executable and run it:
      ```bash
+     # if you have Mac with M1/M2 chip, you need to enable x86 emulation
+     # otherwise, just skip it
+     softwareupdate --install-rosetta
+     
      cd Downloads # probably
      # add execute permission for file
      chmod +x gpth-macos # or gpth-linux
