@@ -1,5 +1,8 @@
 [![AUR](https://img.shields.io/aur/version/gpth-bin?logo=arch-linux)](https://aur.archlinux.org/packages/gpth-bin)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal)](https://www.paypal.me/TheLastGimbus)
+[![total Github Releases downloads](https://img.shields.io/github/downloads/TheLastGimbus/GooglePhotosTakeoutHelper/total?label=total%20downloads)](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases/)
+[![latest version downloads](https://img.shields.io/github/downloads/TheLastGimbus/GooglePhotosTakeoutHelper/latest/total?label=latest%20version%20downloads)](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases/latest)
+[![resolved Github issues](https://img.shields.io/github/issues-closed/TheLastGimbus/GooglePhotosTakeoutHelper?label=resolved%20issues)](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues)
+[![commit activity](https://img.shields.io/github/commit-activity/y/TheLastGimbus/GooglePhotosTakeoutHelper)](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/graphs/contributors)
 
 # Google Photos Takeout Helper 📸🆘
 ## What is this for 🧐
@@ -39,17 +42,12 @@ If you want, you can still use it with args (for scripts etc) - run `--help` to 
      # follow prompted instructions 🥰
      ```
 
-## Contact/errors 📞
-If `gpth` crashes or smth, look up the [Issues](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues) if it's already there (and may have a solution) - otherwise, report a new one 👍
- 
-I could also help you individually for a small tip 💸, on: [Reddit](https://www.reddit.com/user/TheLastGimbus/), [Twitter](https://twitter.com/TheLastGimbus) or email: [google-photos-takeout-gh@niceyyyboyyy.anonaddy.com](mailto:google-photos-takeout-gh@niceyyyboyyy.anonaddy.com)
-
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
-- https://ko-fi.com/thelastgimbus <-- (best)
-- https://www.buymeacoffee.com/TheLastGimbus
-- https://liberapay.com/TheLastGimbus/
-- https://www.paypal.me/TheLastGimbus
+
+[![Donate using ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A6HO71P)
+[![Donate using Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/TheLastGimbus/donate)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?logo=paypal&style=for-the-badge)](https://www.paypal.me/TheLastGimbus)
 
 ## After exporting 🤔
 ### Be aware if you move your photos on your Android phone... ☝

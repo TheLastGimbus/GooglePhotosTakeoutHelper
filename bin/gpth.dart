@@ -384,7 +384,7 @@ void main(List<String> arguments) async {
     "Last thing - I've spent *a ton* of time on this script - \n"
     "if I saved your time and you want to say thanks, you can send me a tip:\n"
     "https://ko-fi.com/thelastgimbus\n"
-    "https://paypal.me/TheLastGimbus\n"
+    "https://www.paypal.com/donate/?hosted_button_id=Z7GVSL9KQPNHW\n"
     "Thank you ❤",
   );
   print('=' * barWidth);
