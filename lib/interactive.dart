@@ -223,7 +223,7 @@ Future<void> unzip(List<File> zips, Directory dir) async {
         'Error occured while unzipping file.\n'
         'Error details: ${e}',
       )
-      exit(69);
+      quit(69);
     }
   }
 }
