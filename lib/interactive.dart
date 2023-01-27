@@ -219,7 +219,7 @@ Future<void> unzip(List<File> zips, Directory dir) async {
     try {
       await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
     } catch(e) {
-      error('Error while unzipping $zip :(\n$e);
+      error('Error while unzipping $zip :(\n$e');
       quit(69);
     }
   }
