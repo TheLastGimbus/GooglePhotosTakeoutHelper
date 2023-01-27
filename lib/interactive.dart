@@ -216,6 +216,14 @@ Future<void> unzip(List<File> zips, Directory dir) async {
   pressEnterToContinue();
   for (final zip in zips) {
     print('Unzipping ${p.basename(zip.path)}...');
-    await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
+    try {
+      await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
+    } catch(e) {
+      error(
+        'Error occured while unzipping file.\n'
+        'Error details: ${e}',
+      )
+      exit(69);
+    }
   }
 }
