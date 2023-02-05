@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
 // remember to bump this
-const version = '3.3.1';
+const version = '3.3.2';
 
 /// convenient print for errors
 void error(Object? object) => stderr.write('$object\n');

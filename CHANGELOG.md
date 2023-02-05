@@ -1,3 +1,7 @@
+## 3.3.2
+
+- Bump SDK and dependencies
+
 ## 3.3.1
 
 ### Fix bugs introduced in `v3.3.0` 🤓
