@@ -335,7 +335,11 @@ void main(List<String> arguments) async {
           : args['divide-to-dates']
               ? date == null
                   ? p.join(output.path, 'date-unknown')
-                  : p.join(output.path, '${date.year}', '${date.month}')
+                  : p.join(
+                      output.path,
+                      '${date.year}',
+                      date.month.toString().padLeft(2, '0'),
+                    )
               : output.path,
     );
     // i think checking vars like this is bit faster than calling fs every time
