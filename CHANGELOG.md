@@ -1,3 +1,8 @@
+## 3.3.3
+
+- Fix memory crashes :D
+- nicer names for split-to-dates thanks to @denouche #168 <3
+
 ## 3.3.2
 
 - Bump SDK and dependencies
