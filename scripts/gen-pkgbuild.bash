@@ -1,5 +1,8 @@
 #!/bin/bash
 # Script to generate PKGBUILD files for Ałycz Linux
+
+set -e  # fail if generating sha fails or smth
+
 txt="# Maintainer: TheLastGimbus <mateusz.soszynski@tuta.io>
 pkgname=gpth-bin
 pkgver=$(grep -oP '(?<=version: ).*' pubspec.yaml)
@@ -19,4 +22,4 @@ package() {
     install -Dm755 \"gpth-linux\" \"\${pkgdir}/usr/bin/gpth\"
 }"
 
-echo "$txt" >PKGBUILD
+echo "$txt" | tee PKGBUILD
