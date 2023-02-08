@@ -2,11 +2,18 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:exif/exif.dart';
+import 'package:gpth/utils.dart';
+import 'package:mime/mime.dart';
 
 /// DateTime from exif data *potentially* hidden within a [file]
 ///
 /// You can try this with *any* file, it either works or not 🤷
 Future<DateTime?> exifExtractor(File file) async {
+  // if file is not image or >32MiB - DO NOT crash :D
+  if (!(lookupMimeType(file.path)?.startsWith('image/') ?? false) ||
+      await file.length() > maxFileSize) {
+    return null;
+  }
   final bytes = await file.readAsBytes();
   // this returns empty {} if file doesn't have exif so don't worry
   final tags = await readExifFromBytes(bytes);

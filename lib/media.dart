@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:gpth/utils.dart';
 
 /// Abstract of a *media* - a photo or video
 /// Main thing is the [file] - this should not change
@@ -34,7 +35,10 @@ class Media {
   Digest? _hash;
 
   /// will be used for finding duplicates/albums
-  Digest get hash => _hash ??= sha256.convert(file.readAsBytesSync());
+  /// WARNING: Returns same value for files > [maxFileSize]
+  Digest get hash => _hash ??= file.lengthSync() > maxFileSize
+      ? Digest([0])
+      : sha256.convert(file.readAsBytesSync());
 
   Media(
     this.file, {
