@@ -1,0 +1,39 @@
+# This is quick action to build apk and share it with artifacts
+# It's for convenience and nightly-testing with people
+name: Build nightly
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get exe name
+        id: exe_name
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            echo "name=gpth-linux" >> $GITHUB_OUTPUT
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            echo "name=gpth-windoza.exe" >> $GITHUB_OUTPUT
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            echo "name=gpth-macos" >> $GITHUB_OUTPUT
+          else
+            echo "Unknown OS: $RUNNER_OS"
+            exit 69
+          fi
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+      - name: Build exe
+        run: dart compile exe bin/gpth.dart -o ./${{ steps.exe_name.outputs.name }}
+      - name: Upload apk as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gpth-nightly-${{ runner.os }}
+          path: ./${{ steps.exe_name.outputs.name }}
+          if-no-files-found: error
