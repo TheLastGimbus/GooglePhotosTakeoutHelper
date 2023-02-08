@@ -72,7 +72,7 @@ jobs:
       # if linux, upload to aur
       - name: Generate PKGBUILD
         if: matrix.os == 'ubuntu-latest'
-        run: ./scripts/gen-pkgbuild.bash ./gpth-${{ steps.clean_tag.outputs.tag }}-${{ runner.os }}.exe > ./PKGBUILD
+        run: ./scripts/gen-pkgbuild.bash ./${{ steps.exe_name.outputs.name }} > ./PKGBUILD
       - name: Upload to AUR
         if: matrix.os == 'ubuntu-latest'
         uses: KSXGitHub/github-actions-deploy-aur@v2
