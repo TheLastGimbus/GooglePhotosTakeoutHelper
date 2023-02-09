@@ -28,7 +28,18 @@ final _commonDatetimePatterns = [
     RegExp(
         r'(?<date>20\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{6})'),
     'YYYY-MM-DD-hhmmss',
-  ]
+  ],
+  // example: 00004XTR_00004_BURST20190216172030.jpg, 201801261147521000.jpg, IMG_1_BURST20160520195318.jpg
+  [
+    RegExp(r'(?<date>20\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d{7})'),
+    'YYYYMMDDhhmmss',
+  ],
+  // example: 2016_01_30_11_49_15.mp4
+  [
+    RegExp(
+        r'(?<date>20\d{2}_(01|02|03|04|05|06|07|08|09|10|11|12)_[0-3]\d_\d{2}_\d{2}_\d{2})'),
+    'YYYY_MM_DD_hh_mm_ss',
+  ],
 ];
 
 /// Guesses DateTime from [file]s name
