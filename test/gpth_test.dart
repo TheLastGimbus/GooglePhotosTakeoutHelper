@@ -96,6 +96,8 @@ AQACEQMRAD8AIcgXf//Z""";
         ['201801261147521000.jpg', '2018-01-26 11:47:52'],
         ['IMG_1_BURST20160623205107_COVER.jpg', '2016-06-23 20:51:07'],
         ['IMG_1_BURST20160520195318.jpg', '2016-05-20 19:53:18'],
+        ['1990_06_16_07_30_00.jpg', '1990-06-16 07:30:00'],
+        ['1869_12_30_16_59_57.jpg', '1869-12-30 16:59:57'],
       ];
       for (final f in files) {
         expect((await guessExtractor(File(f.first))), DateTime.parse(f.last));
