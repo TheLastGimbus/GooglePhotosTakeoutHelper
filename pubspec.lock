@@ -20,10 +20,11 @@ packages:
   archive:
     dependency: "direct main"
     description:
-      name: archive
-      sha256: d6347d54a2d8028e0437e3c099f66fdb8ae02c4720c1e7534c9f24c10351f85d
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: fix-windoza-extract-errors
+      resolved-ref: fdf688a57b66f5cead334bb3130e8c634407a301
+      url: "https://github.com/TheLastGimbus/archive.git"
+    source: git
     version: "3.3.6"
   args:
     dependency: "direct main"
