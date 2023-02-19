@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
-Future<DateTime?> jsonExtractor(File file) async {
-  final jsonFile = await _jsonForFile(file);
+Future<DateTime?> jsonExtractor(File file, {bool tryhard = false}) async {
+  final jsonFile = await _jsonForFile(file, tryhard: tryhard);
   if (jsonFile == null) return null;
   try {
     final data = jsonDecode(await jsonFile.readAsString());
@@ -25,15 +25,22 @@ Future<DateTime?> jsonExtractor(File file) async {
   }
 }
 
-Future<File?> _jsonForFile(File file) async {
+Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
   final dir = Directory(p.dirname(file.path));
   var name = p.basename(file.path);
   // will try all methods to strip name to find json
   for (final method in [
-    (s) => s, // none
+    // none
+    (String s) => s,
     _shortenName,
-    _removeExtra,
-    _removeDigit, // most files with '(digit)' have jsons, so it's last
+    // use those two only with tryhard
+    // look at https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/175
+    // thanks @denouche for reporting this!
+    // TODO: Maybe add tests for this some day
+    if (tryhard) ...[
+      _removeExtra,
+      _removeDigit, // most files with '(digit)' have jsons, so it's last
+    ]
   ]) {
     final jsonFile = File(p.join(dir.path, '${method(name)}.json'));
     if (await jsonFile.exists()) return jsonFile;

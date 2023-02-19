@@ -111,6 +111,9 @@ void main(List<String> arguments) async {
     jsonExtractor,
     exifExtractor,
     if (args['guess-from-name']) guessExtractor,
+    // this is potentially *dangerous* - see:
+    // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/175
+    (f) => jsonExtractor(f, tryhard: true),
   ];
 
   /// ##### Occasional Fix mode #####
