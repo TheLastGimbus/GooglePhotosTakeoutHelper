@@ -1,3 +1,11 @@
+## 3.3.4
+
+- New name-guess patterns from @matt-boris <3
+- Support 19**-s and 18**-s while name guessing
+  > First camera was invented in 1839. I don't underestimate you guys anymore :eyes:
+- Fix path errors on windoza while unzipping #172
+- Fix #175 bad guessing json files with `...(1)` stuff
+
 ## 3.3.3
 
 - Fix memory crashes :D
