@@ -46,6 +46,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
 
 You may still need this mode if:
 - You want to run on Synology where there are no ui programs required for interactive
+  - You can read/discuss in #157 for any help
 - Interactive unzipping crashes for you (known issue in windoza 😢 #178)
 - Want to use this in other script/automation
 
