@@ -1,3 +1,9 @@
+## 3.3.5
+
+- Address #178 issues in logs - instructions on what to do
+
+  Sorry but this is all i can do for now :( we may get actual fix if https://github.com/brendan-duncan/archive/pull/244 ever moves further
+
 ## 3.3.4
 
 - New name-guess patterns from @matt-boris <3
