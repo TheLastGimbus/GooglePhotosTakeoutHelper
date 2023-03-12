@@ -218,6 +218,18 @@ Future<void> unzip(List<File> zips, Directory dir) async {
     print('Unzipping ${p.basename(zip.path)}...');
     try {
       await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
+    } on PathNotFoundException catch (e) {
+      error('Error while unzipping $zip :(\n$e');
+      error('');
+      error('===== This is a known issue ! =====');
+      error("Looks like unzipping doesn't want to work :(");
+      error(
+          "You will have to unzip manually - see 'Running manually' section in README");
+      error('');
+      error(
+          'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#running-manually-with-cmd');
+      error('');
+      error('===== Sorry for inconvenience =====');
     } catch (e) {
       error('Error while unzipping $zip :(\n$e');
       quit(69);

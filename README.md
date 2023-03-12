@@ -18,7 +18,7 @@ It will take those zips, extract everything from them, set their and `file last 
 ## How to use:
 Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complicated arguments - just get your zips, run it, and follow prompted instructions 💃
 
-If you want, you can still use it with args (for scripts etc) - run `--help` to see them 🧑‍💻
+If you want to run it on Synology, have problems with interactive, or just love cmd, look at ["Running manually with cmd"](#running-manually-with-cmd). Otherwise, just:
 
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
     - "deselect all" and then select only Google Photos
@@ -41,6 +41,36 @@ If you want, you can still use it with args (for scripts etc) - run `--help` to 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
+
+### Running manually with cmd
+
+You may still need this mode if:
+- You want to run on Synology where there are no ui programs required for interactive
+- Interactive unzipping crashes for you (known issue in windoza 😢 #178)
+- Want to use this in other script/automation
+
+In that case:
+1. Manually unzip all your takeout zips and merge them into one folder
+2. Open cmd and:
+   - For windoza:
+     ```bash
+     # psst: in windoza cmd, you can just drag and drop files/folders to type them in
+     # 1. change working directory to where gpth.exe is:
+     cd Downloads  # Most probably
+     # run it, selecting input and output folders with options like this:
+     # (you can try to drag and drop them)
+     gpth.exe --input "Downloads\you\input\folder" --output "C:\some\other\location"
+     # remember to use "" !
+     ```
+   - For Linux/macOS:
+     ```bash
+     # ssh/whatever to where you're running it
+     cd Downloads  # folder with gpth
+     chmod +x gpth  # add execute permission
+     ./gpth --input "/some/input/folder" --output "other/output/folder"
+     ```
+
+You can check all cmd flags by running `gpth --help` - for exapmle, the `--divide-to-dates` flag
 
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
