@@ -72,10 +72,20 @@ AQACEQMRAD8AIcgXf//Z""";
           1683078832 * 1000);
       expect((await jsonExtractor(imgFile3))?.millisecondsSinceEpoch,
           1666942303 * 1000);
-      expect((await jsonExtractor(imgFile4))?.millisecondsSinceEpoch,
-          1683074444 * 1000);
-      expect((await jsonExtractor(imgFile4_1))?.millisecondsSinceEpoch,
-          1683074444 * 1000);
+      // They *should* fail without tryhard
+      // See b38efb5d / #175
+      expect((await jsonExtractor(imgFile4))?.millisecondsSinceEpoch, null);
+      expect((await jsonExtractor(imgFile4_1))?.millisecondsSinceEpoch, null);
+      // Should work *with* tryhard
+      expect(
+        (await jsonExtractor(imgFile4, tryhard: true))?.millisecondsSinceEpoch,
+        1683074444 * 1000,
+      );
+      expect(
+        (await jsonExtractor(imgFile4_1, tryhard: true))
+            ?.millisecondsSinceEpoch,
+        1683074444 * 1000,
+      );
     });
     test('test exif extractor', () async {
       expect(
