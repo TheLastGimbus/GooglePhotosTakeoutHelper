@@ -27,10 +27,6 @@ class Media {
   /// higher the worse
   int? dateTakenAccuracy;
 
-  // if those are true, we put them in separate folder
-  bool isArchived = false;
-  bool isTrashed = false;
-
   //cache
   Digest? _hash;
 
@@ -44,8 +40,6 @@ class Media {
     this.file, {
     this.dateTaken,
     this.dateTakenAccuracy,
-    this.isArchived = false,
-    this.isTrashed = false,
   });
 
   @override

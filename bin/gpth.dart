@@ -201,9 +201,6 @@ void main(List<String> arguments) async {
   /// All "year folders" that we found
   final yearFolders = <Directory>[];
 
-  Directory? archiveFolder;
-  Directory? trashFolder;
-
   /// All album folders - that is, folders that were aside yearFolders and were
   /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
@@ -216,10 +213,6 @@ void main(List<String> arguments) async {
   await for (final d in input.list(recursive: true).whereType<Directory>()) {
     if (isYearFolder(d)) {
       yearFolders.add(d);
-    } else if (archiveFolder == null && await isArchiveFolder(d)) {
-      archiveFolder = d;
-    } else if (trashFolder == null && await isTrashFolder(d)) {
-      trashFolder = d;
     } else if (await isAlbumFolder(d)) {
       albumFolders.add(d);
     }
@@ -238,20 +231,6 @@ void main(List<String> arguments) async {
       await input.delete(recursive: true);
     }
     quit(13);
-  }
-
-  await for (final file
-      in (archiveFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isArchived: true));
-  }
-  await for (final file
-      in (trashFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isTrashed: true));
-  }
-  final archiveTrashCount =
-      media.where((e) => e.isArchived || e.isTrashed).length;
-  if (archiveTrashCount > 0) {
-    print('Also found $archiveTrashCount photos/videos in archive/trash :)');
   }
 
   /// ##################################################
@@ -333,20 +312,18 @@ void main(List<String> arguments) async {
   await for (final m in Stream.fromIterable(media)) {
     final date = m.dateTaken;
     final folder = Directory(
-      m.isArchived || m.isTrashed
-          ? p.join(output.path, m.isArchived ? 'Archive' : 'Trash')
-          : args['divide-to-dates']
-              ? date == null
-                  ? p.join(output.path, 'date-unknown')
-                  : p.join(
-                      output.path,
-                      '${date.year}',
-                      date.month.toString().padLeft(2, '0'),
-                    )
-              : output.path,
+      args['divide-to-dates']
+          ? date == null
+              ? p.join(output.path, 'date-unknown')
+              : p.join(
+                  output.path,
+                  '${date.year}',
+                  date.month.toString().padLeft(2, '0'),
+                )
+          : output.path,
     );
     // i think checking vars like this is bit faster than calling fs every time
-    if (args['divide-to-dates'] || m.isArchived || m.isTrashed) {
+    if (args['divide-to-dates']) {
       await folder.create(recursive: true);
     }
     final freeFile =
