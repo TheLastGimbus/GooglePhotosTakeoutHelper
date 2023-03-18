@@ -1,6 +1,23 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:gpth/media.dart';
 import 'package:path/path.dart' as p;
+
+Map<String, List<Media>> groupToUnique(List<Media> media) {
+  final output = <String, List<Media>>{};
+  // group files by size - can't have same hash with diff size
+  for (final sameSize in media.groupListsBy((e) => e.size).entries) {
+    // just add with "...bytes" key if just one
+    if (sameSize.value.length <= 1) {
+      output['${sameSize.key}bytes'] = sameSize.value;
+    } else {
+      // ...calculate their full hashes and group by them
+      output.addAll(sameSize.value.groupListsBy((e) => e.hash.toString()));
+    }
+  }
+  return output;
+}
 
 /// Removes duplicate media from list of media
 ///
@@ -13,38 +30,59 @@ import 'package:path/path.dart' as p;
 /// Returns count of removed
 int removeDuplicates(List<Media> media) {
   var count = 0;
-  // group by albums as we will merge those later
-  final byAlbum = media.groupListsBy((e) => e.albums?.first);
-  for (final album in byAlbum.values) {
-    // group files by size
-    final bySize = album.groupListsBy((e) => e.size);
-    for (final sameSize in bySize.values) {
-      // skip if it's a single one
-      if (sameSize.length <= 1) continue;
-      // ...calculate their full hashes and group by them
-      final byHash = sameSize.groupListsBy((e) => e.hash);
-      for (final sameHash in byHash.values) {
-        // if *now* has any >1 then they must be duplicates
-        if (sameHash.length <= 1) continue;
-        // sort by best date extraction, then file name length
-        // using strings to sort by two values is a sneaky trick i learned at
-        // https://stackoverflow.com/questions/55920677/how-to-sort-a-list-based-on-two-values
+  final byAlbum = media
+      // group by albums as we will merge those later
+      // (to *not* compare hashes between albums)
+      .groupListsBy((e) => e.albums?.first)
+      .values
+      // group by hash
+      .map((albumGroup) => groupToUnique(albumGroup).values);
+  // we don't care about album organization now - flatten
+  final Iterable<List<Media>> hashGroups = byAlbum.flattened;
+  for (final group in hashGroups) {
+    // sort by best date extraction, then file name length
+    // using strings to sort by two values is a sneaky trick i learned at
+    // https://stackoverflow.com/questions/55920677/how-to-sort-a-list-based-on-two-values
 
-        // note: we are comparing accurracy here tho we do know that *all*
-        // of them have it null - i'm leaving this just for sake
-        sameHash.sort((a, b) =>
-            '${a.dateTakenAccuracy ?? 999}${p.basename(a.file.path).length}'
-                .compareTo(
-                    '${b.dateTakenAccuracy ?? 999}${p.basename(b.file.path).length}'));
-        // get list of all except first
-        for (final e in sameHash.sublist(1)) {
-          // remove them from media
-          media.remove(e);
-          count++;
-        }
-      }
+    // note: we are comparing accuracy here tho we do know that *all*
+    // of them have it null - i'm leaving this just for sake
+    group.sort((a, b) =>
+        '${a.dateTakenAccuracy ?? 999}${p.basename(a.file.path).length}'.compareTo(
+            '${b.dateTakenAccuracy ?? 999}${p.basename(b.file.path).length}'));
+    // get list of all except first
+    for (final e in group.sublist(1)) {
+      // remove them from media
+      media.remove(e);
+      count++;
     }
   }
 
   return count;
+}
+
+String albumName(Directory albumDir) => p.basename(albumDir.path);
+
+/// This will analyze [allMedia], find which files are hash-same, and merge
+/// all of them into single [Media] object with all album names they had
+void findAlbums(List<Media> allMedia) {
+  for (final group in groupToUnique(allMedia).values) {
+    if (group.length <= 1) continue; // then this isn't a group
+    // now, we have [group] list that contains actual sauce:
+
+    final allAlbumNames = group.fold(
+      <String>{},
+      (allNames, e) => {...allNames, ...(e.albums ?? {})},
+    );
+    // sort by best date extraction
+    group.sort((a, b) =>
+        (a.dateTakenAccuracy ?? 999).compareTo((b.dateTakenAccuracy ?? 999)));
+    // remove original dirty ones
+    for (final e in group) {
+      allMedia.remove(e);
+    }
+    // set the first (best) one complete album list
+    group.first.albums = allAlbumNames;
+    // add our one, precious ✨perfect✨ one
+    allMedia.add(group.first);
+  }
 }
