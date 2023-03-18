@@ -15,6 +15,13 @@ class Media {
   /// File with the media
   File file;
 
+  /// Names of the albums this media belongs to
+  ///
+  /// This is heavily mutated - at first, media from year folders have this
+  /// null, and those from albums have one name. Then, they are merged into one
+  /// by algos etc.
+  Set<String>? albums;
+
   // cache
   int? _size;
 
@@ -38,10 +45,15 @@ class Media {
 
   Media(
     this.file, {
+    this.albums,
     this.dateTaken,
     this.dateTakenAccuracy,
   });
 
   @override
-  String toString() => 'Media($file, dateTaken: $dateTaken)';
+  String toString() => 'Media('
+      '$file, '
+      'dateTaken: $dateTaken'
+      '${albums != null ? ', albums: $albums' : ''}'
+      ')';
 }

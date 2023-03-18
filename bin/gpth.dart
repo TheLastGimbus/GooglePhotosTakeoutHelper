@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:console_bars/console_bars.dart';
+import 'package:gpth/album.dart';
 import 'package:gpth/date_extractor.dart';
 import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
@@ -195,6 +196,31 @@ void main(List<String> arguments) async {
   // No shitheads, you did not overhear - we *mutate* the whole list and objects
   // inside it. This is not Flutter-ish, but it's not Flutter - it's a small
   // simple script, and this the best solution 😎💯
+
+  // Okay, more details on what will happen here:
+  // 1. We find *all* media in either year folders or album folders.
+  //    Every single file will be a separate [Media] object.
+  //    If given [Media] was found in album folder, it will have it noted
+  // 2. We [removeDuplicates] - if two files in same/null album have same hash,
+  //    one will be removed. Note that there are still duplicates from different
+  //    albums left. This is intentional
+  // 3. We guess their dates. Functions in [dateExtractors] are used in order
+  //    from most to least accurate
+  // 4. Now we [findAlbums]. This will analyze [Media] that have same hashes,
+  //    and leave just one with all [albums] filled.
+  //    final exampleMedia = [
+  //      Media('lonePhoto.jpg'),
+  //      Media('photo1.jpg, albums=null),
+  //      Media('photo1.jpg, albums={Vacation}),
+  //      Media('photo1.jpg, albums={Friends}),
+  //    ];
+  //    findAlbums(exampleMedia);
+  //    exampleMedia == [
+  //      Media('lonePhoto.jpg'),
+  //      Media('photo1.jpg, albums={Vacation, Friends}),
+  //    ];
+  //
+
   /// Big global media list that we'll work on
   final media = <Media>[];
 
@@ -205,7 +231,7 @@ void main(List<String> arguments) async {
   /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
 
-  /// ##### Find all photos/videos and add to list #####
+  /// ##### Find literally *all* photos/videos and add to list #####
 
   print('Okay, running... searching for everything in input folder...');
 
@@ -217,13 +243,20 @@ void main(List<String> arguments) async {
       albumFolders.add(d);
     }
   }
-  await for (final f in Stream.fromIterable(yearFolders)) {
+  for (final f in yearFolders) {
     await for (final file in f.list().wherePhotoVideo()) {
       media.add(Media(file));
     }
   }
+  for (final a in albumFolders) {
+    await for (final file in a.list().wherePhotoVideo()) {
+      media.add(Media(file, albums: {albumName(a)}));
+    }
+  }
 
-  print('Found ${media.length} photos/videos in input folder');
+  // TODO: Remove print as the difference between this and output may scare user
+  // print('Found ${media.length} photos/videos in input folder');
+
   if (media.isEmpty) {
     await interactive.nothingFoundMessage();
     if (interactive.indeed) {
@@ -251,16 +284,6 @@ void main(List<String> arguments) async {
 
   /// ###################################
 
-  /// ##### Find albums #####
-
-  // Now, this is awkward...
-  // we can find albums without a problem, but we have no idea what
-  // to do about it 🤷
-  // so just print it now (flex)
-  // findAlbums(albumFolders, media).forEach(print);
-
-  /// #######################
-
   // NOTE FOR MYSELF/whatever:
   // I placed extracting dates *after* removing duplicates.
   // Today i thought to myself - shouldn't this be reversed?
@@ -273,6 +296,8 @@ void main(List<String> arguments) async {
   // ...and we would potentially waste a lot of time searching for all of their
   //    jsons
   // ...so i'm leaving this like that 😎
+  //
+  // Ps. BUT i've put album merging *after* guess date - notes below
 
   /// ##### Extracting/predicting dates using given extractors #####
 
@@ -301,6 +326,21 @@ void main(List<String> arguments) async {
   print('');
 
   /// ##############################################################
+
+  /// ##### Find albums #####
+
+  // I'm placing merging duplicate Media into albums after guessing date for
+  // each one individually, because they are in different folder.
+  // I wish that, thanks to this, we may find some jsons in albums that would
+  // be broken in shithole of big-ass year folders
+
+  // Now, this is awkward...
+  // we can find albums without a problem, but we have no idea what
+  // to do about it 🤷
+  // so just print it now (flex)
+  findAlbums(media);
+
+  /// #######################
 
   /// ##### Copy/move files to actual output folder #####
 
