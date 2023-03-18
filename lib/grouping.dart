@@ -1,22 +1,37 @@
+/// This files contains functions for removing duplicates and detecting albums
+///
+/// That's because their logic looks very similar and they share code
+
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:gpth/media.dart';
 import 'package:path/path.dart' as p;
 
-Map<String, List<Media>> groupToUnique(List<Media> media) {
-  final output = <String, List<Media>>{};
-  // group files by size - can't have same hash with diff size
-  for (final sameSize in media.groupListsBy((e) => e.size).entries) {
-    // just add with "...bytes" key if just one
-    if (sameSize.value.length <= 1) {
-      output['${sameSize.key}bytes'] = sameSize.value;
-    } else {
-      // ...calculate their full hashes and group by them
-      output.addAll(sameSize.value.groupListsBy((e) => e.hash.toString()));
+extension Group on Iterable<Media> {
+  /// This groups your media into map where key is something that they share
+  /// and value is the List of those media are the same
+  ///
+  /// Key may be "245820998bytes", where there was no other file same size
+  /// (no need to calculate hash), or hash.toSting'ed where hash was calculated
+  ///
+  /// Groups may be 1-lenght, where element was unique, or n-lenght where there
+  /// were duplicates
+  Map<String, List<Media>> groupIdentical() {
+    final output = <String, List<Media>>{};
+    // group files by size - can't have same hash with diff size
+    // ignore: unnecessary_this
+    for (final sameSize in this.groupListsBy((e) => e.size).entries) {
+      // just add with "...bytes" key if just one
+      if (sameSize.value.length <= 1) {
+        output['${sameSize.key}bytes'] = sameSize.value;
+      } else {
+        // ...calculate their full hashes and group by them
+        output.addAll(sameSize.value.groupListsBy((e) => e.hash.toString()));
+      }
     }
+    return output;
   }
-  return output;
 }
 
 /// Removes duplicate media from list of media
@@ -36,7 +51,7 @@ int removeDuplicates(List<Media> media) {
       .groupListsBy((e) => e.albums?.first)
       .values
       // group by hash
-      .map((albumGroup) => groupToUnique(albumGroup).values);
+      .map((albumGroup) => albumGroup.groupIdentical().values);
   // we don't care about album organization now - flatten
   final Iterable<List<Media>> hashGroups = byAlbum.flattened;
   for (final group in hashGroups) {
@@ -65,7 +80,7 @@ String albumName(Directory albumDir) => p.basename(albumDir.path);
 /// This will analyze [allMedia], find which files are hash-same, and merge
 /// all of them into single [Media] object with all album names they had
 void findAlbums(List<Media> allMedia) {
-  for (final group in groupToUnique(allMedia).values) {
+  for (final group in allMedia.groupIdentical().values) {
     if (group.length <= 1) continue; // then this isn't a group
     // now, we have [group] list that contains actual sauce:
 

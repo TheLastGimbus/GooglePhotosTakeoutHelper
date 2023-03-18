@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:console_bars/console_bars.dart';
-import 'package:gpth/album.dart';
 import 'package:gpth/date_extractor.dart';
-import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
 import 'package:gpth/folder_classify.dart';
+import 'package:gpth/grouping.dart';
 import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
