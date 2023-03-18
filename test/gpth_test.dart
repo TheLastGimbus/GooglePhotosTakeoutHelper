@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gpth/album.dart';
+import 'package:collection/collection.dart';
 import 'package:gpth/date_extractor.dart';
-import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
 import 'package:gpth/folder_classify.dart';
+import 'package:gpth/grouping.dart';
 import 'package:gpth/media.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart';
@@ -39,8 +39,16 @@ AQACEQMRAD8AIcgXf//Z""";
   final jsonFile4 = File('simple_file_20200101.jpg.json');
   final media = [
     Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
+    Media(
+      imgFile1,
+      dateTaken: DateTime(2022, 9, 1),
+      dateTakenAccuracy: 2,
+      albums: {albumName(albumDir)},
+    ),
     Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
     Media(imgFile3, dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
+    Media(imgFile4),
+    Media(imgFile4_1, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -52,10 +60,12 @@ AQACEQMRAD8AIcgXf//Z""";
       base64.decode(greenImgBase64.replaceAll('\n', '')),
     );
     // apparently you don't need to .create() before writing 👍
-    imgFile1.writeAsBytesSync([1, 2, 3]); // those two...
+    imgFile1.writeAsBytesSync([0, 1, 2]);
     imgFile1.copySync('${albumDir.path}/${basename(imgFile1.path)}');
-    imgFile2.writeAsBytesSync([1, 2, 3]); // are actual duplicates
-    imgFile3.writeAsBytesSync([3, 2, 1]); // and this one is different
+    imgFile2.writeAsBytesSync([3, 4, 5]);
+    imgFile3.writeAsBytesSync([6, 7, 8]);
+    imgFile4.writeAsBytesSync([9, 10, 11]); // these two...
+    imgFile4_1.writeAsBytesSync([9, 10, 11]); // ...are duplicates
     writeJson(File file, int time) =>
         file.writeAsStringSync('{"photoTakenTime": {"timestamp": "$time"}}');
     writeJson(jsonFile1, 1599078832);
@@ -116,8 +126,8 @@ AQACEQMRAD8AIcgXf//Z""";
   });
   test('test duplicate removal', () {
     expect(removeDuplicates(media), 1);
-    expect(media.length, 2);
-    expect(media.first.file, imgFile1);
+    expect(media.length, 5);
+    expect(media.firstWhereOrNull((e) => e.file == imgFile4), null);
   });
   test('test extras removal', () {
     final m = [Media(imgFile1), Media(imgFile2)];
@@ -125,9 +135,21 @@ AQACEQMRAD8AIcgXf//Z""";
     expect(m.length, 1);
   });
   test('test album finding', () {
-    expect(findAlbums([albumDir], media), [
-      Album('Vacation', [media.first])
-    ]);
+    // sadly, this will still modify [media] some, but won't delete anything
+    final copy = media.toList();
+    removeDuplicates(copy);
+
+    final countBefore = copy.length;
+    findAlbums(copy);
+    expect(countBefore - copy.length, 1);
+
+    final albumed = copy.firstWhere((e) => e.albums != null);
+    expect(albumed.albums, {'Vacation'});
+    expect(albumed.dateTaken, media[0].dateTaken);
+    expect(albumed.dateTaken == media[1].dateTaken, false); // be sure
+    expect(copy.where((e) => e.albums != null).length, 1);
+    // fails because Dart is no Rust :/
+    // expect(media.where((e) => e.albums != null).length, 1);
   });
   group('utils test', () {
     test('test Stream.whereType()', () {
@@ -160,17 +182,28 @@ AQACEQMRAD8AIcgXf//Z""";
     });
   });
   group('folder_classify test', () {
-    test('is archive/trash (fast name only)', () async {
-      expect(await isArchiveFolder(Directory('Takeout/Photos/Archive/')), true);
-      expect(await isArchiveFolder(Directory.current), false);
-      expect(
-        // you must do it because Dart 🤷
-        // https://github.com/flutter/flutter/issues/71183#issuecomment-882213036
-        () async => await isArchiveFolder(Directory('Photos/lol-album')),
-        throwsA(isA<FileSystemException>()),
-      );
-      expect(await isTrashFolder(Directory('Takeout/Photos/Trash')), true);
-      expect(await isTrashFolder(Directory.current), false);
+    final dirs = [
+      Directory('./Photos from 2025'),
+      Directory('./Photos from 1969'),
+      Directory('./Photos from vacation'),
+      Directory('/tmp/very-random-omg'),
+    ];
+    setUpAll(() async {
+      for (var d in dirs) {
+        await d.create();
+      }
+    });
+    test('is year/album folder', () async {
+      expect(isYearFolder(dirs[0]), true);
+      expect(isYearFolder(dirs[1]), true);
+      expect(isYearFolder(dirs[2]), false);
+      expect(await isAlbumFolder(dirs[2]), true);
+      expect(await isAlbumFolder(dirs[3]), false);
+    });
+    tearDownAll(() async {
+      for (var d in dirs) {
+        await d.delete();
+      }
     });
   });
 
@@ -181,6 +214,8 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile1.deleteSync();
     imgFile2.deleteSync();
     imgFile3.deleteSync();
+    imgFile4.deleteSync();
+    imgFile4_1.deleteSync();
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
     jsonFile3.deleteSync();
