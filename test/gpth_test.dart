@@ -7,6 +7,7 @@ import 'package:gpth/extras.dart';
 import 'package:gpth/folder_classify.dart';
 import 'package:gpth/grouping.dart';
 import 'package:gpth/media.dart';
+import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
