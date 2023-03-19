@@ -19,6 +19,17 @@ import 'package:file_picker_desktop/file_picker_desktop.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
+const albumOptions = {
+  'shortcut': '[Recommended] Album folders with shortcuts/symlinks to '
+      'original photos. Recommended as it will take the least space, but '
+      'may not be portable when moving across systems/computes/phones etc',
+  'nothing': 'Just ignore them and put all photos into one folder',
+  'duplicate-copy': 'Album folders with photos copied into them. '
+      'This will work across all systems, but may take wayyy more space!!',
+  'json': "[Advanced] Make a .json file with info about albums. "
+      "Use if you're a programmer and plan to process this stuff yourself"
+};
+
 /// Whether we are, indeed, running interactive (or not)
 var indeed = false;
 
@@ -145,6 +156,22 @@ Future<bool> askDivideDates() async {
       error('Invalid answer - try again');
       return askDivideDates();
   }
+}
+
+Future<String> askAlbums() async {
+  print('What should be done with albums?');
+  var i = 0;
+  for (final entry in albumOptions.entries) {
+    print('[${i++}] ${entry.key}: ${entry.value}');
+  }
+  final answer = int.tryParse(await askForInt());
+  if (answer == null || answer < 0 || answer >= albumOptions.length) {
+    error('Invalid answer - try again');
+    return askAlbums();
+  }
+  final choice = albumOptions.keys.elementAt(answer);
+  print('Okay, doing: $choice');
+  return choice;
 }
 
 // this is used in cli mode as well

@@ -41,6 +41,13 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts *extracted*. ')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
+    ..addOption(
+      'albums',
+      help: 'What to do about albums?',
+      allowed: interactive.albumOptions.keys,
+      allowedHelp: interactive.albumOptions,
+      defaultsTo: 'shortcut',
+    )
     ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
     ..addFlag(
@@ -89,7 +96,11 @@ void main(List<String> arguments) async {
     print('');
     args['divide-to-dates'] = await interactive.askDivideDates();
     print('');
+    args['albums'] = await interactive.askAlbums();
+    print('');
 
+    // TODO: for those to be accurate with "duplicate-copy" album option, we need to move files not only from year folders but also albums
+    // TODO: Add pointers to files in albums in Media objects
     // calculate approx space required for everything
     final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
     final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
@@ -253,9 +264,6 @@ void main(List<String> arguments) async {
     }
   }
 
-  // TODO: Remove print as the difference between this and output may scare user
-  // print('Found ${media.length} photos/videos in input folder');
-
   if (media.isEmpty) {
     await interactive.nothingFoundMessage();
     if (interactive.indeed) {
@@ -333,10 +341,7 @@ void main(List<String> arguments) async {
   // I wish that, thanks to this, we may find some jsons in albums that would
   // be broken in shithole of big-ass year folders
 
-  // Now, this is awkward...
-  // we can find albums without a problem, but we have no idea what
-  // to do about it 🤷
-  // so just print it now (flex)
+  print('Finding albums...');
   findAlbums(media);
 
   /// #######################
@@ -350,6 +355,7 @@ void main(List<String> arguments) async {
   );
   await for (final m in Stream.fromIterable(media)) {
     final date = m.dateTaken;
+    // TODO: Implement albums
     final folder = Directory(
       args['divide-to-dates']
           ? date == null
@@ -400,6 +406,7 @@ void main(List<String> arguments) async {
   if (countPoop > 0) {
     print("Couldn't find date for $countPoop photos/videos :/");
   }
+  // TODO: proper count with albums
   print('${args['copy'] ? 'Copied' : 'Moved'} ${media.length} '
       'files to "${output.path}"');
   print('');
