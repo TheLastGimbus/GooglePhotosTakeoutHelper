@@ -49,7 +49,8 @@ AQACEQMRAD8AIcgXf//Z""";
     Media({null: imgFile2}, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
     Media({null: imgFile3},
         dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
-    Media({null: imgFile4}),
+    Media({null: imgFile4}), // these two...
+    // ...are duplicates
     Media({null: imgFile4_1}, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
   ];
 
@@ -210,6 +211,120 @@ AQACEQMRAD8AIcgXf//Z""";
         await d.delete();
       }
     });
+  });
+
+  /// This is complicated, thus those test are not bullet-proof
+  group('test moving logic', () {
+    final output = Directory(join(Directory.systemTemp.path, 'testy-output'));
+    setUp(() async {
+      await output.create();
+      removeDuplicates(media);
+      findAlbums(media);
+    });
+    test('shortcut', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'shortcut',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 2 folders + media + 1 album-ed shortcut
+      expect(outputted.length, 2 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 1);
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS', 'Vacation'},
+      );
+    });
+    test('nothing', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'nothing',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 1 folder + media
+      expect(outputted.length, 1 + media.length);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 1);
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS'},
+      );
+    });
+    test('duplicate-copy', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'duplicate-copy',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 2 folders + media + 1 album-ed copy
+      expect(outputted.length, 2 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 2);
+      expect(outputted.whereType<File>().length, media.length + 1);
+      expect(
+        UnorderedIterableEquality<String>().equals(
+          outputted.whereType<File>().map((e) => basename(e.path)),
+          [
+            "image-edited.jpg",
+            "image-edited.jpg", // two times
+            "Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg",
+            "simple_file_20200101-edited(1).jpg",
+            "Urlaub in Knaufspesch in der Schneifel (38).JPG",
+          ],
+        ),
+        true,
+      );
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS', 'Vacation'},
+      );
+    });
+    test('json', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'json',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 1 folder + media + 1 json
+      expect(outputted.length, 1 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 1);
+      expect(outputted.whereType<File>().length, media.length + 1);
+      expect(
+        UnorderedIterableEquality<String>().equals(
+          outputted.whereType<File>().map((e) => basename(e.path)),
+          [
+            "image-edited.jpg",
+            "Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg",
+            "simple_file_20200101-edited(1).jpg",
+            "Urlaub in Knaufspesch in der Schneifel (38).JPG",
+            "albums-info.json",
+          ],
+        ),
+        true,
+      );
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS'},
+      );
+    });
+    tearDown(() async => await output.delete(recursive: true));
   });
 
   /// Delete all shitty files as we promised
