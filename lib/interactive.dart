@@ -23,11 +23,11 @@ const albumOptions = {
   'shortcut': '[Recommended] Album folders with shortcuts/symlinks to '
       'original photos. Recommended as it will take the least space, but '
       'may not be portable when moving across systems/computes/phones etc',
-  'nothing': 'Just ignore them and put all photos into one folder',
+  'nothing': 'Just ignore them and put year-photos into one folder',
   'duplicate-copy': 'Album folders with photos copied into them. '
       'This will work across all systems, but may take wayyy more space!!',
-  'json': "[Advanced] Make a .json file with info about albums. "
-      "Use if you're a programmer and plan to process this stuff yourself"
+  'json': "Put ALL photos (including Archive and Trash) in one folder and make a .json file with info about albums. "
+      "Use if you're a programmer, or just want to get everything, ignoring lack of year-folders etc."
 };
 
 /// Whether we are, indeed, running interactive (or not)

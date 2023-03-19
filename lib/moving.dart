@@ -1,6 +1,7 @@
 /// This file contains logic/utils for final act of moving actual files once
 /// we have everything grouped, de-duplicated and sorted
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -54,13 +55,21 @@ Stream<int> moveFiles(
   required String albumBehavior,
 }) async* {
   assert(interactive.albumOptions.keys.contains(albumBehavior));
+
+  /// used only in 'json' behavior
+  /// key = name of main outputted file | value = list of albums it belongs to
+  final infoJson = <String, List<String>>{};
   var i = 0;
   for (final m in allMediaFinal) {
     // main file shortcuts will link to
     File? mainFile;
-    // this will put null media first so album shortcuts can link to it
-    final nullFirst =
-        m.files.entries.sorted((a, b) => (a.key ?? '').compareTo(b.key ?? ''));
+
+    final nullFirst = albumBehavior == 'json'
+        // in 'json' case, we want to copy ALL files (like Archive) as normals
+        ? [MapEntry(null, m.files.values.first)]
+        // this will put null media first so album shortcuts can link to it
+        : m.files.entries
+            .sorted((a, b) => (a.key ?? '').compareTo(b.key ?? ''));
     // iterate over all media of file to do something about them
     // ignore non-nulls with 'ignore', copy with 'duplicate-copy',
     // symlink with 'shortcut' etc
@@ -124,8 +133,17 @@ Stream<int> moveFiles(
         time = DateTime(1970);
       }
       await result.setLastModified(time);
+
+      if (albumBehavior == 'json') {
+        infoJson[p.basename(result.path)] =
+            m.files.keys.whereNotNull().toList();
+      }
     }
     // done with this media - next!
     yield ++i;
+  }
+  if (albumBehavior == 'json') {
+    await File(p.join(output.path, 'albums-info.json'))
+        .writeAsString(jsonEncode(infoJson));
   }
 }
