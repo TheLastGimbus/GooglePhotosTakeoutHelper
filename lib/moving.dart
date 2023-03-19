@@ -8,7 +8,16 @@ import 'package:gpth/interactive.dart' as interactive;
 import 'package:path/path.dart' as p;
 
 import 'media.dart';
-import 'utils.dart';
+
+/// This will add (1) add end of file name over and over until file with such
+/// name doesn't exist yet. Will leave without "(1)" if is free already
+File findNotExistingName(File initialFile) {
+  var file = initialFile;
+  while (file.existsSync()) {
+    file = File('${p.withoutExtension(file.path)}(1)${p.extension(file.path)}');
+  }
+  return file;
+}
 
 /// This will create symlink on unix and shortcut on windoza
 ///

@@ -44,16 +44,6 @@ extension Util on Stream {
   Stream<T> whereType<T>() => where((e) => e is T).cast<T>();
 }
 
-/// This will add (1) add end of file name over and over until file with such
-/// name doesn't exist yet. Will leave without "(1)" if is free already
-File findNotExistingName(File initialFile) {
-  var file = initialFile;
-  while (file.existsSync()) {
-    file = File('${p.withoutExtension(file.path)}(1)${p.extension(file.path)}');
-  }
-  return file;
-}
-
 Future<int?> getDiskFree([String? path]) async {
   path ??= Directory.current.path;
   if (Platform.isLinux) {
