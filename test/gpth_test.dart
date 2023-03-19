@@ -38,17 +38,18 @@ AQACEQMRAD8AIcgXf//Z""";
   final imgFile4_1 = File('simple_file_20200101-edited(1).jpg');
   final jsonFile4 = File('simple_file_20200101.jpg.json');
   final media = [
-    Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
+    Media({null: imgFile1},
+        dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
     Media(
-      imgFile1,
+      {albumName(albumDir): imgFile1},
       dateTaken: DateTime(2022, 9, 1),
       dateTakenAccuracy: 2,
-      albums: {albumName(albumDir)},
     ),
-    Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
-    Media(imgFile3, dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
-    Media(imgFile4),
-    Media(imgFile4_1, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
+    Media({null: imgFile2}, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
+    Media({null: imgFile3},
+        dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
+    Media({null: imgFile4}),
+    Media({null: imgFile4_1}, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -127,10 +128,13 @@ AQACEQMRAD8AIcgXf//Z""";
   test('test duplicate removal', () {
     expect(removeDuplicates(media), 1);
     expect(media.length, 5);
-    expect(media.firstWhereOrNull((e) => e.file == imgFile4), null);
+    expect(media.firstWhereOrNull((e) => e.firstFile == imgFile4), null);
   });
   test('test extras removal', () {
-    final m = [Media(imgFile1), Media(imgFile2)];
+    final m = [
+      Media({null: imgFile1}),
+      Media({null: imgFile2}),
+    ];
     expect(removeExtras(m), 1);
     expect(m.length, 1);
   });
@@ -143,11 +147,11 @@ AQACEQMRAD8AIcgXf//Z""";
     findAlbums(copy);
     expect(countBefore - copy.length, 1);
 
-    final albumed = copy.firstWhere((e) => e.albums != null);
-    expect(albumed.albums, {'Vacation'});
+    final albumed = copy.firstWhere((e) => e.files.length > 1);
+    expect(albumed.files.keys, [null, 'Vacation']);
     expect(albumed.dateTaken, media[0].dateTaken);
     expect(albumed.dateTaken == media[1].dateTaken, false); // be sure
-    expect(copy.where((e) => e.albums != null).length, 1);
+    expect(copy.where((e) => e.files.length > 1).length, 1);
     // fails because Dart is no Rust :/
     // expect(media.where((e) => e.albums != null).length, 1);
   });
