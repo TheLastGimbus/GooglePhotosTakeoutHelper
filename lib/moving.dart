@@ -24,15 +24,34 @@ File findNotExistingName(File initialFile) {
 ///
 /// Uses [findNotExistingName] for safety
 Future<File> createShortcut(Directory location, File target) async {
-  final name = Platform.isWindows
-      ? '${p.basenameWithoutExtension(target.path)}.lnk'
-      : p.basename(target.path);
+  final name = '${p.basename(target.path)}${Platform.isWindows ? '.lnk' : ''}';
   final link = findNotExistingName(File(p.join(location.path, name)));
   if (Platform.isWindows) {
-    throw UnimplementedError('TODO: Actually windoza');
+    final res = await Process.run(
+      'powershell.exe',
+      [
+        '-ExecutionPolicy',
+        'Bypass',
+        '-NoLogo',
+        '-NonInteractive',
+        '-NoProfile',
+        '-Command',
+        '\$ws = New-Object -ComObject WScript.Shell; '
+            '\$s = \$ws.CreateShortcut(\'${link.path}\'); '
+            '\$s.TargetPath = \'${p.absolute(target.path)}\'; '
+            '\$s.Save()',
+      ],
+    );
+    if (res.exitCode != 0) {
+      throw 'PowerShell doesnt work :( - '
+          'report that to @TheLastGimbus on GitHub:\n\n'
+          'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues\n\n'
+          '...or try other album solution\n'
+          'sorry for inconvenience :(';
+    }
+    return File(link.path);
   } else {
-    return File(
-        (await Link(link.path).create(p.canonicalize(target.path))).path);
+    return File((await Link(link.path).create(p.absolute(target.path))).path);
   }
 }
 
