@@ -78,7 +78,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
 
   group('DateTime extractors', () {
-    test('test json extractor', () async {
+    test('json', () async {
       expect((await jsonExtractor(imgFile1))?.millisecondsSinceEpoch,
           1599078832 * 1000);
       expect((await jsonExtractor(imgFile2))?.millisecondsSinceEpoch,
@@ -100,13 +100,13 @@ AQACEQMRAD8AIcgXf//Z""";
         1683074444 * 1000,
       );
     });
-    test('test exif extractor', () async {
+    test('exif', () async {
       expect(
         (await exifExtractor(imgFileGreen)),
         DateTime.parse('2022-12-16 16:06:47'),
       );
     });
-    test('test guess extractor', () async {
+    test('guess', () async {
       final files = [
         ['Screenshot_20190919-053857_Camera-edited.jpg', '2019-09-19 05:38:57'],
         ['MVIMG_20190215_193501.MP4', '2019-02-15 19:35:01'],
@@ -127,12 +127,12 @@ AQACEQMRAD8AIcgXf//Z""";
       }
     });
   });
-  test('test duplicate removal', () {
+  test('Duplicate removal', () {
     expect(removeDuplicates(media), 1);
     expect(media.length, 5);
     expect(media.firstWhereOrNull((e) => e.firstFile == imgFile4), null);
   });
-  test('test extras removal', () {
+  test('Extras removal', () {
     final m = [
       Media({null: imgFile1}),
       Media({null: imgFile2}),
@@ -140,7 +140,7 @@ AQACEQMRAD8AIcgXf//Z""";
     expect(removeExtras(m), 1);
     expect(m.length, 1);
   });
-  test('test album finding', () {
+  test('Album finding', () {
     // sadly, this will still modify [media] some, but won't delete anything
     final copy = media.toList();
     removeDuplicates(copy);
@@ -157,12 +157,12 @@ AQACEQMRAD8AIcgXf//Z""";
     // fails because Dart is no Rust :/
     // expect(media.where((e) => e.albums != null).length, 1);
   });
-  group('utils test', () {
-    test('test Stream.whereType()', () {
+  group('Utils', () {
+    test('Stream.whereType()', () {
       final stream = Stream.fromIterable([1, 'a', 2, 'b', 3, 'c']);
       expect(stream.whereType<int>(), emitsInOrder([1, 2, 3, emitsDone]));
     });
-    test('test Stream<FileSystemEntity>.wherePhotoVideo()', () {
+    test('Stream<FileSystemEntity>.wherePhotoVideo()', () {
       //    check if stream with random list of files is emitting only photos and videos
       //   use standard formats as jpg and mp4 but also rare ones like 3gp and eps
       final stream = Stream.fromIterable(<FileSystemEntity>[
@@ -179,15 +179,15 @@ AQACEQMRAD8AIcgXf//Z""";
         emitsInOrder(['a.jpg', 'b.mp4', 'c.3gp', 'e.png', emitsDone]),
       );
     });
-    test('test findNotExistingName()', () {
+    test('findNotExistingName()', () {
       expect(findNotExistingName(imgFileGreen).path, 'green(1).jpg');
       expect(findNotExistingName(File('not-here.jpg')).path, 'not-here.jpg');
     });
-    test('test getDiskFree()', () async {
+    test('getDiskFree()', () async {
       expect(await getDiskFree('.'), isNotNull);
     });
   });
-  group('folder_classify test', () {
+  group('folder_classify', () {
     final dirs = [
       Directory('./Photos from 2025'),
       Directory('./Photos from 1969'),
@@ -214,7 +214,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
 
   /// This is complicated, thus those test are not bullet-proof
-  group('test moving logic', () {
+  group('Moving logic', () {
     final output = Directory(join(Directory.systemTemp.path, 'testy-output'));
     setUp(() async {
       await output.create();
