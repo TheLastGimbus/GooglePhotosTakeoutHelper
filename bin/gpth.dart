@@ -8,6 +8,7 @@ import 'package:gpth/folder_classify.dart';
 import 'package:gpth/grouping.dart';
 import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
+import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
@@ -353,41 +354,13 @@ void main(List<String> arguments) async {
     desc: "${args['copy'] ? 'Coping' : 'Moving'} files to output folder",
     width: barWidth,
   );
-  await for (final m in Stream.fromIterable(media)) {
-    final date = m.dateTaken;
-    // TODO: Implement albums
-    final folder = Directory(
-      args['divide-to-dates']
-          ? date == null
-              ? p.join(output.path, 'date-unknown')
-              : p.join(
-                  output.path,
-                  '${date.year}',
-                  date.month.toString().padLeft(2, '0'),
-                )
-          : output.path,
-    );
-    // i think checking vars like this is bit faster than calling fs every time
-    if (args['divide-to-dates']) {
-      await folder.create(recursive: true);
-    }
-    final freeFile =
-        findNotExistingName(File(p.join(folder.path, p.basename(m.file.path))));
-    final c = args['copy']
-        ? await m.file.copy(freeFile.path)
-        : await m.file.rename(freeFile.path);
-    var time = m.dateTaken ?? DateTime.now();
-    if (Platform.isWindows && time.isBefore(DateTime(1970))) {
-      print('WARNING: ${m.file.path} has date $time, which is before 1970 '
-          '(not supported on Windows) - will be set to 1970-01-01');
-      time = DateTime(1970);
-    }
-    await c.setLastModified(time);
-    // on windows, there is also file creation - but it's not supported by dart
-    // i tried this, and kinda works, but is extra slow :(
-    // await Process.run('Powershell.exe', ['-command', '(Get-Item "${c.path}").CreationTime=("${time.toLocal().toIso8601String()}")']);
-    barCopy.increment();
-  }
+  await moveFiles(
+    media,
+    output,
+    copy: args['copy'],
+    divideToDates: args['divide-to-dates'],
+    albumBehavior: args['albums'],
+  ).listen((_) => barCopy.increment).asFuture();
   print('');
 
   // remove unzipped folder if was created
