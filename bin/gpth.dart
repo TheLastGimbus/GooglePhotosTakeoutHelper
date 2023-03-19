@@ -100,8 +100,6 @@ void main(List<String> arguments) async {
     args['albums'] = await interactive.askAlbums();
     print('');
 
-    // TODO: for those to be accurate with "duplicate-copy" album option, we need to move files not only from year folders but also albums
-    // TODO: Add pointers to files in albums in Media objects
     // calculate approx space required for everything
     final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
     final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
@@ -360,7 +358,7 @@ void main(List<String> arguments) async {
     copy: args['copy'],
     divideToDates: args['divide-to-dates'],
     albumBehavior: args['albums'],
-  ).listen((_) => barCopy.increment).asFuture();
+  ).listen((_) => barCopy.increment()).asFuture();
   print('');
 
   // remove unzipped folder if was created
