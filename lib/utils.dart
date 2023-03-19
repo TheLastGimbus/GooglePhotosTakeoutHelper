@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
 // remember to bump this
-const version = '3.3.5';
+const version = '3.4.0-rc.1 - ALBUMS!';
 
 /// max file size to read for exif/hash/anything
 const maxFileSize = 64 * 1024 * 1024;

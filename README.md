@@ -22,7 +22,6 @@ If you want to run it on Synology, have problems with interactive, or just love 
 
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
     - "deselect all" and then select only Google Photos
-    - deselect all "album folders" - folders with name of some album, and select *only* "year folders" - folders named like "`Photos from 20..`" - don't worry, all of your photos are in "year folders" anyway.
    
    (Note: don't unzip them, gpth will do it for you 😉)
 1. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
@@ -60,7 +59,8 @@ In that case:
      cd Downloads  # Most probably
      # run it, selecting input and output folders with options like this:
      # (you can try to drag and drop them)
-     gpth.exe --input "Downloads\you\input\folder" --output "C:\some\other\location"
+     gpth.exe --input "Downloads\you\input\folder" --output "C:\some\other\location" --albums "shortcuts"
+     # select which album solution you like - see --help for all of them
      # remember to use "" !
      ```
    - For Linux/macOS:
@@ -68,7 +68,8 @@ In that case:
      # ssh/whatever to where you're running it
      cd Downloads  # folder with gpth
      chmod +x gpth  # add execute permission
-     ./gpth --input "/some/input/folder" --output "other/output/folder"
+     ./gpth --input "/some/input/folder" --output "other/output/folder" --albums "shortcuts"
+     # select which album solution you like - see --help for all of them
      ```
 
 You can check all cmd flags by running `gpth --help` - for exapmle, the `--divide-to-dates` flag
