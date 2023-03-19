@@ -377,8 +377,10 @@ void main(List<String> arguments) async {
   if (countPoop > 0) {
     print("Couldn't find date for $countPoop photos/videos :/");
   }
-  // TODO: proper count with albums
-  print('${args['copy'] ? 'Copied' : 'Moved'} ${media.length} '
+  final movedCount = ['nothing', 'json'].contains(args['albums'])
+      ? media.length
+      : media.fold(0, (prev, e) => prev + e.files.length);
+  print('${args['copy'] ? 'Copied' : 'Moved'} $movedCount '
       'files to "${output.path}"');
   print('');
   print(
