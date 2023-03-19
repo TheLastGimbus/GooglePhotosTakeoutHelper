@@ -255,12 +255,12 @@ void main(List<String> arguments) async {
   }
   for (final f in yearFolders) {
     await for (final file in f.list().wherePhotoVideo()) {
-      media.add(Media(file));
+      media.add(Media({null: file}));
     }
   }
   for (final a in albumFolders) {
     await for (final file in a.list().wherePhotoVideo()) {
-      media.add(Media(file, albums: {albumName(a)}));
+      media.add(Media({albumName(a): file}));
     }
   }
 
@@ -316,7 +316,7 @@ void main(List<String> arguments) async {
   for (var i = 0; i < media.length; i++) {
     var q = 0;
     for (final extractor in dateExtractors) {
-      final date = await extractor(media[i].file);
+      final date = await extractor(media[i].firstFile);
       if (date != null) {
         media[i].dateTaken = date;
         media[i].dateTakenAccuracy = q;
@@ -327,7 +327,7 @@ void main(List<String> arguments) async {
       q++;
     }
     if (media[i].dateTaken == null) {
-      print("\nCan't get date on ${media[i].file.path}");
+      print("\nCan't get date on ${media[i].firstFile.path}");
     }
   }
   print('');

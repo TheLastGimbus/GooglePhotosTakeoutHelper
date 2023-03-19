@@ -48,7 +48,7 @@ int removeDuplicates(List<Media> media) {
   final byAlbum = media
       // group by albums as we will merge those later
       // (to *not* compare hashes between albums)
-      .groupListsBy((e) => e.albums?.first)
+      .groupListsBy((e) => e.files.keys.first)
       .values
       // group by hash
       .map((albumGroup) => albumGroup.groupIdentical().values);
@@ -62,8 +62,9 @@ int removeDuplicates(List<Media> media) {
     // note: we are comparing accuracy here tho we do know that *all*
     // of them have it null - i'm leaving this just for sake
     group.sort((a, b) =>
-        '${a.dateTakenAccuracy ?? 999}${p.basename(a.file.path).length}'.compareTo(
-            '${b.dateTakenAccuracy ?? 999}${p.basename(b.file.path).length}'));
+        '${a.dateTakenAccuracy ?? 999}${p.basename(a.firstFile.path).length}'
+            .compareTo(
+                '${b.dateTakenAccuracy ?? 999}${p.basename(b.firstFile.path).length}'));
     // get list of all except first
     for (final e in group.sublist(1)) {
       // remove them from media
@@ -84,9 +85,9 @@ void findAlbums(List<Media> allMedia) {
     if (group.length <= 1) continue; // then this isn't a group
     // now, we have [group] list that contains actual sauce:
 
-    final allAlbumNames = group.fold(
-      <String>{},
-      (allNames, e) => {...allNames, ...(e.albums ?? {})},
+    final allFiles = group.fold(
+      <String?, File>{},
+      (allFiles, e) => allFiles..addAll(e.files),
     );
     // sort by best date extraction
     group.sort((a, b) =>
@@ -96,7 +97,7 @@ void findAlbums(List<Media> allMedia) {
       allMedia.remove(e);
     }
     // set the first (best) one complete album list
-    group.first.albums = allAlbumNames;
+    group.first.files = allFiles;
     // add our one, precious ✨perfect✨ one
     allMedia.add(group.first);
   }
