@@ -276,7 +276,6 @@ void main(List<String> arguments) async {
 
   /// ##### Find duplicates #####
 
-  // TODO: Check if we even need to print this if it's maybe fast enough
   print('Finding duplicates...');
 
   final countDuplicates = removeDuplicates(media);
