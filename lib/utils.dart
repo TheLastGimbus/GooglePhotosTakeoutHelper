@@ -9,7 +9,7 @@ import 'package:proper_filesize/proper_filesize.dart';
 import 'media.dart';
 
 // remember to bump this
-const version = '3.4.0-rc.1 - ALBUMS!';
+const version = '3.4.0';
 
 /// max file size to read for exif/hash/anything
 const maxFileSize = 64 * 1024 * 1024;
