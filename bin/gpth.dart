@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:console_bars/console_bars.dart';
 import 'package:gpth/date_extractor.dart';
-import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
 import 'package:gpth/folder_classify.dart';
+import 'package:gpth/grouping.dart';
 import 'package:gpth/interactive.dart' as interactive;
 import 'package:gpth/media.dart';
+import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
@@ -41,6 +42,13 @@ void main(List<String> arguments) async {
         abbr: 'i', help: 'Input folder with *all* takeouts *extracted*. ')
     ..addOption('output',
         abbr: 'o', help: 'Output folder where all photos will land')
+    ..addOption(
+      'albums',
+      help: 'What to do about albums?',
+      allowed: interactive.albumOptions.keys,
+      allowedHelp: interactive.albumOptions,
+      defaultsTo: 'shortcut',
+    )
     ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
     ..addFlag(
@@ -88,6 +96,8 @@ void main(List<String> arguments) async {
     final out = await interactive.getOutput();
     print('');
     args['divide-to-dates'] = await interactive.askDivideDates();
+    print('');
+    args['albums'] = await interactive.askAlbums();
     print('');
 
     // calculate approx space required for everything
@@ -195,20 +205,42 @@ void main(List<String> arguments) async {
   // No shitheads, you did not overhear - we *mutate* the whole list and objects
   // inside it. This is not Flutter-ish, but it's not Flutter - it's a small
   // simple script, and this the best solution 😎💯
+
+  // Okay, more details on what will happen here:
+  // 1. We find *all* media in either year folders or album folders.
+  //    Every single file will be a separate [Media] object.
+  //    If given [Media] was found in album folder, it will have it noted
+  // 2. We [removeDuplicates] - if two files in same/null album have same hash,
+  //    one will be removed. Note that there are still duplicates from different
+  //    albums left. This is intentional
+  // 3. We guess their dates. Functions in [dateExtractors] are used in order
+  //    from most to least accurate
+  // 4. Now we [findAlbums]. This will analyze [Media] that have same hashes,
+  //    and leave just one with all [albums] filled.
+  //    final exampleMedia = [
+  //      Media('lonePhoto.jpg'),
+  //      Media('photo1.jpg, albums=null),
+  //      Media('photo1.jpg, albums={Vacation}),
+  //      Media('photo1.jpg, albums={Friends}),
+  //    ];
+  //    findAlbums(exampleMedia);
+  //    exampleMedia == [
+  //      Media('lonePhoto.jpg'),
+  //      Media('photo1.jpg, albums={Vacation, Friends}),
+  //    ];
+  //
+
   /// Big global media list that we'll work on
   final media = <Media>[];
 
   /// All "year folders" that we found
   final yearFolders = <Directory>[];
 
-  Directory? archiveFolder;
-  Directory? trashFolder;
-
   /// All album folders - that is, folders that were aside yearFolders and were
   /// not matching "Photos from ...." name
   final albumFolders = <Directory>[];
 
-  /// ##### Find all photos/videos and add to list #####
+  /// ##### Find literally *all* photos/videos and add to list #####
 
   print('Okay, running... searching for everything in input folder...');
 
@@ -216,21 +248,21 @@ void main(List<String> arguments) async {
   await for (final d in input.list(recursive: true).whereType<Directory>()) {
     if (isYearFolder(d)) {
       yearFolders.add(d);
-    } else if (archiveFolder == null && await isArchiveFolder(d)) {
-      archiveFolder = d;
-    } else if (trashFolder == null && await isTrashFolder(d)) {
-      trashFolder = d;
     } else if (await isAlbumFolder(d)) {
       albumFolders.add(d);
     }
   }
-  await for (final f in Stream.fromIterable(yearFolders)) {
+  for (final f in yearFolders) {
     await for (final file in f.list().wherePhotoVideo()) {
-      media.add(Media(file));
+      media.add(Media({null: file}));
+    }
+  }
+  for (final a in albumFolders) {
+    await for (final file in a.list().wherePhotoVideo()) {
+      media.add(Media({albumName(a): file}));
     }
   }
 
-  print('Found ${media.length} photos/videos in input folder');
   if (media.isEmpty) {
     await interactive.nothingFoundMessage();
     if (interactive.indeed) {
@@ -240,25 +272,10 @@ void main(List<String> arguments) async {
     quit(13);
   }
 
-  await for (final file
-      in (archiveFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isArchived: true));
-  }
-  await for (final file
-      in (trashFolder?.list().wherePhotoVideo() ?? Stream.empty())) {
-    media.add(Media(file, isTrashed: true));
-  }
-  final archiveTrashCount =
-      media.where((e) => e.isArchived || e.isTrashed).length;
-  if (archiveTrashCount > 0) {
-    print('Also found $archiveTrashCount photos/videos in archive/trash :)');
-  }
-
   /// ##################################################
 
   /// ##### Find duplicates #####
 
-  // TODO: Check if we even need to print this if it's maybe fast enough
   print('Finding duplicates...');
 
   final countDuplicates = removeDuplicates(media);
@@ -272,16 +289,6 @@ void main(List<String> arguments) async {
 
   /// ###################################
 
-  /// ##### Find albums #####
-
-  // Now, this is awkward...
-  // we can find albums without a problem, but we have no idea what
-  // to do about it 🤷
-  // so just print it now (flex)
-  // findAlbums(albumFolders, media).forEach(print);
-
-  /// #######################
-
   // NOTE FOR MYSELF/whatever:
   // I placed extracting dates *after* removing duplicates.
   // Today i thought to myself - shouldn't this be reversed?
@@ -294,6 +301,8 @@ void main(List<String> arguments) async {
   // ...and we would potentially waste a lot of time searching for all of their
   //    jsons
   // ...so i'm leaving this like that 😎
+  //
+  // Ps. BUT i've put album merging *after* guess date - notes below
 
   /// ##### Extracting/predicting dates using given extractors #####
 
@@ -305,7 +314,7 @@ void main(List<String> arguments) async {
   for (var i = 0; i < media.length; i++) {
     var q = 0;
     for (final extractor in dateExtractors) {
-      final date = await extractor(media[i].file);
+      final date = await extractor(media[i].firstFile);
       if (date != null) {
         media[i].dateTaken = date;
         media[i].dateTakenAccuracy = q;
@@ -316,56 +325,39 @@ void main(List<String> arguments) async {
       q++;
     }
     if (media[i].dateTaken == null) {
-      print("\nCan't get date on ${media[i].file.path}");
+      print("\nCan't get date on ${media[i].firstFile.path}");
     }
   }
   print('');
 
   /// ##############################################################
 
+  /// ##### Find albums #####
+
+  // I'm placing merging duplicate Media into albums after guessing date for
+  // each one individually, because they are in different folder.
+  // I wish that, thanks to this, we may find some jsons in albums that would
+  // be broken in shithole of big-ass year folders
+
+  print('Finding albums...');
+  findAlbums(media);
+
+  /// #######################
+
   /// ##### Copy/move files to actual output folder #####
 
   final barCopy = FillingBar(
-    total: media.length,
-    desc: "${args['copy'] ? 'Coping' : 'Moving'} files to output folder",
+    total: outputFileCount(media, args['albums']),
+    desc: "${args['copy'] ? 'Coping' : 'Moving'} photos to output folder",
     width: barWidth,
   );
-  await for (final m in Stream.fromIterable(media)) {
-    final date = m.dateTaken;
-    final folder = Directory(
-      m.isArchived || m.isTrashed
-          ? p.join(output.path, m.isArchived ? 'Archive' : 'Trash')
-          : args['divide-to-dates']
-              ? date == null
-                  ? p.join(output.path, 'date-unknown')
-                  : p.join(
-                      output.path,
-                      '${date.year}',
-                      date.month.toString().padLeft(2, '0'),
-                    )
-              : output.path,
-    );
-    // i think checking vars like this is bit faster than calling fs every time
-    if (args['divide-to-dates'] || m.isArchived || m.isTrashed) {
-      await folder.create(recursive: true);
-    }
-    final freeFile =
-        findNotExistingName(File(p.join(folder.path, p.basename(m.file.path))));
-    final c = args['copy']
-        ? await m.file.copy(freeFile.path)
-        : await m.file.rename(freeFile.path);
-    var time = m.dateTaken ?? DateTime.now();
-    if (Platform.isWindows && time.isBefore(DateTime(1970))) {
-      print('WARNING: ${m.file.path} has date $time, which is before 1970 '
-          '(not supported on Windows) - will be set to 1970-01-01');
-      time = DateTime(1970);
-    }
-    await c.setLastModified(time);
-    // on windows, there is also file creation - but it's not supported by dart
-    // i tried this, and kinda works, but is extra slow :(
-    // await Process.run('Powershell.exe', ['-command', '(Get-Item "${c.path}").CreationTime=("${time.toLocal().toIso8601String()}")']);
-    barCopy.increment();
-  }
+  await moveFiles(
+    media,
+    output,
+    copy: args['copy'],
+    divideToDates: args['divide-to-dates'],
+    albumBehavior: args['albums'],
+  ).listen((_) => barCopy.increment()).asFuture();
   print('');
 
   // remove unzipped folder if was created
@@ -384,8 +376,6 @@ void main(List<String> arguments) async {
   if (countPoop > 0) {
     print("Couldn't find date for $countPoop photos/videos :/");
   }
-  print('${args['copy'] ? 'Copied' : 'Moved'} ${media.length} '
-      'files to "${output.path}"');
   print('');
   print(
     "Last thing - I've spent *a ton* of time on this script - \n"

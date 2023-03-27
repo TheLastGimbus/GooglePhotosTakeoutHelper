@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gpth/album.dart';
+import 'package:collection/collection.dart';
 import 'package:gpth/date_extractor.dart';
-import 'package:gpth/duplicate.dart';
 import 'package:gpth/extras.dart';
 import 'package:gpth/folder_classify.dart';
+import 'package:gpth/grouping.dart';
 import 'package:gpth/media.dart';
+import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart';
 import 'package:test/test.dart';
@@ -38,9 +39,19 @@ AQACEQMRAD8AIcgXf//Z""";
   final imgFile4_1 = File('simple_file_20200101-edited(1).jpg');
   final jsonFile4 = File('simple_file_20200101.jpg.json');
   final media = [
-    Media(imgFile1, dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
-    Media(imgFile2, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
-    Media(imgFile3, dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
+    Media({null: imgFile1},
+        dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
+    Media(
+      {albumName(albumDir): imgFile1},
+      dateTaken: DateTime(2022, 9, 1),
+      dateTakenAccuracy: 2,
+    ),
+    Media({null: imgFile2}, dateTaken: DateTime(2020), dateTakenAccuracy: 2),
+    Media({null: imgFile3},
+        dateTaken: DateTime(2022, 10, 28), dateTakenAccuracy: 1),
+    Media({null: imgFile4}), // these two...
+    // ...are duplicates
+    Media({null: imgFile4_1}, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -52,10 +63,12 @@ AQACEQMRAD8AIcgXf//Z""";
       base64.decode(greenImgBase64.replaceAll('\n', '')),
     );
     // apparently you don't need to .create() before writing 👍
-    imgFile1.writeAsBytesSync([1, 2, 3]); // those two...
+    imgFile1.writeAsBytesSync([0, 1, 2]);
     imgFile1.copySync('${albumDir.path}/${basename(imgFile1.path)}');
-    imgFile2.writeAsBytesSync([1, 2, 3]); // are actual duplicates
-    imgFile3.writeAsBytesSync([3, 2, 1]); // and this one is different
+    imgFile2.writeAsBytesSync([3, 4, 5]);
+    imgFile3.writeAsBytesSync([6, 7, 8]);
+    imgFile4.writeAsBytesSync([9, 10, 11]); // these two...
+    imgFile4_1.writeAsBytesSync([9, 10, 11]); // ...are duplicates
     writeJson(File file, int time) =>
         file.writeAsStringSync('{"photoTakenTime": {"timestamp": "$time"}}');
     writeJson(jsonFile1, 1599078832);
@@ -65,7 +78,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
 
   group('DateTime extractors', () {
-    test('test json extractor', () async {
+    test('json', () async {
       expect((await jsonExtractor(imgFile1))?.millisecondsSinceEpoch,
           1599078832 * 1000);
       expect((await jsonExtractor(imgFile2))?.millisecondsSinceEpoch,
@@ -87,13 +100,13 @@ AQACEQMRAD8AIcgXf//Z""";
         1683074444 * 1000,
       );
     });
-    test('test exif extractor', () async {
+    test('exif', () async {
       expect(
         (await exifExtractor(imgFileGreen)),
         DateTime.parse('2022-12-16 16:06:47'),
       );
     });
-    test('test guess extractor', () async {
+    test('guess', () async {
       final files = [
         ['Screenshot_20190919-053857_Camera-edited.jpg', '2019-09-19 05:38:57'],
         ['MVIMG_20190215_193501.MP4', '2019-02-15 19:35:01'],
@@ -114,27 +127,42 @@ AQACEQMRAD8AIcgXf//Z""";
       }
     });
   });
-  test('test duplicate removal', () {
+  test('Duplicate removal', () {
     expect(removeDuplicates(media), 1);
-    expect(media.length, 2);
-    expect(media.first.file, imgFile1);
+    expect(media.length, 5);
+    expect(media.firstWhereOrNull((e) => e.firstFile == imgFile4), null);
   });
-  test('test extras removal', () {
-    final m = [Media(imgFile1), Media(imgFile2)];
+  test('Extras removal', () {
+    final m = [
+      Media({null: imgFile1}),
+      Media({null: imgFile2}),
+    ];
     expect(removeExtras(m), 1);
     expect(m.length, 1);
   });
-  test('test album finding', () {
-    expect(findAlbums([albumDir], media), [
-      Album('Vacation', [media.first])
-    ]);
+  test('Album finding', () {
+    // sadly, this will still modify [media] some, but won't delete anything
+    final copy = media.toList();
+    removeDuplicates(copy);
+
+    final countBefore = copy.length;
+    findAlbums(copy);
+    expect(countBefore - copy.length, 1);
+
+    final albumed = copy.firstWhere((e) => e.files.length > 1);
+    expect(albumed.files.keys, [null, 'Vacation']);
+    expect(albumed.dateTaken, media[0].dateTaken);
+    expect(albumed.dateTaken == media[1].dateTaken, false); // be sure
+    expect(copy.where((e) => e.files.length > 1).length, 1);
+    // fails because Dart is no Rust :/
+    // expect(media.where((e) => e.albums != null).length, 1);
   });
-  group('utils test', () {
-    test('test Stream.whereType()', () {
+  group('Utils', () {
+    test('Stream.whereType()', () {
       final stream = Stream.fromIterable([1, 'a', 2, 'b', 3, 'c']);
       expect(stream.whereType<int>(), emitsInOrder([1, 2, 3, emitsDone]));
     });
-    test('test Stream<FileSystemEntity>.wherePhotoVideo()', () {
+    test('Stream<FileSystemEntity>.wherePhotoVideo()', () {
       //    check if stream with random list of files is emitting only photos and videos
       //   use standard formats as jpg and mp4 but also rare ones like 3gp and eps
       final stream = Stream.fromIterable(<FileSystemEntity>[
@@ -151,27 +179,152 @@ AQACEQMRAD8AIcgXf//Z""";
         emitsInOrder(['a.jpg', 'b.mp4', 'c.3gp', 'e.png', emitsDone]),
       );
     });
-    test('test findNotExistingName()', () {
+    test('findNotExistingName()', () {
       expect(findNotExistingName(imgFileGreen).path, 'green(1).jpg');
       expect(findNotExistingName(File('not-here.jpg')).path, 'not-here.jpg');
     });
-    test('test getDiskFree()', () async {
+    test('getDiskFree()', () async {
       expect(await getDiskFree('.'), isNotNull);
     });
   });
-  group('folder_classify test', () {
-    test('is archive/trash (fast name only)', () async {
-      expect(await isArchiveFolder(Directory('Takeout/Photos/Archive/')), true);
-      expect(await isArchiveFolder(Directory.current), false);
-      expect(
-        // you must do it because Dart 🤷
-        // https://github.com/flutter/flutter/issues/71183#issuecomment-882213036
-        () async => await isArchiveFolder(Directory('Photos/lol-album')),
-        throwsA(isA<FileSystemException>()),
-      );
-      expect(await isTrashFolder(Directory('Takeout/Photos/Trash')), true);
-      expect(await isTrashFolder(Directory.current), false);
+  group('folder_classify', () {
+    final dirs = [
+      Directory('./Photos from 2025'),
+      Directory('./Photos from 1969'),
+      Directory('./Photos from vacation'),
+      Directory('/tmp/very-random-omg'),
+    ];
+    setUpAll(() async {
+      for (var d in dirs) {
+        await d.create();
+      }
     });
+    test('is year/album folder', () async {
+      expect(isYearFolder(dirs[0]), true);
+      expect(isYearFolder(dirs[1]), true);
+      expect(isYearFolder(dirs[2]), false);
+      expect(await isAlbumFolder(dirs[2]), true);
+      expect(await isAlbumFolder(dirs[3]), false);
+    });
+    tearDownAll(() async {
+      for (var d in dirs) {
+        await d.delete();
+      }
+    });
+  });
+
+  /// This is complicated, thus those test are not bullet-proof
+  group('Moving logic', () {
+    final output = Directory(join(Directory.systemTemp.path, 'testy-output'));
+    setUp(() async {
+      await output.create();
+      removeDuplicates(media);
+      findAlbums(media);
+    });
+    test('shortcut', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'shortcut',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 2 folders + media + 1 album-ed shortcut
+      expect(outputted.length, 2 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 1);
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS', 'Vacation'},
+      );
+    });
+    test('nothing', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'nothing',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 1 folder + media
+      expect(outputted.length, 1 + media.length);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 1);
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS'},
+      );
+    });
+    test('duplicate-copy', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'duplicate-copy',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 2 folders + media + 1 album-ed copy
+      expect(outputted.length, 2 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 2);
+      expect(outputted.whereType<File>().length, media.length + 1);
+      expect(
+        UnorderedIterableEquality<String>().equals(
+          outputted.whereType<File>().map((e) => basename(e.path)),
+          [
+            "image-edited.jpg",
+            "image-edited.jpg", // two times
+            "Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg",
+            "simple_file_20200101-edited(1).jpg",
+            "Urlaub in Knaufspesch in der Schneifel (38).JPG",
+          ],
+        ),
+        true,
+      );
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS', 'Vacation'},
+      );
+    });
+    test('json', () async {
+      await moveFiles(
+        media,
+        output,
+        copy: true,
+        divideToDates: false,
+        albumBehavior: 'json',
+      ).toList();
+      final outputted =
+          await output.list(recursive: true, followLinks: false).toSet();
+      // 1 folder + media + 1 json
+      expect(outputted.length, 1 + media.length + 1);
+      expect(outputted.whereType<Link>().length, 0);
+      expect(outputted.whereType<Directory>().length, 1);
+      expect(outputted.whereType<File>().length, media.length + 1);
+      expect(
+        UnorderedIterableEquality<String>().equals(
+          outputted.whereType<File>().map((e) => basename(e.path)),
+          [
+            "image-edited.jpg",
+            "Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg",
+            "simple_file_20200101-edited(1).jpg",
+            "Urlaub in Knaufspesch in der Schneifel (38).JPG",
+            "albums-info.json",
+          ],
+        ),
+        true,
+      );
+      expect(
+        outputted.whereType<Directory>().map((e) => basename(e.path)).toSet(),
+        {'ALL_PHOTOS'},
+      );
+    });
+    tearDown(() async => await output.delete(recursive: true));
   });
 
   /// Delete all shitty files as we promised
@@ -181,6 +334,8 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile1.deleteSync();
     imgFile2.deleteSync();
     imgFile3.deleteSync();
+    imgFile4.deleteSync();
+    imgFile4_1.deleteSync();
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
     jsonFile3.deleteSync();

@@ -28,7 +28,7 @@ int removeExtras(List<Media> media) {
   final copy = media.toList();
   var count = 0;
   for (final m in copy) {
-    final name = p.withoutExtension(p.basename(m.file.path)).toLowerCase();
+    final name = p.withoutExtension(p.basename(m.firstFile.path)).toLowerCase();
     for (final extra in _extraFormats) {
       if (name.endsWith(extra)) {
         media.remove(m);

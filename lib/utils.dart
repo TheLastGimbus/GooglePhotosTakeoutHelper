@@ -6,8 +6,10 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
+import 'media.dart';
+
 // remember to bump this
-const version = '3.3.5';
+const version = '3.4.0-rc.1 - ALBUMS!';
 
 /// max file size to read for exif/hash/anything
 const maxFileSize = 64 * 1024 * 1024;
@@ -42,16 +44,6 @@ extension Y on Stream<FileSystemEntity> {
 
 extension Util on Stream {
   Stream<T> whereType<T>() => where((e) => e is T).cast<T>();
-}
-
-/// This will add (1) add end of file name over and over until file with such
-/// name doesn't exist yet. Will leave without "(1)" if is free already
-File findNotExistingName(File initialFile) {
-  var file = initialFile;
-  while (file.existsSync()) {
-    file = File('${p.withoutExtension(file.path)}(1)${p.extension(file.path)}');
-  }
-  return file;
 }
 
 Future<int?> getDiskFree([String? path]) async {
@@ -110,3 +102,15 @@ String filesize(int bytes) => ProperFilesize.generateHumanReadableFilesize(
       base: Bases.Binary,
       decimals: 2,
     );
+
+int outputFileCount(List<Media> media, String albumOption) {
+  if (['shortcut', 'duplicate-copy'].contains(albumOption)) {
+    return media.fold(0, (prev, e) => prev + e.files.length);
+  } else if (albumOption == 'json') {
+    return media.length;
+  } else if (albumOption == 'nothing') {
+    return media.where((e) => e.files.containsKey(null)).length;
+  } else {
+    throw ArgumentError.value(albumOption, 'albumOption');
+  }
+}

@@ -19,6 +19,20 @@ import 'package:file_picker_desktop/file_picker_desktop.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
+const albumOptions = {
+  'shortcut': '[Recommended] Album folders with shortcuts/symlinks to '
+      'original photos. Recommended as it will take the least space, but '
+      'may not be portable when moving across systems/computes/phones etc',
+  'duplicate-copy': 'Album folders with photos copied into them. '
+      'This will work across all systems, but may take wayyy more space!!',
+  'json': "Put ALL photos (including Archive and Trash) in one folder and "
+      "make a .json file with info about albums. "
+      "Use if you're a programmer, or just want to get everything, "
+      "ignoring lack of year-folders etc.",
+  'nothing': 'Just ignore them and put year-photos into one folder. '
+      'WARNING: This ignores Archive/Trash !!!',
+};
+
 /// Whether we are, indeed, running interactive (or not)
 var indeed = false;
 
@@ -105,7 +119,13 @@ Future<List<File>> getZips() async {
     error('Not all files you selected are zips :/ please do this again');
     quit(6969);
   }
-  print('Cool!');
+  // potentially shows user they selected too little ?
+  print('Cool! Selected ${files.count} zips => '
+      '${filesize(
+    files.files
+        .map((e) => File(e.path!).statSync().size)
+        .reduce((a, b) => a + b),
+  )}');
   await sleep(1);
   return files.files.map((e) => File(e.path!)).toList();
 }
@@ -145,6 +165,22 @@ Future<bool> askDivideDates() async {
       error('Invalid answer - try again');
       return askDivideDates();
   }
+}
+
+Future<String> askAlbums() async {
+  print('What should be done with albums?');
+  var i = 0;
+  for (final entry in albumOptions.entries) {
+    print('[${i++}] ${entry.key}: ${entry.value}');
+  }
+  final answer = int.tryParse(await askForInt());
+  if (answer == null || answer < 0 || answer >= albumOptions.length) {
+    error('Invalid answer - try again');
+    return askAlbums();
+  }
+  final choice = albumOptions.keys.elementAt(answer);
+  print('Okay, doing: $choice');
+  return choice;
 }
 
 // this is used in cli mode as well
@@ -213,7 +249,6 @@ Future<void> unzip(List<File> zips, Directory dir) async {
   print('gpth will now unzip all of that, process it and put everything in '
       'the output folder :)');
   await sleep(1);
-  pressEnterToContinue();
   for (final zip in zips) {
     print('Unzipping ${p.basename(zip.path)}...');
     try {
