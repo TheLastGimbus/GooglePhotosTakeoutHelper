@@ -243,7 +243,6 @@ Future<void> unzip(List<File> zips, Directory dir) async {
   print('gpth will now unzip all of that, process it and put everything in '
       'the output folder :)');
   await sleep(1);
-  pressEnterToContinue();
   for (final zip in zips) {
     print('Unzipping ${p.basename(zip.path)}...');
     try {
