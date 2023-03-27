@@ -119,7 +119,13 @@ Future<List<File>> getZips() async {
     error('Not all files you selected are zips :/ please do this again');
     quit(6969);
   }
-  print('Cool!');
+  // potentially shows user they selected too little ?
+  print('Cool! Selected ${files.count} zips => '
+      '${filesize(
+    files.files
+        .map((e) => File(e.path!).statSync().size)
+        .reduce((a, b) => a + b),
+  )}');
   await sleep(1);
   return files.files.map((e) => File(e.path!)).toList();
 }
