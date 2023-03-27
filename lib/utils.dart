@@ -6,6 +6,8 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
 
+import 'media.dart';
+
 // remember to bump this
 const version = '3.4.0-rc.1 - ALBUMS!';
 
@@ -100,3 +102,15 @@ String filesize(int bytes) => ProperFilesize.generateHumanReadableFilesize(
       base: Bases.Binary,
       decimals: 2,
     );
+
+int outputFileCount(List<Media> media, String albumOption) {
+  if (['shortcut', 'duplicate-copy'].contains(albumOption)) {
+    return media.fold(0, (prev, e) => prev + e.files.length);
+  } else if (albumOption == 'json') {
+    return media.length;
+  } else if (albumOption == 'nothing') {
+    return media.where((e) => e.files.containsKey(null)).length;
+  } else {
+    throw ArgumentError.value(albumOption, 'albumOption');
+  }
+}

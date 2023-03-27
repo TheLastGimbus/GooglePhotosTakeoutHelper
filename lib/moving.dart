@@ -65,7 +65,8 @@ Future<File> createShortcut(Directory location, File target) async {
 ///
 /// [albumBehavior] must be one of [interactive.albumOptions]
 ///
-/// Emits number of Medias that it did (starting from 1)
+/// Emits number of files that it copied/created/whatever (starting from 1) -
+/// use [outputFileCount] function for progress measurement
 Stream<int> moveFiles(
   List<Media> allMediaFinal,
   Directory output, {
@@ -153,13 +154,15 @@ Stream<int> moveFiles(
       }
       await result.setLastModified(time);
 
+      // one copy/move/whatever - one yield
+      yield ++i;
+
       if (albumBehavior == 'json') {
         infoJson[p.basename(result.path)] =
             m.files.keys.whereNotNull().toList();
       }
     }
     // done with this media - next!
-    yield ++i;
   }
   if (albumBehavior == 'json') {
     await File(p.join(output.path, 'albums-info.json'))

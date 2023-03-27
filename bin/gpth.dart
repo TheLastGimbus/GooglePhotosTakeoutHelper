@@ -348,8 +348,8 @@ void main(List<String> arguments) async {
   /// ##### Copy/move files to actual output folder #####
 
   final barCopy = FillingBar(
-    total: media.length,
-    desc: "${args['copy'] ? 'Coping' : 'Moving'} files to output folder",
+    total: outputFileCount(media, args['albums']),
+    desc: "${args['copy'] ? 'Coping' : 'Moving'} photos to output folder",
     width: barWidth,
   );
   await moveFiles(
@@ -377,11 +377,6 @@ void main(List<String> arguments) async {
   if (countPoop > 0) {
     print("Couldn't find date for $countPoop photos/videos :/");
   }
-  final movedCount = ['nothing', 'json'].contains(args['albums'])
-      ? media.length
-      : media.fold(0, (prev, e) => prev + e.files.length);
-  print('${args['copy'] ? 'Copied' : 'Moved'} $movedCount '
-      'files to "${output.path}"');
   print('');
   print(
     "Last thing - I've spent *a ton* of time on this script - \n"
