@@ -1,3 +1,15 @@
+## 3.4.0
+
+### Albums 🎉
+
+It finally happened everyone! It wasn't easy, but I think I nailed it and everything should perfectly 👌
+
+You get **_🔥FOUR🔥_** different options on how you want your albums 😱 - detailed descriptions about them is at: https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/discussions/187#discussion-4980576
+
+(This also automatically nicely covers Trash/Archive, so previous solution that originally closed the https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/138 was replaced)
+
+### Happy Take-outing 🥳 
+
 ## 3.3.5
 
 - Address #178 issues in logs - instructions on what to do
