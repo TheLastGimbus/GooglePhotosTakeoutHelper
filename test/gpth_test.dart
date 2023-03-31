@@ -39,7 +39,7 @@ AQACEQMRAD8AIcgXf//Z""";
   final imgFile4_1 = File('simple_file_20200101-edited(1).jpg');
   final jsonFile4 = File('simple_file_20200101.jpg.json');
   final imgFile5 = File('img_(87).(vacation stuff).lol(87).jpg');
-  final jsonFile6 = File('img_(87).(vacation stuff).lol.jpg(87).json');
+  final jsonFile5 = File('img_(87).(vacation stuff).lol.jpg(87).json');
   final media = [
     Media({null: imgFile1},
         dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
@@ -79,7 +79,7 @@ AQACEQMRAD8AIcgXf//Z""";
     writeJson(jsonFile2, 1683078832);
     writeJson(jsonFile3, 1666942303);
     writeJson(jsonFile4, 1683074444);
-    writeJson(jsonFile6, 1680289442);
+    writeJson(jsonFile5, 1680289442);
   });
 
   group('DateTime extractors', () {
@@ -347,9 +347,11 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile3.deleteSync();
     imgFile4.deleteSync();
     imgFile4_1.deleteSync();
+    imgFile5.deleteSync();
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
     jsonFile3.deleteSync();
     jsonFile4.deleteSync();
+    jsonFile5.deleteSync();
   });
 }
