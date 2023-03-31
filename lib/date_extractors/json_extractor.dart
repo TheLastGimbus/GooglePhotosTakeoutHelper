@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
@@ -77,11 +78,14 @@ String _shortenName(String filename) => '$filename.json'.length > 51
 ///
 /// This function does just that, and by my current intuition tells me it's
 /// pretty safe to use so I'll put it without the tryHard flag
+// note: would be nice if we had some tougher tests for this
 String _bracketSwap(String filename) {
   // this is with the dot - more probable that it's just before the extension
   final match = RegExp(r'\(\d+\)\.').allMatches(filename).lastOrNull;
   if (match == null) return filename;
-  final bracket = match.group(0)!;
-  final withoutBracket = filename.replaceAll(bracket, '.');
-  return '$withoutBracket${bracket}json';
+  final bracket = match.group(0)!.replaceAll('.', ''); // remove dot
+  // remove only last to avoid errors with filenames like:
+  // 'image(3).(2)(3).jpg' <- "(3)." repeats twice
+  final withoutBracket = filename.replaceLast(bracket, '');
+  return '$withoutBracket$bracket';
 }

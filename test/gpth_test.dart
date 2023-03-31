@@ -38,6 +38,8 @@ AQACEQMRAD8AIcgXf//Z""";
   final imgFile4 = File('simple_file_20200101-edited.jpg');
   final imgFile4_1 = File('simple_file_20200101-edited(1).jpg');
   final jsonFile4 = File('simple_file_20200101.jpg.json');
+  final imgFile5 = File('img_(87).(vacation stuff).lol(87).jpg');
+  final jsonFile6 = File('img_(87).(vacation stuff).lol.jpg(87).json');
   final media = [
     Media({null: imgFile1},
         dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
@@ -52,6 +54,7 @@ AQACEQMRAD8AIcgXf//Z""";
     Media({null: imgFile4}), // these two...
     // ...are duplicates
     Media({null: imgFile4_1}, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
+    Media({null: imgFile5}, dateTaken: DateTime(2020), dateTakenAccuracy: 1),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -69,12 +72,14 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile3.writeAsBytesSync([6, 7, 8]);
     imgFile4.writeAsBytesSync([9, 10, 11]); // these two...
     imgFile4_1.writeAsBytesSync([9, 10, 11]); // ...are duplicates
+    imgFile5.writeAsBytesSync([12, 13, 14]);
     writeJson(File file, int time) =>
         file.writeAsStringSync('{"photoTakenTime": {"timestamp": "$time"}}');
     writeJson(jsonFile1, 1599078832);
     writeJson(jsonFile2, 1683078832);
     writeJson(jsonFile3, 1666942303);
     writeJson(jsonFile4, 1683074444);
+    writeJson(jsonFile6, 1680289442);
   });
 
   group('DateTime extractors', () {
@@ -98,6 +103,10 @@ AQACEQMRAD8AIcgXf//Z""";
         (await jsonExtractor(imgFile4_1, tryhard: true))
             ?.millisecondsSinceEpoch,
         1683074444 * 1000,
+      );
+      expect(
+        (await jsonExtractor(imgFile5, tryhard: false))?.millisecondsSinceEpoch,
+        1680289442 * 1000,
       );
     });
     test('exif', () async {
@@ -129,7 +138,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
   test('Duplicate removal', () {
     expect(removeDuplicates(media), 1);
-    expect(media.length, 5);
+    expect(media.length, 6);
     expect(media.firstWhereOrNull((e) => e.firstFile == imgFile4), null);
   });
   test('Extras removal', () {
@@ -282,6 +291,7 @@ AQACEQMRAD8AIcgXf//Z""";
             "Screenshot_2022-10-28-09-31-43-118_com.snapchat.jpg",
             "simple_file_20200101-edited(1).jpg",
             "Urlaub in Knaufspesch in der Schneifel (38).JPG",
+            "img_(87).(vacation stuff).lol(87).jpg",
           ],
         ),
         true,
@@ -315,6 +325,7 @@ AQACEQMRAD8AIcgXf//Z""";
             "simple_file_20200101-edited(1).jpg",
             "Urlaub in Knaufspesch in der Schneifel (38).JPG",
             "albums-info.json",
+            "img_(87).(vacation stuff).lol(87).jpg",
           ],
         ),
         true,

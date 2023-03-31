@@ -114,3 +114,12 @@ int outputFileCount(List<Media> media, String albumOption) {
     throw ArgumentError.value(albumOption, 'albumOption');
   }
 }
+
+extension Z on String {
+  /// Returns same string if pattern not found
+  String replaceLast(String from, String to) {
+    final lastIndex = lastIndexOf(from);
+    if (lastIndex == -1) return this;
+    return replaceRange(lastIndex, lastIndex + from.length, to);
+  }
+}
