@@ -14,6 +14,9 @@ Future<DateTime?> exifExtractor(File file) async {
       await file.length() > maxFileSize) {
     return null;
   }
+  // NOTE: reading whole file may seem slower than using readExifFromFile
+  // but while testing it was actually 2x faster on my pc 0_o
+  // i have nvme + btrfs, but still, will leave as is
   final bytes = await file.readAsBytes();
   // this returns empty {} if file doesn't have exif so don't worry
   final tags = await readExifFromBytes(bytes);
