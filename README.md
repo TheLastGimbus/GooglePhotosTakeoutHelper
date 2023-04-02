@@ -36,6 +36,8 @@ If you want to run it on Synology, have problems with interactive, or just love 
      cd Downloads # probably
      # add execute permission for file
      chmod +x gpth-macos # or gpth-linux
+     # tell MacOS Gatekeeper to not worry
+     xattr -r -d com.apple.quarantine gpth-macos
      # run it 🏃
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
@@ -68,6 +70,8 @@ In that case:
      # ssh/whatever to where you're running it
      cd Downloads  # folder with gpth
      chmod +x gpth  # add execute permission
+     # tell MacOS Gatekeeper to not worry
+     xattr -r -d com.apple.quarantine gpth-macos
      ./gpth --input "/some/input/folder" --output "other/output/folder" --albums "shortcuts"
      # select which album solution you like - see --help for all of them
      ```
