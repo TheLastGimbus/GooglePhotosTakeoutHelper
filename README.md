@@ -45,6 +45,18 @@ If you want to run it on Synology, have problems with interactive, or just love 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
+3. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
+   - Download Phil Harvey's exiftool: https://exiftool.sourceforge.net/
+   - Open the cmd/terminal, and run
+     ```bash
+     # cd to folder where you downloaded exiftool
+     cd Downloads
+     # run it on your output folder:
+     # (the '*' at the end means "run on all files")
+     exiftool -overwrite_original -P "-AllDates<FileModifyDate" "your/output/folder/path/*"
+     ```
+
+Done! Enjoy your photos!!!
 
 ### Running manually with cmd
 
