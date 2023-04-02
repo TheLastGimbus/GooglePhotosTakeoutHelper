@@ -131,7 +131,7 @@ Future<List<File>> getZips() async {
     pressEnterToContinue();
   }
   if (!files.files.every((e) =>
-  File(e.path!).statSync().type == FileSystemEntityType.file &&
+      File(e.path!).statSync().type == FileSystemEntityType.file &&
       RegExp(r'\.(zip|tgz)$').hasMatch(e.path!))) {
     print('Files: [${files.files.map((e) => p.basename(e.path!)).join(', ')}]');
     error('Not all files you selected are zips :/ please do this again');
@@ -238,23 +238,23 @@ Future<void> freeSpaceNotice(int required, Directory dir) async {
   if (freeSpace == null) {
     print(
       'Note: everything will take ~${filesize(required)} of disk space - '
-          'make sure you have that available on ${dir.path} - otherwise, '
-          'Ctrl-C to exit, and make some free space!\n'
-          'Or: unzip manually, remove the zips and use gpth with cmd options',
+      'make sure you have that available on ${dir.path} - otherwise, '
+      'Ctrl-C to exit, and make some free space!\n'
+      'Or: unzip manually, remove the zips and use gpth with cmd options',
     );
   } else if (freeSpace < required) {
     print(
       '!!! WARNING !!!\n'
-          'Whole process requires ${filesize(required)} of space, but you '
-          'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
-          'Go make some free space!\n'
-          '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
+      'Whole process requires ${filesize(required)} of space, but you '
+      'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
+      'Go make some free space!\n'
+      '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
     );
     quit(69);
   } else {
     print(
       '(Note: everything will take ~${filesize(required)} of disk space - '
-          'you have ${filesize(freeSpace)} free so should be fine :)',
+      'you have ${filesize(freeSpace)} free so should be fine :)',
     );
   }
   await sleep(3);
