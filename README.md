@@ -25,6 +25,8 @@ If you want to run it on Synology, have problems with interactive, or just love 
       
       <img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
 1. Unzip them all and merge into one, so that all "Takeout" folders become one
+   
+   <img width="75%" alt="Unzip image tutorial" src="https://user-images.githubusercontent.com/40139196/229361367-b9803ab9-2724-4ddf-9af5-4df507e02dfe.png">
 2. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
     - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
 3. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
