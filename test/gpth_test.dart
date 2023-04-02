@@ -40,6 +40,10 @@ AQACEQMRAD8AIcgXf//Z""";
   final jsonFile4 = File('simple_file_20200101.jpg.json');
   final imgFile5 = File('img_(87).(vacation stuff).lol(87).jpg');
   final jsonFile5 = File('img_(87).(vacation stuff).lol.jpg(87).json');
+  final imgFile6 = File('IMG-20150125-WA0003-modifié.jpg');
+  final jsonFile6 = File('IMG-20150125-WA0003.jpg.json');
+  final imgFile7 = File('IMG-20150125-WA0003-modifié(1).jpg');
+  final jsonFile7 = File('IMG-20150125-WA0003.jpg.json');
   final media = [
     Media({null: imgFile1},
         dateTaken: DateTime(2020, 9, 1), dateTakenAccuracy: 1),
@@ -55,6 +59,8 @@ AQACEQMRAD8AIcgXf//Z""";
     // ...are duplicates
     Media({null: imgFile4_1}, dateTaken: DateTime(2019), dateTakenAccuracy: 3),
     Media({null: imgFile5}, dateTaken: DateTime(2020), dateTakenAccuracy: 1),
+    Media({null: imgFile6}, dateTaken: DateTime(2015), dateTakenAccuracy: 1),
+    Media({null: imgFile7}, dateTaken: DateTime(2015), dateTakenAccuracy: 1),
   ];
 
   /// Set up test stuff - create test shitty files in wherever pwd is
@@ -73,6 +79,8 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile4.writeAsBytesSync([9, 10, 11]); // these two...
     imgFile4_1.writeAsBytesSync([9, 10, 11]); // ...are duplicates
     imgFile5.writeAsBytesSync([12, 13, 14]);
+    imgFile6.writeAsBytesSync([15, 16, 17]);
+    imgFile7.writeAsBytesSync([18, 19, 20]);
     writeJson(File file, int time) =>
         file.writeAsStringSync('{"photoTakenTime": {"timestamp": "$time"}}');
     writeJson(jsonFile1, 1599078832);
@@ -80,6 +88,8 @@ AQACEQMRAD8AIcgXf//Z""";
     writeJson(jsonFile3, 1666942303);
     writeJson(jsonFile4, 1683074444);
     writeJson(jsonFile5, 1680289442);
+    writeJson(jsonFile6, 1422183600);
+    writeJson(jsonFile7, 1422183600);
   });
 
   group('DateTime extractors', () {
@@ -92,7 +102,10 @@ AQACEQMRAD8AIcgXf//Z""";
           1666942303 * 1000);
       // They *should* fail without tryhard
       // See b38efb5d / #175
-      expect((await jsonExtractor(imgFile4))?.millisecondsSinceEpoch, null);
+      expect(
+        (await jsonExtractor(imgFile4))?.millisecondsSinceEpoch,
+        1683074444 * 1000,
+      );
       expect((await jsonExtractor(imgFile4_1))?.millisecondsSinceEpoch, null);
       // Should work *with* tryhard
       expect(
@@ -107,6 +120,18 @@ AQACEQMRAD8AIcgXf//Z""";
       expect(
         (await jsonExtractor(imgFile5, tryhard: false))?.millisecondsSinceEpoch,
         1680289442 * 1000,
+      );
+      expect(
+        (await jsonExtractor(imgFile6, tryhard: false))?.millisecondsSinceEpoch,
+        1422183600 * 1000,
+      );
+      expect(
+        (await jsonExtractor(imgFile7, tryhard: false))?.millisecondsSinceEpoch,
+        null,
+      );
+      expect(
+        (await jsonExtractor(imgFile7, tryhard: true))?.millisecondsSinceEpoch,
+        1422183600 * 1000,
       );
     });
     test('exif', () async {
@@ -138,7 +163,7 @@ AQACEQMRAD8AIcgXf//Z""";
   });
   test('Duplicate removal', () {
     expect(removeDuplicates(media), 1);
-    expect(media.length, 6);
+    expect(media.length, 8);
     expect(media.firstWhereOrNull((e) => e.firstFile == imgFile4), null);
   });
   test('Extras removal', () {
@@ -292,6 +317,8 @@ AQACEQMRAD8AIcgXf//Z""";
             "simple_file_20200101-edited(1).jpg",
             "Urlaub in Knaufspesch in der Schneifel (38).JPG",
             "img_(87).(vacation stuff).lol(87).jpg",
+            "IMG-20150125-WA0003-modifié.jpg",
+            "IMG-20150125-WA0003-modifié(1).jpg",
           ],
         ),
         true,
@@ -326,6 +353,8 @@ AQACEQMRAD8AIcgXf//Z""";
             "Urlaub in Knaufspesch in der Schneifel (38).JPG",
             "albums-info.json",
             "img_(87).(vacation stuff).lol(87).jpg",
+            "IMG-20150125-WA0003-modifié.jpg",
+            "IMG-20150125-WA0003-modifié(1).jpg",
           ],
         ),
         true,
@@ -348,10 +377,14 @@ AQACEQMRAD8AIcgXf//Z""";
     imgFile4.deleteSync();
     imgFile4_1.deleteSync();
     imgFile5.deleteSync();
+    imgFile6.deleteSync();
+    imgFile7.deleteSync();
     jsonFile1.deleteSync();
     jsonFile2.deleteSync();
     jsonFile3.deleteSync();
     jsonFile4.deleteSync();
     jsonFile5.deleteSync();
+    jsonFile6.deleteSync();
+    jsonFile7.deleteSync();
   });
 }

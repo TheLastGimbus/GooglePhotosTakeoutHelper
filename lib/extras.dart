@@ -2,7 +2,7 @@ import 'package:path/path.dart' as p;
 
 import 'media.dart';
 
-const _extraFormats = [
+const extraFormats = [
   // EN/US - thanks @DalenW
   '-edited',
   '-effects',
@@ -31,7 +31,7 @@ int removeExtras(List<Media> media) {
   var count = 0;
   for (final m in copy) {
     final name = p.withoutExtension(p.basename(m.firstFile.path)).toLowerCase();
-    for (final extra in _extraFormats) {
+    for (final extra in extraFormats) {
       if (name.endsWith(extra)) {
         media.remove(m);
         count++;

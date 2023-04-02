@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:gpth/extras.dart' as extras;
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
@@ -37,11 +38,12 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
     _shortenName,
     // test: combining this with _shortenName?? which way around?
     _bracketSwap,
+    _removeExtra,
     // use those two only with tryhard
     // look at https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/175
     // thanks @denouche for reporting this!
     if (tryhard) ...[
-      _removeExtra,
+      _removeExtraRegex,
       _removeDigit, // most files with '(digit)' have jsons, so it's last
     ]
   ]) {
@@ -54,13 +56,35 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
 String _removeDigit(String filename) =>
     filename.replaceAll(RegExp(r'\(\d\)\.'), '.');
 
-// this matches anything like
-// 'some_photo_name-edited' or 'some_photo_name-edited(1)'
-// but also!
-// 'some_photo_name-literallyanything(1).notreally_whatiwant.jpg'
-// so it's slightly dangerous but i'll allow it
-String _removeExtra(String filename) =>
-    filename.replaceAll(RegExp(r'-\w+(\(\d\))?\.'), '.');
+/// This removes only strings defined in [extraFormats] list from `extras.dart`,
+/// so it's pretty safe
+String _removeExtra(String filename) {
+  for (final extra in extras.extraFormats) {
+    if (filename.contains(extra)) {
+      return filename.replaceLast(extra, '');
+    }
+  }
+  return filename;
+}
+
+/// this will match:
+/// ```
+///        '.extension' v  v end of string
+/// something-edited(1).jpg
+///        extra ^   ^ optional number in '()'
+///
+/// Result: something.jpg
+/// ```
+/// so it's *kinda* safe
+String _removeExtraRegex(String filename) {
+  // include all characters, also with accents
+  final matches = RegExp(r'(?<extra>-[A-Za-zÀ-ÖØ-öø-ÿ]+(\(\d\))?)\.\w+$')
+      .allMatches(filename);
+  if (matches.length == 1) {
+    return filename.replaceAll(matches.first.namedGroup('extra')!, '');
+  }
+  return filename;
+}
 
 // this resolves years of bugs and head-scratches 😆
 // f.e: https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/8#issuecomment-736539592
