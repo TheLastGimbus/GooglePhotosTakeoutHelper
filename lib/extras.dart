@@ -18,6 +18,8 @@ const _extraFormats = [
   '-編集済み',
   // IT - thanks @rgstori
   '-modificato',
+  // FR - for @palijn's problems <3
+  '-modifié',
   // Add more "edited" flags in more languages if you want.
   // They need to be lowercase.
 ];
