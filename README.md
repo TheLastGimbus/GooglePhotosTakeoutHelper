@@ -53,7 +53,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
      cd Downloads
      # run it on your output folder:
      # (the '*' at the end means "run on all files")
-     exiftool -overwrite_original -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/*"
+     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/*"
      ```
 
 Done! Enjoy your photos!!!
