@@ -17,15 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.10.0"
-  archive:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: fix-windoza-extract-errors
-      resolved-ref: fdf688a57b66f5cead334bb3130e8c634407a301
-      url: "https://github.com/TheLastGimbus/archive.git"
-    source: git
-    version: "3.3.6"
   args:
     dependency: "direct main"
     description:
@@ -274,14 +265,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      sha256: c3120a968135aead39699267f4c74bc9a08e4e909e86bc1b0af5bfd78691123c
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.7.2"
   pool:
     dependency: transitive
     description:

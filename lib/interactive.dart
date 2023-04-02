@@ -14,7 +14,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
+// @Deprecated('Interactive unzipping is suspended for now!')
+// import 'package:archive/archive_io.dart';
 import 'package:file_picker_desktop/file_picker_desktop.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -84,7 +85,24 @@ Future<void> nothingFoundMessage() async {
   print('After fixing this, go ahead and try again :)');
 }
 
+Future<Directory> getInputDir() async {
+  print('Select the directory where you unzipped all your takeout zips');
+  print('(Make sure they are merged => there is only one "Takeout" folder!)');
+  await sleep(1);
+  pressEnterToContinue();
+  final dir = await getDirectoryPath(dialogTitle: 'Select unzipped folder:');
+  await sleep(1);
+  if (dir == null) {
+    error('Duh, something went wrong with selecting - try again!');
+    return getOutput();
+  }
+  print('Cool!');
+  sleep(1);
+  return Directory(dir);
+}
+
 /// Asks user for zip files with ui dialogs
+@Deprecated('Interactive unzipping is suspended for now!')
 Future<List<File>> getZips() async {
   print('First, select all .zips from Google Takeout '
       '(use Ctrl to select multiple)');
@@ -113,7 +131,7 @@ Future<List<File>> getZips() async {
     pressEnterToContinue();
   }
   if (!files.files.every((e) =>
-      File(e.path!).statSync().type == FileSystemEntityType.file &&
+  File(e.path!).statSync().type == FileSystemEntityType.file &&
       RegExp(r'\.(zip|tgz)$').hasMatch(e.path!))) {
     print('Files: [${files.files.map((e) => p.basename(e.path!)).join(', ')}]');
     error('Not all files you selected are zips :/ please do this again');
@@ -136,14 +154,14 @@ Future<Directory> getOutput() async {
   await sleep(1);
   pressEnterToContinue();
   final dir = await getDirectoryPath(dialogTitle: 'Select output folder:');
+  await sleep(1);
   if (dir == null) {
     error('Duh, something went wrong with selecting - try again!');
-    quit(69);
+    return getOutput();
   }
-  await sleep(1.5);
   print('Cool!');
   sleep(1);
-  return Directory(dir!);
+  return Directory(dir);
 }
 
 Future<bool> askDivideDates() async {
@@ -214,28 +232,29 @@ Future<bool> askForCleanOutput() async {
 }
 
 /// Checks free space on disk and notifies user accordingly
+@Deprecated('Interactive unzipping is suspended for now!')
 Future<void> freeSpaceNotice(int required, Directory dir) async {
   final freeSpace = await getDiskFree(dir.path);
   if (freeSpace == null) {
     print(
       'Note: everything will take ~${filesize(required)} of disk space - '
-      'make sure you have that available on ${dir.path} - otherwise, '
-      'Ctrl-C to exit, and make some free space!\n'
-      'Or: unzip manually, remove the zips and use gpth with cmd options',
+          'make sure you have that available on ${dir.path} - otherwise, '
+          'Ctrl-C to exit, and make some free space!\n'
+          'Or: unzip manually, remove the zips and use gpth with cmd options',
     );
   } else if (freeSpace < required) {
     print(
       '!!! WARNING !!!\n'
-      'Whole process requires ${filesize(required)} of space, but you '
-      'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
-      'Go make some free space!\n'
-      '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
+          'Whole process requires ${filesize(required)} of space, but you '
+          'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
+          'Go make some free space!\n'
+          '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
     );
     quit(69);
   } else {
     print(
       '(Note: everything will take ~${filesize(required)} of disk space - '
-      'you have ${filesize(freeSpace)} free so should be fine :)',
+          'you have ${filesize(freeSpace)} free so should be fine :)',
     );
   }
   await sleep(3);
@@ -243,31 +262,33 @@ Future<void> freeSpaceNotice(int required, Directory dir) async {
 }
 
 /// Unzips all zips to given folder (creates it if needed)
+@Deprecated('Interactive unzipping is suspended for now!')
 Future<void> unzip(List<File> zips, Directory dir) async {
-  if (await dir.exists()) await dir.delete(recursive: true);
-  await dir.create(recursive: true);
-  print('gpth will now unzip all of that, process it and put everything in '
-      'the output folder :)');
-  await sleep(1);
-  for (final zip in zips) {
-    print('Unzipping ${p.basename(zip.path)}...');
-    try {
-      await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
-    } on PathNotFoundException catch (e) {
-      error('Error while unzipping $zip :(\n$e');
-      error('');
-      error('===== This is a known issue ! =====');
-      error("Looks like unzipping doesn't want to work :(");
-      error(
-          "You will have to unzip manually - see 'Running manually' section in README");
-      error('');
-      error(
-          'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#running-manually-with-cmd');
-      error('');
-      error('===== Sorry for inconvenience =====');
-    } catch (e) {
-      error('Error while unzipping $zip :(\n$e');
-      quit(69);
-    }
-  }
+  throw UnimplementedError();
+  // if (await dir.exists()) await dir.delete(recursive: true);
+  // await dir.create(recursive: true);
+  // print('gpth will now unzip all of that, process it and put everything in '
+  //     'the output folder :)');
+  // await sleep(1);
+  // for (final zip in zips) {
+  //   print('Unzipping ${p.basename(zip.path)}...');
+  //   try {
+  //     await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
+  //   } on PathNotFoundException catch (e) {
+  //     error('Error while unzipping $zip :(\n$e');
+  //     error('');
+  //     error('===== This is a known issue ! =====');
+  //     error("Looks like unzipping doesn't want to work :(");
+  //     error(
+  //         "You will have to unzip manually - see 'Running manually' section in README");
+  //     error('');
+  //     error(
+  //         'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#running-manually-with-cmd');
+  //     error('');
+  //     error('===== Sorry for inconvenience =====');
+  //   } catch (e) {
+  //     error('Error while unzipping $zip :(\n$e');
+  //     quit(69);
+  //   }
+  // }
 }

@@ -16,7 +16,7 @@ This script does just that - it organizes and cleans up your Takeout for you �
 It will take those zips, extract everything from them, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month) 🗄
 
 ## How to use:
-Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complicated arguments - just get your zips, run it, and follow prompted instructions 💃
+Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complicated arguments - just get your takeout, run gpth, and follow prompted instructions 💃
 
 If you want to run it on Synology, have problems with interactive, or just love cmd, look at ["Running manually with cmd"](#running-manually-with-cmd). Otherwise, just:
 
@@ -24,12 +24,10 @@ If you want to run it on Synology, have problems with interactive, or just love 
     - "deselect all" and then select only Google Photos
       
       <img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
-
-   
-   (Note: don't unzip them, gpth will do it for you 😉)
-1. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
+1. Unzip them all and merge into one, so that all "Takeout" folders become one
+2. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
     - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
-2. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
+3. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
    - On Mac/Linux: open terminal, `cd` to the folder with downloaded executable and run it:
      ```bash
      # if you have Mac with M1/M2 chip, you need to enable x86 emulation
@@ -45,7 +43,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
-3. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
+4. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
    - Download Phil Harvey's exiftool: https://exiftool.sourceforge.net/
    - Open the cmd/terminal, and run
      ```bash
@@ -63,7 +61,7 @@ Done! Enjoy your photos!!!
 You may still need this mode if:
 - You want to run on Synology where there are no ui programs required for interactive
   - You can read/discuss in #157 for any help
-- Interactive unzipping crashes for you (known issue in windoza 😢 #178)
+- ~~Interactive unzipping crashes for you (known issue in windoza 😢 #178)~~ - disabled for now
 - Want to use this in other script/automation
 
 In that case:

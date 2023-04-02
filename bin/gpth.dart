@@ -91,7 +91,9 @@ void main(List<String> arguments) async {
     await interactive.greet();
     print('');
     // ask for everything
-    final zips = await interactive.getZips();
+    // @Deprecated('Interactive unzipping is suspended for now!')
+    // final zips = await interactive.getZips();
+    final inDir = await interactive.getInputDir();
     print('');
     final out = await interactive.getOutput();
     print('');
@@ -100,18 +102,20 @@ void main(List<String> arguments) async {
     args['albums'] = await interactive.askAlbums();
     print('');
 
-    // calculate approx space required for everything
-    final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
-    final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
-    await interactive.freeSpaceNotice(requiredSpace, out); // and notify this
-    print('');
-
-    final unzipDir = Directory(p.join(out.path, '.gpth-unzipped'));
-    args['input'] = unzipDir.path;
+    // @Deprecated('Interactive unzipping is suspended for now!')
+    // // calculate approx space required for everything
+    // final cumZipsSize = zips.map((e) => e.lengthSync()).reduce((a, b) => a + b);
+    // final requiredSpace = (cumZipsSize * 2) + 256 * 1024 * 1024;
+    // await interactive.freeSpaceNotice(requiredSpace, out); // and notify this
+    // print('');
+    //
+    // final unzipDir = Directory(p.join(out.path, '.gpth-unzipped'));
+    // args['input'] = unzipDir.path;
+    args['input'] = inDir.path;
     args['output'] = out.path;
-
-    await interactive.unzip(zips, unzipDir);
-    print('');
+    //
+    // await interactive.unzip(zips, unzipDir);
+    // print('');
   }
 
   // elastic list of extractors - can add/remove with cli flags
@@ -265,10 +269,11 @@ void main(List<String> arguments) async {
 
   if (media.isEmpty) {
     await interactive.nothingFoundMessage();
-    if (interactive.indeed) {
-      print('([interactive] removing unzipped folder...)');
-      await input.delete(recursive: true);
-    }
+    // @Deprecated('Interactive unzipping is suspended for now!')
+    // if (interactive.indeed) {
+    //   print('([interactive] removing unzipped folder...)');
+    //   await input.delete(recursive: true);
+    // }
     quit(13);
   }
 
@@ -360,11 +365,12 @@ void main(List<String> arguments) async {
   ).listen((_) => barCopy.increment()).asFuture();
   print('');
 
-  // remove unzipped folder if was created
-  if (interactive.indeed) {
-    print('Removing unzipped folder...');
-    await input.delete(recursive: true);
-  }
+  // @Deprecated('Interactive unzipping is suspended for now!')
+  // // remove unzipped folder if was created
+  // if (interactive.indeed) {
+  //   print('Removing unzipped folder...');
+  //   await input.delete(recursive: true);
+  // }
 
   /// ###################################################
 
