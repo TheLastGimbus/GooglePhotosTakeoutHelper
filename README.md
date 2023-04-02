@@ -22,6 +22,9 @@ If you want to run it on Synology, have problems with interactive, or just love 
 
 0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
     - "deselect all" and then select only Google Photos
+      
+      <img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
+
    
    (Note: don't unzip them, gpth will do it for you 😉)
 1. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
