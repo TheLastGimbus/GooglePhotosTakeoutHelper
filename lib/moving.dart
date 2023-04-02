@@ -135,7 +135,15 @@ Stream<int> moveFiles(
         result = await moveFile();
         mainFile = result;
       } else if (albumBehavior == 'shortcut' && mainFile != null) {
-        result = await createShortcut(folder, mainFile);
+        try {
+          result = await createShortcut(folder, mainFile);
+        } catch (e) {
+          // in case powershell fails/whatever
+          print('Creating shortcut for '
+              '${p.basename(mainFile.path)} in ${p.basename(folder.path)} '
+              'failed :( - coping normal file instead');
+          result = await moveFile();
+        }
       } else {
         // else - if we either run duplicate-copy or main file is missing:
         // (this happens with archive/trash/weird situation)
