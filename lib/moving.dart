@@ -23,6 +23,8 @@ File findNotExistingName(File initialFile) {
 /// This will create symlink on unix and shortcut on windoza
 ///
 /// Uses [findNotExistingName] for safety
+///
+/// WARN: Crashes with non-ascii names :(
 Future<File> createShortcut(Directory location, File target) async {
   final name = '${p.basename(target.path)}${Platform.isWindows ? '.lnk' : ''}';
   final link = findNotExistingName(File(p.join(location.path, name)));
@@ -141,7 +143,7 @@ Stream<int> moveFiles(
           // in case powershell fails/whatever
           print('Creating shortcut for '
               '${p.basename(mainFile.path)} in ${p.basename(folder.path)} '
-              'failed :( - coping normal file instead');
+              'failed :(\n$e\n - coping normal file instead');
           result = await moveFile();
         }
       } else {
