@@ -1,3 +1,12 @@
+## 3.4.1
+
+- Lot of serious bug fixes
+  - Interactive unzipping was disabled because it sometimes lost *a lot of* photos ;_;
+    
+    Sorry if anyone lost anything - now I made some visual instruction on how to unzip
+  - Gracefully handle powershell fail - it fails with non-ascii names :(
+- Great improvement on json matching - now, my 5k Takeout has 100% matches!
+
 ## 3.4.0
 
 ### Albums 🎉
