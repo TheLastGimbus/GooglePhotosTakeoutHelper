@@ -91,7 +91,7 @@ In that case:
      # select which album solution you like - see --help for all of them
      ```
 
-You can check all cmd flags by running `gpth --help` - for exapmle, the `--divide-to-dates` flag
+You can check all cmd flags by running `gpth --help` - for example, the `--divide-to-dates` flag
 
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
