@@ -109,9 +109,11 @@ I spent **a lot of** time fixing bugs and making this work stable 💖 - would b
 ### What to do when you got rid of Google Photos? What are the alternatives? 🗺
  - I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local Wi-Fi, so you're not dependent on any service or internet connection. It will also keep original file creation date and metadata, so it resolves Android issue that I mentioned before.
 
- - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
+ - [Immich](https://immich.app/) aims to be full blown GPhotos replacement - it's still under development, but already looks great!
 
- - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress
+ - Same with [Photoprism](https://photoprism.org/), tho this one is in development longer (may be more mature)
+
+ - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
 
 ### Other Takeout projects
 I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
