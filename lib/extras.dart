@@ -20,6 +20,8 @@ const extraFormats = [
   '-modificato',
   // FR - for @palijn's problems <3
   '-modifié',
+  // ES - @Sappstal report
+  '-ha editado',
   // Add more "edited" flags in more languages if you want.
   // They need to be lowercase.
 ];
