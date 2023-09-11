@@ -52,8 +52,8 @@ If you want to run it on Synology, have problems with interactive, or just love 
      # cd to folder where you downloaded exiftool
      cd Downloads
      # run it on your output folder:
-     # (the '*' at the end means "run on all files")
-     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/*"
+     # (the '-r' means "run on all files/in sub-folders" aka recursively)
+     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/"
      ```
 
 Done! Enjoy your photos!!!
@@ -91,7 +91,7 @@ In that case:
      # select which album solution you like - see --help for all of them
      ```
 
-You can check all cmd flags by running `gpth --help` - for exapmle, the `--divide-to-dates` flag
+You can check all cmd flags by running `gpth --help` - for example, the `--divide-to-dates` flag
 
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
@@ -109,9 +109,11 @@ I spent **a lot of** time fixing bugs and making this work stable 💖 - would b
 ### What to do when you got rid of Google Photos? What are the alternatives? 🗺
  - I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local Wi-Fi, so you're not dependent on any service or internet connection. It will also keep original file creation date and metadata, so it resolves Android issue that I mentioned before.
 
- - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
+ - [Immich](https://immich.app/) aims to be full blown GPhotos replacement - it's still under development, but already looks great!
 
- - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress
+ - Same with [Photoprism](https://photoprism.org/), tho this one is in development longer (may be more mature)
+
+ - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
 
 ### Other Takeout projects
 I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
