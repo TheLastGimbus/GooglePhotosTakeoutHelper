@@ -52,8 +52,8 @@ If you want to run it on Synology, have problems with interactive, or just love 
      # cd to folder where you downloaded exiftool
      cd Downloads
      # run it on your output folder:
-     # (the '*' at the end means "run on all files")
-     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/*"
+     # (the '-r' means "run on all files/in sub-folders" aka recursively)
+     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/"
      ```
 
 Done! Enjoy your photos!!!
