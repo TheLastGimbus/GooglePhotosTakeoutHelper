@@ -30,7 +30,7 @@ Future<File> createShortcut(Directory location, File target) async {
   final link = findNotExistingName(File(p.join(location.path, name)));
   // this must be relative to not break when user moves whole folder around:
   // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/232
-  final targetRelativePath = p.relative(target.path, from: link.path);
+  final targetRelativePath = p.relative(target.path, from: link.parent.path);
   if (Platform.isWindows) {
     final res = await Process.run(
       'powershell.exe',
