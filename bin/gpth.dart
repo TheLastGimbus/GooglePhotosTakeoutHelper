@@ -344,7 +344,7 @@ void main(List<String> arguments) async {
   // I wish that, thanks to this, we may find some jsons in albums that would
   // be broken in shithole of big-ass year folders
 
-  print('Finding albums...');
+  print('Finding albums (this may take some time, dont worry :) ...');
   findAlbums(media);
 
   /// #######################
