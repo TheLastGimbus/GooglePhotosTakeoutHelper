@@ -1,3 +1,18 @@
+## 3.4.2
+
+### Bug fixes again 🐛
+
+- (maybe?) fix weird windoza trailing spaces in folder names (literally wtf??) - #212
+  
+  Not sure about this one so hope there will be no day-1 patch 😇🙏
+
+- update to Dart 3 🔥
+- recognize `.mts` files as videos, unlike Apache 😒 - #223
+- change shortcuts/symlinks to relative so it doesn't break on folder move 🤦 - #232
+- don't fail on set-file-modification errors - turns out there are lot of these - #229
+
+### Happy takeouts 👽
+
 ## 3.4.1
 
 - Lot of serious bug fixes
