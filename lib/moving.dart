@@ -108,7 +108,7 @@ Stream<int> moveFiles(
       final folder = Directory(
         p.join(
           output.path,
-          file.key ?? 'ALL_PHOTOS', // album or all
+          file.key?.trim() ?? 'ALL_PHOTOS', // album or all
           divideToDates
               ? date == null
                   ? 'date-unknown'
