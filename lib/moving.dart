@@ -165,7 +165,18 @@ Stream<int> moveFiles(
             '(not supported on Windows) - will be set to 1970-01-01');
         time = DateTime(1970);
       }
-      await result.setLastModified(time);
+      try {
+        await result.setLastModified(time);
+      } on OSError catch (e) {
+        // Sometimes windoza throws error but successes anyway 🙃:
+        // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/229#issuecomment-1685085899
+        // That's why this is here
+        if (e.errorCode != 0) {
+          print("WARNING: Can't set modification time on $result: $e");
+        }
+      } catch (e) {
+        print("WARNING: Can't set modification time on $result: $e");
+      }
 
       // one copy/move/whatever - one yield
       yield ++i;
