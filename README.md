@@ -20,16 +20,19 @@ Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complica
 
 If you want to run it on Synology, have problems with interactive, or just love cmd, look at ["Running manually with cmd"](#running-manually-with-cmd). Otherwise, just:
 
-0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
-    - "deselect all" and then select only Google Photos
+### 1. Get all your photos from [Google Takeout](https://takeout.google.com/) 📥
+"deselect all" and then select only Google Photos
       
-      <img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
-1. Unzip them all and merge into one, so that all "Takeout" folders become one
+<img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
+
+### 2. Unzip them all and merge into one, so that all "Takeout" folders become one
    
    <img width="75%" alt="Unzip image tutorial" src="https://user-images.githubusercontent.com/40139196/229361367-b9803ab9-2724-4ddf-9af5-4df507e02dfe.png">
-2. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
-    - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
-3. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
+   
+### 3. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒 ([also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin))
+
+### 4. Run `gpth`
+   - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
    - On Mac/Linux: open terminal, `cd` to the folder with downloaded executable and run it:
      ```bash
      # if you have Mac with M1/M2 chip, you need to enable x86 emulation
@@ -45,7 +48,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
-4. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
+### 5. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
    - Download Phil Harvey's exiftool: https://exiftool.sourceforge.net/
    - Open the cmd/terminal, and run
      ```bash
