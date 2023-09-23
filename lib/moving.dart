@@ -28,6 +28,9 @@ File findNotExistingName(File initialFile) {
 Future<File> createShortcut(Directory location, File target) async {
   final name = '${p.basename(target.path)}${Platform.isWindows ? '.lnk' : ''}';
   final link = findNotExistingName(File(p.join(location.path, name)));
+  // this must be relative to not break when user moves whole folder around:
+  // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/232
+  final targetRelativePath = p.relative(target.path, from: link.parent.path);
   if (Platform.isWindows) {
     final res = await Process.run(
       'powershell.exe',
@@ -40,7 +43,7 @@ Future<File> createShortcut(Directory location, File target) async {
         '-Command',
         '\$ws = New-Object -ComObject WScript.Shell; '
             '\$s = \$ws.CreateShortcut(\'${link.path}\'); '
-            '\$s.TargetPath = \'${p.absolute(target.path)}\'; '
+            '\$s.TargetPath = \'$targetRelativePath\'; '
             '\$s.Save()',
       ],
     );
@@ -53,7 +56,7 @@ Future<File> createShortcut(Directory location, File target) async {
     }
     return File(link.path);
   } else {
-    return File((await Link(link.path).create(p.absolute(target.path))).path);
+    return File((await Link(link.path).create(targetRelativePath)).path);
   }
 }
 
@@ -105,15 +108,15 @@ Stream<int> moveFiles(
       final folder = Directory(
         p.join(
           output.path,
-          file.key ?? 'ALL_PHOTOS', // album or all
-          divideToDates
-              ? date == null
-                  ? 'date-unknown'
-                  : p.join(
+          file.key?.trim() ?? 'ALL_PHOTOS', // album or all
+          date == null
+              ? 'date-unknown'
+              : divideToDates
+                  ? p.join(
                       '${date.year}',
                       date.month.toString().padLeft(2, '0'),
                     )
-              : '',
+                  : '',
         ),
       );
       // now folder logic is so complex i'll just create it every time 🤷
@@ -162,7 +165,18 @@ Stream<int> moveFiles(
             '(not supported on Windows) - will be set to 1970-01-01');
         time = DateTime(1970);
       }
-      await result.setLastModified(time);
+      try {
+        await result.setLastModified(time);
+      } on OSError catch (e) {
+        // Sometimes windoza throws error but successes anyway 🙃:
+        // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/229#issuecomment-1685085899
+        // That's why this is here
+        if (e.errorCode != 0) {
+          print("WARNING: Can't set modification time on $result: $e");
+        }
+      } catch (e) {
+        print("WARNING: Can't set modification time on $result: $e");
+      }
 
       // one copy/move/whatever - one yield
       yield ++i;

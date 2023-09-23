@@ -20,16 +20,19 @@ Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complica
 
 If you want to run it on Synology, have problems with interactive, or just love cmd, look at ["Running manually with cmd"](#running-manually-with-cmd). Otherwise, just:
 
-0. Get all your photos in [Google Takeout](https://takeout.google.com/) 📥
-    - "deselect all" and then select only Google Photos
+### 1. Get all your photos from [Google Takeout](https://takeout.google.com/) 📥
+"deselect all" and then select only Google Photos
       
-      <img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
-1. Unzip them all and merge into one, so that all "Takeout" folders become one
+<img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
+
+### 2. Unzip them all and merge into one, so that all "Takeout" folders become one
    
    <img width="75%" alt="Unzip image tutorial" src="https://user-images.githubusercontent.com/40139196/229361367-b9803ab9-2724-4ddf-9af5-4df507e02dfe.png">
-2. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒
-    - [also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin)
-3. - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
+   
+### 3. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒 ([also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin))
+
+### 4. Run `gpth`
+   - On Windoza: just double-click the downloaded `.exe` 🎉 - tell windoza defender that it's safe, and follow prompted instructions 🧾
    - On Mac/Linux: open terminal, `cd` to the folder with downloaded executable and run it:
      ```bash
      # if you have Mac with M1/M2 chip, you need to enable x86 emulation
@@ -45,15 +48,15 @@ If you want to run it on Synology, have problems with interactive, or just love 
      ./gpth-macos # or ./gpth-linux
      # follow prompted instructions 🥰
      ```
-4. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
+### 5. Most of your photos should have correct original EXIFs (metadata), but if you want, you can insert them everywhere with `exiftool`, so you won't lose their creation time
    - Download Phil Harvey's exiftool: https://exiftool.sourceforge.net/
    - Open the cmd/terminal, and run
      ```bash
      # cd to folder where you downloaded exiftool
      cd Downloads
      # run it on your output folder:
-     # (the '*' at the end means "run on all files")
-     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/*"
+     # (the '-r' means "run on all files/in sub-folders" aka recursively)
+     exiftool -overwrite_original -r -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/"
      ```
 
 Done! Enjoy your photos!!!
@@ -91,7 +94,7 @@ In that case:
      # select which album solution you like - see --help for all of them
      ```
 
-You can check all cmd flags by running `gpth --help` - for exapmle, the `--divide-to-dates` flag
+You can check all cmd flags by running `gpth --help` - for example, the `--divide-to-dates` flag
 
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
@@ -109,9 +112,11 @@ I spent **a lot of** time fixing bugs and making this work stable 💖 - would b
 ### What to do when you got rid of Google Photos? What are the alternatives? 🗺
  - I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local Wi-Fi, so you're not dependent on any service or internet connection. It will also keep original file creation date and metadata, so it resolves Android issue that I mentioned before.
 
- - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
+ - [Immich](https://immich.app/) aims to be full blown GPhotos replacement - it's still under development, but already looks great!
 
- - Guys at [Photoprism](https://photoprism.org/) are working on full Google Photos alternative, with search and AI tagging etc, but it's stil work in progress
+ - Same with [Photoprism](https://photoprism.org/), tho this one is in development longer (may be more mature)
+
+ - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
 
 ### Other Takeout projects
 I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
