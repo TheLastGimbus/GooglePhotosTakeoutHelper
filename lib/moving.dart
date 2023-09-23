@@ -109,14 +109,14 @@ Stream<int> moveFiles(
         p.join(
           output.path,
           file.key?.trim() ?? 'ALL_PHOTOS', // album or all
-          divideToDates
-              ? date == null
-                  ? 'date-unknown'
-                  : p.join(
+          date == null
+              ? 'date-unknown'
+              : divideToDates
+                  ? p.join(
                       '${date.year}',
                       date.month.toString().padLeft(2, '0'),
                     )
-              : '',
+                  : '',
         ),
       );
       // now folder logic is so complex i'll just create it every time 🤷
