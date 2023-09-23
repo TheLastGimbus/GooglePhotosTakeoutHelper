@@ -23,6 +23,7 @@ dependencies:
   #      url: https://github.com/TheLastGimbus/archive.git
   #      ref: fix-windoza-extract-errors
   proper_filesize: ^0.0.2
+  unorm_dart: ^0.2.0
 
 dev_dependencies:
   lints: ^2.1.1
