@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:gpth/extras.dart' as extras;
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
 Future<DateTime?> jsonExtractor(File file, {bool tryhard = false}) async {
@@ -59,6 +60,9 @@ String _removeDigit(String filename) =>
 /// This removes only strings defined in [extraFormats] list from `extras.dart`,
 /// so it's pretty safe
 String _removeExtra(String filename) {
+  // MacOS uses NFD that doesn't work with our accents 🙃🙃
+  // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/247
+  filename = unorm.nfc(filename);
   for (final extra in extras.extraFormats) {
     if (filename.contains(extra)) {
       return filename.replaceLast(extra, '');
@@ -77,6 +81,9 @@ String _removeExtra(String filename) {
 /// ```
 /// so it's *kinda* safe
 String _removeExtraRegex(String filename) {
+  // MacOS uses NFD that doesn't work with our accents 🙃🙃
+  // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/247
+  filename = unorm.nfc(filename);
   // include all characters, also with accents
   final matches = RegExp(r'(?<extra>-[A-Za-zÀ-ÖØ-öø-ÿ]+(\(\d\))?)\.\w+$')
       .allMatches(filename);

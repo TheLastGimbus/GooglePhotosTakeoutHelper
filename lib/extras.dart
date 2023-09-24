@@ -1,4 +1,5 @@
 import 'package:path/path.dart' as p;
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'media.dart';
 
@@ -34,7 +35,9 @@ int removeExtras(List<Media> media) {
   for (final m in copy) {
     final name = p.withoutExtension(p.basename(m.firstFile.path)).toLowerCase();
     for (final extra in extraFormats) {
-      if (name.endsWith(extra)) {
+      // MacOS uses NFD that doesn't work with our accents 🙃🙃
+      // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/pull/247
+      if (unorm.nfc(name).endsWith(extra)) {
         media.remove(m);
         count++;
         break;
