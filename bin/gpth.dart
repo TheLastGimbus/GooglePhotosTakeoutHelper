@@ -93,7 +93,15 @@ void main(List<String> arguments) async {
     // ask for everything
     // @Deprecated('Interactive unzipping is suspended for now!')
     // final zips = await interactive.getZips();
-    final inDir = await interactive.getInputDir();
+    late Directory inDir;
+    try {
+      inDir = await interactive.getInputDir();
+    } catch (e) {
+      print("Hmm, interactive selecting input dir crashed... \n"
+          "it looks like you're running in headless/on Synology/NAS...\n"
+          "If so, you have to use cli options - run 'gpth --help' to see them");
+      exit(69);
+    }
     print('');
     final out = await interactive.getOutput();
     print('');
