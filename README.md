@@ -119,9 +119,14 @@ I spent **a lot of** time fixing bugs and making this work stable 💖 - would b
  - If you want something more centralized but also self-hosted, [Nextcloud](https://nextcloud.com) is a nice choice, but its approach to photos is still not perfect. (And you need to set up your own server)
 
 ### Other Takeout projects
-I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
 
-https://github.com/vHanda/google-keep-exporter
+- https://github.com/vHanda/google-keep-exporter
+
+  I used this tool to export my notes to markdown - you can then edit them with any markdown editor you like :)
+
+- https://github.com/AlecRust/gphotos-takeout-repair
+
+  A Node.js based CLI tool that targets the same problem of cleaning Google Photos exports created with Takeout.
 
 ### Where is the Python script 🐍 ??
 Yeah, the whole thing got re-written in Dart, and now it's way more stable and faster. If you still want Python for some reason, check out v2.x - in releases/tags
