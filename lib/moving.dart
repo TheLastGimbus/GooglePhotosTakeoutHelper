@@ -115,7 +115,6 @@ Stream<int> moveFiles(
               : divideToDates
                   ? p.join(
                       '${date.year}',
-                      date.month.toString().padLeft(2, '0'),
                     )
                   : '',
         ),
