@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:gpth/interactive.dart' as interactive;
+import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 
 import 'media.dart';
@@ -130,9 +131,19 @@ Stream<int> moveFiles(
       moveFile() async {
         final freeFile = findNotExistingName(
             File(p.join(folder.path, p.basename(file.value.path))));
-        return copy
-            ? await file.value.copy(freeFile.path)
-            : await file.value.rename(freeFile.path);
+        try {
+          return copy
+              ? await file.value.copy(freeFile.path)
+              : await file.value.rename(freeFile.path);
+        } on FileSystemException {
+          print(
+            "Uh-uh, it looks like you selected other output drive than\n"
+            "input one - gpth can't move files between them. But, you don't have\n"
+            "to do this! Gpth *moves* files, so this doesn't take any extra space!\n"
+            "Please run again and select different output location <3",
+          );
+          quit(1);
+        }
       }
 
       if (file.key == null) {

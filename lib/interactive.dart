@@ -119,7 +119,7 @@ Future<List<File>> getZips() async {
     error('Duh, something went wrong with selecting - try again!');
     quit(69);
   }
-  if (files!.count == 0) {
+  if (files.count == 0) {
     error('No files selected - try again :/');
     quit(6969);
   }
@@ -150,7 +150,8 @@ Future<List<File>> getZips() async {
 
 /// Asks user for output folder with ui dialogs
 Future<Directory> getOutput() async {
-  print('Now, select output folder - all photos will be extracted there');
+  print('Now, select output folder - all photos will be moved there\n'
+      '(note: GPTH will *move* your photos - no extra space will be taken ;)');
   await sleep(1);
   pressEnterToContinue();
   final dir = await getDirectoryPath(dialogTitle: 'Select output folder:');
@@ -223,12 +224,10 @@ Future<bool> askForCleanOutput() async {
     case '3':
       print('Okay, exiting...');
       quit(0);
-      break;
     default:
       error('Invalid answer - try again');
       return askForCleanOutput();
   }
-  throw 'WTF this should never happen - go tell @TheLastGimbus';
 }
 
 /// Checks free space on disk and notifies user accordingly

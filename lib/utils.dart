@@ -17,7 +17,7 @@ const maxFileSize = 64 * 1024 * 1024;
 /// convenient print for errors
 void error(Object? object) => stderr.write('$object\n');
 
-void quit([int code = 1]) {
+Never quit([int code = 1]) {
   if (interactive.indeed) {
     print('[gpth ${code != 0 ? 'quitted :(' : 'finished :)'} (code $code) - '
         'press enter to close]');
