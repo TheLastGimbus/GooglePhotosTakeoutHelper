@@ -65,7 +65,7 @@ Done! Enjoy your photos!!!
 
 You may still need this mode if:
 - You want to run on Synology where there are no ui programs required for interactive
-  - You can read/discuss in #157 for any help
+  - You can read/discuss in [#157](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/discussions/157) for any help
 - ~~Interactive unzipping crashes for you (known issue in windoza 😢 #178)~~ - disabled for now
 - Want to use this in other script/automation
 
