@@ -157,7 +157,7 @@ Stream<int> moveFiles(
           // in case powershell fails/whatever
           print('Creating shortcut for '
               '${p.basename(mainFile.path)} in ${p.basename(folder.path)} '
-              'failed :(\n$e\n - coping normal file instead');
+              'failed :(\n$e\n - copying normal file instead');
           result = await moveFile();
         }
       } else {

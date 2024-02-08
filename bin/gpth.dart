@@ -361,7 +361,7 @@ void main(List<String> arguments) async {
 
   final barCopy = FillingBar(
     total: outputFileCount(media, args['albums']),
-    desc: "${args['copy'] ? 'Coping' : 'Moving'} photos to output folder",
+    desc: "${args['copy'] ? 'Copying' : 'Moving'} photos to output folder",
     width: barWidth,
   );
   await moveFiles(

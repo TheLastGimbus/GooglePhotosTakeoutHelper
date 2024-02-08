@@ -112,7 +112,7 @@ I spent **a lot of** time fixing bugs and making this work stable 💖 - would b
 ### Be aware if you move your photos on your Android phone... ☝
 (99% of the times), if you move some files in Android, their creation and modification time is reset to current.
 
-"Simple Gallery" app usually keeps original file creation time when moving and coping (but I don't guarantee it). It's also pretty cool - check it out: https://github.com/SimpleMobileTools/Simple-Gallery
+"Simple Gallery" app usually keeps original file creation time when moving and copying (but I don't guarantee it). It's also pretty cool - check it out: https://github.com/SimpleMobileTools/Simple-Gallery
 
 ### What to do when you got rid of Google Photos? What are the alternatives? 🗺
  - I really recommend you using [Syncthing](https://syncthing.net/) for syncing your photos and files across devices. It does so through your local Wi-Fi, so you're not dependent on any service or internet connection. It will also keep original file creation date and metadata, so it resolves Android issue that I mentioned before.
