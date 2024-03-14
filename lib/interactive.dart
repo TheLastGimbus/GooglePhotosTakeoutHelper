@@ -165,21 +165,29 @@ Future<Directory> getOutput() async {
   return Directory(dir);
 }
 
-Future<bool> askDivideDates() async {
+Future<num> askDivideDates() async {
   print('Do you want your photos in one big chronological folder, '
       'or divided to folders by year/month?');
   print('[1] (default) - one big folder');
-  print('[2] - year/month folders');
-  print('(Type 1 or 2 or press enter for default):');
+  print('[2] - year folders');
+  print('[3] - year/month folders');
+  print('[3] - year/month/day folders');
+  print('(Type a number or press enter for default):');
   final answer = await askForInt();
   switch (answer) {
     case '1':
     case '':
-      print('Okay, one big it is!');
-      return false;
+      print('Selected one big folder');
+      return 0;
     case '2':
-      print('Okay, will divide to folders!');
-      return true;
+      print('Will divide by year');
+      return 1;
+    case '3':
+      print('Will divide by year and month');
+      return 2;
+    case '4':
+      print('Will divide by year, month, and day');
+      return 3;
     default:
       error('Invalid answer - try again');
       return askDivideDates();
