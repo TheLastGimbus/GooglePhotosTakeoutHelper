@@ -42,6 +42,7 @@ extension X on Iterable<FileSystemEntity> {
 extension Y on Stream<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
   Stream<File> wherePhotoVideo() => whereType<File>().where((e) {
+        if (p.basename(e.path).startsWith('.')) return false;
         final mime = lookupMimeType(e.path) ?? "";
         return mime.startsWith('image/') ||
             mime.startsWith('video/') ||
