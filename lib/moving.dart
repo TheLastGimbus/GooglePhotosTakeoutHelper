@@ -67,7 +67,7 @@ Future<File> createShortcut(Directory location, File target) async {
 ///
 /// [copy] indicates whether to copy files or move them
 ///
-/// [divideToDates] will divide to dates even inside albums!
+/// [divideToDates] 1. One folder 2. Year folder 3. Year/Month 4. Year/Month/Day
 ///
 /// [albumBehavior] must be one of [interactive.albumOptions]
 ///
@@ -77,7 +77,7 @@ Stream<int> moveFiles(
   List<Media> allMediaFinal,
   Directory output, {
   required bool copy,
-  required bool divideToDates,
+  required num divideToDates,
   required String albumBehavior,
 }) async* {
   assert(interactive.albumOptions.keys.contains(albumBehavior));
@@ -106,20 +106,43 @@ Stream<int> moveFiles(
       }
       // now on, logic is shared for nothing+null/shortcut/copy cases
       final date = m.dateTaken;
+      String folderName;
+      if (file.key != null) {
+        folderName = file.key!.trim();
+      } else {
+        folderName = 'ALL_PHOTOS';
+      }
+
+      String dateFolder;
+      if (date == null) {
+        dateFolder = 'date-unknown';
+      } else {
+        if (divideToDates == 3) {
+          dateFolder = p.join(
+            '${date.year}',
+            date.month.toString().padLeft(2, '0'),
+            date.day.toString().padLeft(2, '0'),
+          );
+        } else if (divideToDates == 2) {
+          dateFolder = p.join(
+            '${date.year}',
+            date.month.toString().padLeft(2, '0'),
+          );
+        } else if (divideToDates == 1) {
+          dateFolder = '${date.year}';
+        } else {
+          dateFolder = '';
+        }
+      }
+
       final folder = Directory(
         p.join(
           output.path,
-          file.key?.trim() ?? 'ALL_PHOTOS', // album or all
-          date == null
-              ? 'date-unknown'
-              : divideToDates
-                  ? p.join(
-                      '${date.year}',
-                      date.month.toString().padLeft(2, '0'),
-                    )
-                  : '',
+          folderName,
+          dateFolder,
         ),
       );
+
       // now folder logic is so complex i'll just create it every time 🤷
       await folder.create(recursive: true);
 
