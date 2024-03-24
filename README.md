@@ -84,7 +84,7 @@ In that case:
      cd Downloads  # Most probably
      # run it, selecting input and output folders with options like this:
      # (you can try to drag and drop them)
-     gpth.exe --input "Downloads\you\input\folder" --output "C:\some\other\location" --albums "shortcuts"
+     gpth.exe --input "Downloads\you\input\folder" --output "C:\some\other\location" --albums "shortcut"
      # select which album solution you like - see --help for all of them
      # remember to use "" !
      ```
@@ -95,7 +95,7 @@ In that case:
      chmod +x gpth  # add execute permission
      # tell MacOS Gatekeeper to not worry
      xattr -r -d com.apple.quarantine gpth-macos
-     ./gpth --input "/some/input/folder" --output "other/output/folder" --albums "shortcuts"
+     ./gpth --input "/some/input/folder" --output "other/output/folder" --albums "shortcut"
      # select which album solution you like - see --help for all of them
      ```
 
