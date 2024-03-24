@@ -11,6 +11,7 @@ import 'package:gpth/media.dart';
 import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
+import 'package:gpth/date_extractors/heic_video_extractor.dart';
 
 const helpText = """GooglePhotosTakeoutHelper v$version - The Dart successor
 
@@ -133,6 +134,7 @@ void main(List<String> arguments) async {
     jsonExtractor,
     exifExtractor,
     if (args['guess-from-name']) guessExtractor,
+    heicVideoExtractor,
     // this is potentially *dangerous* - see:
     // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/175
     (f) => jsonExtractor(f, tryhard: true),
