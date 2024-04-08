@@ -23,7 +23,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
 ### 1. Get all your photos from [Google Takeout](https://takeout.google.com/) 📥
 "deselect all" and then select only Google Photos
       
-<img width="75%" alt="gpth usage image tutorial" src="https://user-images.githubusercontent.com/40139196/229353040-14af25c1-5454-4d1f-866a-8b10d5a7c648.png">
+<img width="75%" alt="gpth usage image tutorial" src="https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/assets/40139196/8e85f58c-9958-466a-a176-51af85bb73dd">
 
 ### 2. Unzip them all and merge into one, so that all "Takeout" folders become one
    
