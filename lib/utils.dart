@@ -26,8 +26,18 @@ Never quit([int code = 1]) {
   exit(code);
 }
 
+String getMime(File e) {
+  var mime = lookupMimeType(e.path);
+  if (mime != null)
+    return mime;
+  RandomAccessFile rafile = e.openSync();
+  final header = rafile.readSync(defaultMagicNumbersMaxLength);
+  rafile.closeSync();
+  return lookupMimeType(e.path, headerBytes: header) ?? "";
+}
+
 bool isMedia(File e) {
-  final mime = lookupMimeType(e.path) ?? "";
+  final mime = getMime(e);
   return mime.startsWith('image/') ||
     mime.startsWith('video/') ||
     // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
