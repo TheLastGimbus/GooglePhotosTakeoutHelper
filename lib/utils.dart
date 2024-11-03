@@ -35,7 +35,10 @@ extension X on Iterable<FileSystemEntity> {
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts'||
+            // temporary support for Apple Raw image formats
+            p.extension(e.path).toLowerCase() == ".dng" ||
+            p.extension(e.path).toLowerCase() == ".cr2" ;
       });
 }
 
@@ -48,7 +51,10 @@ extension Y on Stream<FileSystemEntity> {
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts' ||
+            // temporary support for Apple Raw image formats
+            p.extension(e.path).toLowerCase() == ".dng"||
+            p.extension(e.path).toLowerCase() == ".cr2" ;
       });
 }
 
