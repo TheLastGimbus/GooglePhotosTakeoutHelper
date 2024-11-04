@@ -49,7 +49,9 @@ void main(List<String> arguments) async {
       allowedHelp: interactive.albumOptions,
       defaultsTo: 'shortcut',
     )
-    ..addFlag('divide-to-dates', help: 'Divide output to folders by year/month')
+    ..addOption('divide-to-dates',
+        help: 'Divide output to folders by nothing/year/month/day',
+        allowed: ['0', '1', '2', '3'])
     ..addFlag('skip-extras', help: 'Skip extra images (like -edited etc)')
     ..addFlag(
       'guess-from-name',
