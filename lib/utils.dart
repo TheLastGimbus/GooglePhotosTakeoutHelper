@@ -26,30 +26,34 @@ Never quit([int code = 1]) {
   exit(code);
 }
 
+String getMime(File e) {
+  var mime = lookupMimeType(e.path);
+  if (mime != null)
+    return mime;
+  RandomAccessFile rafile = e.openSync();
+  final header = rafile.readSync(defaultMagicNumbersMaxLength);
+  rafile.closeSync();
+  return lookupMimeType(e.path, headerBytes: header) ?? "";
+}
+
+bool isMedia(File e) {
+  final mime = getMime(e);
+  return mime.startsWith('image/') ||
+    mime.startsWith('video/') ||
+    // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
+    // https://github.com/dart-lang/mime/issues/102
+    // 🙃🙃
+    mime == 'model/vnd.mts';
+}
+
 extension X on Iterable<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
-  Iterable<File> wherePhotoVideo() => whereType<File>().where((e) {
-        final mime = lookupMimeType(e.path) ?? "";
-        return mime.startsWith('image/') ||
-            mime.startsWith('video/') ||
-            // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
-            // https://github.com/dart-lang/mime/issues/102
-            // 🙃🙃
-            mime == 'model/vnd.mts';
-      });
+  Iterable<File> wherePhotoVideo() => whereType<File>().where(isMedia);
 }
 
 extension Y on Stream<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
-  Stream<File> wherePhotoVideo() => whereType<File>().where((e) {
-        final mime = lookupMimeType(e.path) ?? "";
-        return mime.startsWith('image/') ||
-            mime.startsWith('video/') ||
-            // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
-            // https://github.com/dart-lang/mime/issues/102
-            // 🙃🙃
-            mime == 'model/vnd.mts';
-      });
+  Stream<File> wherePhotoVideo() => whereType<File>().where(isMedia);
 }
 
 extension Util on Stream {
