@@ -29,6 +29,15 @@ const extraFormats = [
   // They need to be lowercase.
 ];
 
+
+const imageFormats = [
+  'jpg',
+  'jpeg',
+  'mp.jpg',
+  'dng',
+  'heic',
+];
+
 /// Removes any media that match any of "extra" formats
 /// Returns count of removed
 int removeExtras(List<Media> media) {

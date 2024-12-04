@@ -46,6 +46,7 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
     if (tryhard) ...[
       _removeExtraRegex,
       _removeDigit, // most files with '(digit)' have jsons, so it's last
+      ..._matchLivePhotos(),
     ]
   ]) {
     final jsonFile = File(p.join(dir.path, '${method(name)}.json'));
@@ -91,6 +92,42 @@ String _removeExtraRegex(String filename) {
     return filename.replaceAll(matches.first.namedGroup('extra')!, '');
   }
   return filename;
+}
+
+
+/// this returns a set of match functions corresponding to possible image formats
+/// An issue with live photos is that the video component is not give a seperate json
+/// The original still image has the json with the name matching the base image format
+/// It is common to see files from take out look like this:
+/// ```
+///         image1.jpg (Still image from live shot)
+///         image1.mpeg (moving component of live shot)
+///         image1.jpg.json (json metadata)
+/// ```
+/// We need to guess the still image format and append it to the file name then search for the json
+/// This function uses common image formats used in live shots defined in [imageFormats] list from `extras.dart`,
+List<dynamic> _matchLivePhotos() {
+  var matchFunctions = [];
+  for (final imageFormat in extras.imageFormats) {
+    matchFunctions.add((f) => _matchLivePhoto(f, imageFormat));
+  }
+  // We need to add back functions for all corrective methods if the base search fails to return a match
+  for (final imageFormat in extras.imageFormats) {
+    matchFunctions.add((f) => _matchLivePhoto(_shortenName(f), imageFormat));
+    matchFunctions.add((f) => _matchLivePhoto(_bracketSwap(f), imageFormat));
+    matchFunctions.add((f) => _matchLivePhoto(_removeExtra(f), imageFormat));
+    matchFunctions.add((f) => _matchLivePhoto(_removeExtraRegex(f), imageFormat));
+    matchFunctions.add((f) => _matchLivePhoto(_removeDigit(f), imageFormat));
+  }
+  return matchFunctions;
+}
+
+
+/// this is the helper function for `_matchLivePhotos` that strips the file extension and replaces it with
+/// a still image extension
+String _matchLivePhoto(String filename, String imageFormat) {
+  filename = unorm.nfc(filename);
+  return '${p.basenameWithoutExtension(filename)}${imageFormat}';
 }
 
 // this resolves years of bugs and head-scratches 😆
