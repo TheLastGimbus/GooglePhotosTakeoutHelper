@@ -13,7 +13,7 @@ What if you want to just have one folder with all photos, in chronological order
 
 This script does just that - it organizes and cleans up your Takeout for you 🧹😌
 
-It will take all of those folders, find all photos in them, set their and `file last modified` correctly, and put it in one big folder (or folders divided by a month) 🗄
+It will take all of those folders, find all photos in them, set their `file last modified` correctly, and put it in one big folder (or folders divided by a month) 🗄
 
 ## How to use:
 Since `v3.2.0`, `gpth` is interactive 🎉 - you don't need to type any complicated arguments - just get your takeout, run gpth, and follow prompted instructions 💃

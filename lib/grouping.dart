@@ -36,7 +36,7 @@ extension Group on Iterable<Media> {
 
 /// Removes duplicate media from list of media
 ///
-/// This is ment to be used *early*, and it's aware of un-merged albums.
+/// This is meant to be used *early*, and it's aware of un-merged albums.
 /// Meaning, it will leave duplicated files if they have different
 /// [Media.albums] value
 ///
