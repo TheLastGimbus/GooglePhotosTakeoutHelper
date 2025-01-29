@@ -55,10 +55,10 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
   return null;
 }
 
-// if the original file was uploaded without an extension there will be no
-// extension in the "title" of the json but the image in the filesystem will
-// have one that was automatically added, hence we need to ignore it when
-// searching for the json
+// if the originally file was uploaded without an extension, 
+// (for example, "20030616" (jpg but without ext))
+// it's json won't have the extension ("20030616.json"), but the image
+// itself (after google proccessed it) - will ("20030616.jpg" tadam)
 String _noExtension(String filename) =>
     p.basenameWithoutExtension(File(filename).path);
 
