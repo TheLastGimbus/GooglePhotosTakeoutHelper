@@ -40,6 +40,7 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
     // test: combining this with _shortenName?? which way around?
     _bracketSwap,
     _removeExtra,
+    _noExtension,
     // use those two only with tryhard
     // look at https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/175
     // thanks @denouche for reporting this!
@@ -53,6 +54,13 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
   }
   return null;
 }
+
+// if the originally file was uploaded without an extension, 
+// (for example, "20030616" (jpg but without ext))
+// it's json won't have the extension ("20030616.json"), but the image
+// itself (after google proccessed it) - will ("20030616.jpg" tadam)
+String _noExtension(String filename) =>
+    p.basenameWithoutExtension(File(filename).path);
 
 String _removeDigit(String filename) =>
     filename.replaceAll(RegExp(r'\(\d\)\.'), '.');
