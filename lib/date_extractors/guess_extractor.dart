@@ -43,6 +43,12 @@ final _commonDatetimePatterns = [
         r'(?<date>(20|19|18)\d{2}_(01|02|03|04|05|06|07|08|09|10|11|12)_[0-3]\d_\d{2}_\d{2}_\d{2})'),
     'YYYY_MM_DD_hh_mm_ss',
   ],
+  // example: 20190620_184109.jpg
+  [
+    RegExp(
+        r'(20|19|18)\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d_\d{6}'),
+    'YYYYMMDD_hhmmss'
+  ]
 ];
 
 /// Guesses DateTime from [file]s name
