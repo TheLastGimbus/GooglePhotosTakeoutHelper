@@ -260,7 +260,7 @@ AQACEQMRAD8AIcgXf//Z""";
         media,
         output,
         copy: true,
-        divideToDates: false,
+        divideToDates: 0,
         albumBehavior: 'shortcut',
       ).toList();
       final outputted =
@@ -278,7 +278,7 @@ AQACEQMRAD8AIcgXf//Z""";
         media,
         output,
         copy: true,
-        divideToDates: false,
+        divideToDates: 0,
         albumBehavior: 'nothing',
       ).toList();
       final outputted =
@@ -297,7 +297,7 @@ AQACEQMRAD8AIcgXf//Z""";
         media,
         output,
         copy: true,
-        divideToDates: false,
+        divideToDates: 0,
         albumBehavior: 'duplicate-copy',
       ).toList();
       final outputted =
@@ -333,7 +333,7 @@ AQACEQMRAD8AIcgXf//Z""";
         media,
         output,
         copy: true,
-        divideToDates: false,
+        divideToDates: 0,
         albumBehavior: 'json',
       ).toList();
       final outputted =
