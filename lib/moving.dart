@@ -27,7 +27,7 @@ File findNotExistingName(File initialFile) {
 ///
 /// WARN: Crashes with non-ascii names :(
 Future<File> createShortcut(Directory location, File target) async {
-  final name = '${p.basename(target.path)}${Platform.isWindows ? '.lnk' : ''}';
+  final name = p.basename(target.path);
   final link = findNotExistingName(File(p.join(location.path, name)));
   // this must be relative to not break when user moves whole folder around:
   // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/232
@@ -35,6 +35,7 @@ Future<File> createShortcut(Directory location, File target) async {
   if (Platform.isWindows) {
     final res = await Process.run(
       'powershell.exe',
+      workingDirectory: link.parent.path,
       [
         '-ExecutionPolicy',
         'Bypass',
@@ -42,10 +43,9 @@ Future<File> createShortcut(Directory location, File target) async {
         '-NonInteractive',
         '-NoProfile',
         '-Command',
-        '\$ws = New-Object -ComObject WScript.Shell; '
-            '\$s = \$ws.CreateShortcut(\'${link.path}\'); '
-            '\$s.TargetPath = \'$targetRelativePath\'; '
-            '\$s.Save()',
+        'New-Item -ItemType SymbolicLink '
+            '-Path \'${link.path}\' '
+            '-Target \'$targetRelativePath\'',
       ],
     );
     if (res.exitCode != 0) {
