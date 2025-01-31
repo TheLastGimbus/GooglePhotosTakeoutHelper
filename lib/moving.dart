@@ -131,18 +131,16 @@ Stream<int> moveFiles(
       moveFile() async {
         final freeFile = findNotExistingName(
             File(p.join(folder.path, p.basename(file.value.path))));
-        try {
-          return copy
-              ? await file.value.copy(freeFile.path)
-              : await file.value.rename(freeFile.path);
-        } on FileSystemException {
-          print(
-            "Uh-uh, it looks like you selected other output drive than\n"
-            "input one - gpth can't move files between them. But, you don't have\n"
-            "to do this! Gpth *moves* files, so this doesn't take any extra space!\n"
-            "Please run again and select different output location <3",
-          );
-          quit(1);
+        if (copy) {
+          return await file.value.copy(freeFile.path);
+        } else {
+          try {
+            return await file.value.rename(freeFile.path);
+          } on FileSystemException {
+            var temp = await file.value.copy(freeFile.path);
+            await file.value.delete();
+            return temp;
+          }
         }
       }
 
