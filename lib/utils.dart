@@ -133,3 +133,41 @@ extension Z on String {
     return replaceRange(lastIndex, lastIndex + from.length, to);
   }
 }
+
+Future<void> renameIncorrectJsonFiles(Directory directory) async {
+  int renamedCount = 0;
+  await for (final entity in directory.list(recursive: true)) {
+    if (entity is File && p.extension(entity.path) == '.json') {
+      final originalName = p.basename(entity.path);
+
+      // Regex to dettect pattern
+      final regex = RegExp(
+        r'^(.*\.[a-z0-9]{3,5})\..+\.json$',
+        caseSensitive: false,
+      );
+      
+      final match = regex.firstMatch(originalName);
+      if (match != null) {
+        final newName = '${match.group(1)}.json';
+        if (newName != originalName) {
+          final newPath = p.join(p.dirname(entity.path), newName);
+          final newFile = File(newPath);
+          
+          // Verify if the file renamed already exists
+          if (await newFile.exists()) {
+            print('[Renamed] Skipping: $newPath already exists');
+          } else {
+            try {
+              await entity.rename(newPath);
+              renamedCount++;
+              //print('[Renamed] ${entity.path} -> $newPath');
+            } on FileSystemException catch (e) {
+              print('[Error] Renaming ${entity.path}: ${e.message}');
+            }
+          }
+        }
+      }
+    }
+  }
+  print('Successfully renamed JSON files (suffix removed): $renamedCount');
+}

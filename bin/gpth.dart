@@ -107,6 +107,8 @@ void main(List<String> arguments) async {
     print('');
     args['divide-to-dates'] = await interactive.askDivideDates();
     print('');
+    args['modify-json'] = await interactive.askModifyJson();
+    print('');
     args['albums'] = await interactive.askAlbums();
     print('');
 
@@ -206,6 +208,12 @@ void main(List<String> arguments) async {
     }
   }
   await output.create(recursive: true);
+
+  if (args['modify-json'].toString() == "0") {
+    print('Fixin JSON files. Removing suffix (this may take some time) ...');
+    await renameIncorrectJsonFiles(input);
+  }
+
 
   /// ##################################################
 
