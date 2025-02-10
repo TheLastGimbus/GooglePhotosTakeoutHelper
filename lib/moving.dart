@@ -61,6 +61,14 @@ Future<File> createShortcut(Directory location, File target) async {
   }
 }
 
+Future<File> moveFileAndCreateShortcut(Directory newLocation, File target) async {
+  final newPath = p.join(newLocation.path, p.basename(target.path));
+  final movedFile = await target.rename(newPath); // Move the file from year folder to album (new location)
+
+  // Create shortcut in the original path (year folder)
+  return await createShortcut(target.parent, movedFile);
+}
+
 /// Big-ass logic of moving files from input to output
 ///
 /// [allMediaFinal] should be nice, de-duplicated and album-ed etc
@@ -160,7 +168,24 @@ Stream<int> moveFiles(
               'failed :(\n$e\n - copying normal file instead');
           result = await moveFile();
         }
-      } else {
+      } else if (albumBehavior == 'reverse-shortcut' && mainFile != null) {
+         try {
+          result = await moveFileAndCreateShortcut(folder, mainFile);
+        } catch (e) {
+          if (e is FileSystemException) {
+            //If file not exists its because is already moved to another album
+            //Just copy the original to the album
+            result = await moveFile();       
+          }else{
+          // in case of other exception, print details
+          print('Creating shortcut for '
+              '${p.basename(mainFile.path)} in ${p.basename(folder.path)} '
+              'failed :(\n$e\n - copying normal file instead');
+          result = await moveFile();     
+          }  
+        }
+      }
+       else {
         // else - if we either run duplicate-copy or main file is missing:
         // (this happens with archive/trash/weird situation)
         // just copy it
