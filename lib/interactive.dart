@@ -186,6 +186,31 @@ Future<bool> askDivideDates() async {
   }
 }
 
+Future<num> askModifyJson() async {
+  print(
+      'Check if your .json files of your photos contains "supplemental-metadata" '
+      'between the original extension and .json. If this suffix is present, '
+      'the script will not detect the corresponding JSON file');
+  print('For example: myImageName.jpg.supplemental-metadata.json');
+  print(
+      '[1] (Erase suffix) - [Recommended] Yes, the photos have the suffix "supplemental-metadata"');
+  print('[2] (Dont Erease suffix) - No');
+  print('(Type a number or press enter for default):');
+  final answer = await askForInt();
+  switch (answer) {
+    case '1':
+    case '':
+      print('Will erease the suffix "supplemental-metadata"');
+      return 0;
+    case '2':
+      print('Will not erease the suffix');
+      return 1;
+    default:
+      error('Invalid answer - try again');
+      return askModifyJson();
+  }
+}
+
 Future<String> askAlbums() async {
   print('What should be done with albums?');
   var i = 0;
