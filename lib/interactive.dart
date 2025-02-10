@@ -32,6 +32,11 @@ const albumOptions = {
       "ignoring lack of year-folders etc.",
   'nothing': 'Just ignore them and put year-photos into one folder. '
       'WARNING: This ignores Archive/Trash !!!',
+  'reverse-shortcut': 'Album folders with ORIGINAL photos. "ALL_PHOTOS" folder '
+      'with shortcuts/symlinks to albums. If a photo is not in an album, '
+      'the original is saved. CAUTION: If a photo is in multiple albums, it will '
+      'be duplicated in the other albums, and the shortcuts/symlinks in '
+      '"ALL_PHOTOS" will point only to one album.',
 };
 
 /// Whether we are, indeed, running interactive (or not)

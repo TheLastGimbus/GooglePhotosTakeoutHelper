@@ -114,7 +114,7 @@ String filesize(int bytes) => ProperFilesize.generateHumanReadableFilesize(
     );
 
 int outputFileCount(List<Media> media, String albumOption) {
-  if (['shortcut', 'duplicate-copy'].contains(albumOption)) {
+  if (['shortcut', 'duplicate-copy', 'reverse-shortcut'].contains(albumOption)) {
     return media.fold(0, (prev, e) => prev + e.files.length);
   } else if (albumOption == 'json') {
     return media.length;
