@@ -210,10 +210,9 @@ void main(List<String> arguments) async {
   await output.create(recursive: true);
 
   if (args['modify-json'].toString() == "0") {
-    print('Fixin JSON files. Removing suffix (this may take some time) ...');
+    print('Fixing JSON files. Removing suffix (this may take some time)...');
     await renameIncorrectJsonFiles(input);
   }
-
 
   /// ##################################################
 

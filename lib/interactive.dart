@@ -187,11 +187,13 @@ Future<bool> askDivideDates() async {
 }
 
 Future<num> askModifyJson() async {
-  print('Check if your .json files of your photos contains "supplemental-metadata" '
+  print(
+      'Check if your .json files of your photos contains "supplemental-metadata" '
       'between the original extension and .json. If this suffix is present, '
       'the script will not detect the corresponding JSON file');
   print('For example: myImageName.jpg.supplemental-metadata.json');
-  print('[1] (Erase suffix) - [Recommended] Yes, the photos have the suffix "supplemental-metadata"');
+  print(
+      '[1] (Erase suffix) - [Recommended] Yes, the photos have the suffix "supplemental-metadata"');
   print('[2] (Dont Erease suffix) - No');
   print('(Type a number or press enter for default):');
   final answer = await askForInt();
