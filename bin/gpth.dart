@@ -11,6 +11,9 @@ import 'package:gpth/media.dart';
 import 'package:gpth/moving.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
+import 'package:logging/logging.dart';
+
+final Logger _logger = Logger('GooglePhotosHelper');
 
 const helpText = """GooglePhotosTakeoutHelper v$version - The Dart successor
 
@@ -26,6 +29,13 @@ Then, run: gpth --input "folder/with/all/takeouts" --output "your/output/folder"
 const barWidth = 40;
 
 void main(List<String> arguments) async {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.message}');
+  });
+
+  setupLogging(); // From lib/logging_setup.dart
+
   final parser = ArgParser()
     ..addFlag('help', abbr: 'h', negatable: false)
     ..addOption(
@@ -157,8 +167,12 @@ void main(List<String> arguments) async {
       for (final extractor in dateExtractors) {
         date = await extractor(file);
         if (date != null) {
-          await file.setLastModified(date);
-          set++;
+          try {
+            await file.setLastModified(date);
+            set++;
+          } catch (e) {
+            _logger.warning("Failed to set last modified date for ${file.path}: $e");
+          }
           break;
         }
       }
@@ -206,6 +220,27 @@ void main(List<String> arguments) async {
     }
   }
   await output.create(recursive: true);
+
+  final parser = ArgParser()
+    ..addOption('input', abbr: 'i', defaultsTo: '.')
+    ..addOption('output', abbr: 'o')
+    ..addFlag('dry-run', abbr: 'd')
+    ..addFlag('deduplicate', help: 'Remove duplicates via content hashing')
+    ..addOption('date-format', defaultsTo: 'yyyy/yyyy-MM');
+
+  try {
+    final results = parser.parse(args);
+    await processDirectory(
+      Directory(results['input']),
+      outputDir: Directory(results['output']),
+      dryRun: results['dry-run'],
+      deduplicate: results['deduplicate'],
+      dateFormat: results['date-format'],
+    );
+  } catch (e, stackTrace) {
+    _logger.severe('Fatal error: $e', stackTrace);
+    exit(1);
+  }
 
   /// ##################################################
 

@@ -21,6 +21,12 @@ File findNotExistingName(File initialFile) {
   return file;
 }
 
+Future<void> organizeMedia(Media media, {required bool deduplicate}) async {
+  if (deduplicate) {
+    await _handleDuplicates(media);
+  }
+}
+
 /// This will create symlink on unix and shortcut on windoza
 ///
 /// Uses [findNotExistingName] for safety
@@ -128,7 +134,7 @@ Stream<int> moveFiles(
 
       /// moves/copies file with safe name
       // it's here because we do this for two cases
-      moveFile() async {
+      Future<File?> moveFile() async {
         final freeFile = findNotExistingName(
             File(p.join(folder.path, p.basename(file.value.path))));
         try {
@@ -168,32 +174,35 @@ Stream<int> moveFiles(
       }
 
       // Done! Now, set the date:
-
-      var time = m.dateTaken ?? DateTime.now();
-      if (Platform.isWindows && time.isBefore(DateTime(1970))) {
-        print(
-            'WARNING: ${m.firstFile.path} has date $time, which is before 1970 '
-            '(not supported on Windows) - will be set to 1970-01-01');
-        time = DateTime(1970);
-      }
-      try {
-        await result.setLastModified(time);
-      } on OSError catch (e) {
-        // Sometimes windoza throws error but successes anyway 🙃:
-        // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/229#issuecomment-1685085899
-        // That's why this is here
-        if (e.errorCode != 0) {
+      if (result != null) {
+        var time = m.dateTaken ?? DateTime.now();
+        if (Platform.isWindows && time.isBefore(DateTime(1970))) {
+          print(
+              'WARNING: ${m.firstFile.path} has date $time, which is before 1970 '
+              '(not supported on Windows) - will be set to 1970-01-01');
+          time = DateTime(1970);
+        }
+        try {
+          await result.setLastModified(time);
+        } on OSError catch (e) {
+          // Sometimes windoza throws error but successes anyway 🙃:
+          // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/229#issuecomment-1685085899
+          // That's why this is here
+          if (e.errorCode != 0) {
+            print("WARNING: Can't set modification time on $result: $e");
+          }
+        } catch (e) {
           print("WARNING: Can't set modification time on $result: $e");
         }
-      } catch (e) {
-        print("WARNING: Can't set modification time on $result: $e");
+      } else {
+        print("WARNING: Resulting file is null, skipping date modification.");
       }
 
       // one copy/move/whatever - one yield
       yield ++i;
 
       if (albumBehavior == 'json') {
-        infoJson[p.basename(result.path)] =
+        infoJson[p.basename(result!.path)] =
             m.files.keys.whereNotNull().toList();
       }
     }

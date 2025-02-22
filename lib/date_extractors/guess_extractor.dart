@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:convert/convert.dart';
 import 'package:path/path.dart' as p;
+import 'package:logging/logging.dart';
+
+final _logger = Logger('GuessExtractor');
 
 // These are thanks to @hheimbuerger <3
 final _commonDatetimePatterns = [
@@ -45,9 +48,35 @@ final _commonDatetimePatterns = [
   ],
 ];
 
+final RegExp _dateRegex = RegExp(
+  r'(20\d{2})([0-1]\d)([0-3]\d)[_\-]?([0-2]\d)([0-5]\d)([0-5]\d)'
+);
+
+DateTime? guessDateFromFilename(String filename) {
+  final match = _dateRegex.firstMatch(filename);
+  if (match == null) return null;
+  
+  try {
+    return DateTime(
+      int.parse(match.group(1)!),
+      int.parse(match.group(2)!),
+      int.parse(match.group(3)!),
+      int.parse(match.group(4)!),
+      int.parse(match.group(5)!),
+      int.parse(match.group(6)!),
+    );
+  } catch (e) {
+    _logger.warning('Failed to parse date from filename: $filename');
+    return null;
+  }
+}
+
 /// Guesses DateTime from [file]s name
 /// - for example Screenshot_20190919-053857.jpg - we can guess this 😎
 Future<DateTime?> guessExtractor(File file) async {
+  final guessedDate = guessDateFromFilename(p.basename(file.path));
+  if (guessedDate != null) return guessedDate;
+
   for (final pat in _commonDatetimePatterns) {
     // extract date str with regex
     final match = (pat.first as RegExp).firstMatch(p.basename(file.path));

@@ -3,4 +3,7 @@
 github: TheLastGimbus
 ko_fi: thelastgimbus
 liberapay: TheLastGimbus
-custom: [ "https://www.paypal.me/TheLastGimbus" ]
+custom: 
+  - "https://www.paypal.me/TheLastGimbus"
+  - "https://ko-fi.com/thelastgimbus"
+  - "https://liberapay.com/TheLastGimbus"

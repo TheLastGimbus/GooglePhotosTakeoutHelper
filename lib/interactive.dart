@@ -97,7 +97,7 @@ Future<Directory> getInputDir() async {
     return getOutput();
   }
   print('Cool!');
-  sleep(1);
+  await sleep(1);
   return Directory(dir);
 }
 
@@ -161,7 +161,7 @@ Future<Directory> getOutput() async {
     return getOutput();
   }
   print('Cool!');
-  sleep(1);
+  await sleep(1);
   return Directory(dir);
 }
 

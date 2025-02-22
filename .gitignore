@@ -1,3 +1,4 @@
+# Ignore IDE directories
 .idea/
 .vscode/
 
@@ -8,8 +9,33 @@
 # Conventional directory for build output.
 build/
 
+# Ignore photos and output directories
 photos/
-
 ALL_PHOTOS/
 output/
+
+# Ignore log files
 *.log
+
+# Ignore analysis options
+analysis_options.yaml
+
+# Ignore generated files
+*.g.dart
+*.freezed.dart
+
+# Ignore coverage output
+coverage/
+
+# Ignore test result files
+test-results/
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore Windows specific files
+Thumbs.db

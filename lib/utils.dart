@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:gpth/interactive.dart' as interactive;
@@ -132,4 +133,11 @@ extension Z on String {
     if (lastIndex == -1) return this;
     return replaceRange(lastIndex, lastIndex + from.length, to);
   }
+}
+
+String sanitizeFilename(String name) {
+  // Remove reserved characters for Windows/macOS/Linux
+  final sanitized = name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+  // Truncate to avoid filesystem limits
+  return sanitized.length <= 255 ? sanitized : sanitized.substring(0, 255);
 }

@@ -13,7 +13,7 @@ import 'package:path/path.dart';
 import 'package:test/test.dart';
 
 void main() {
-  /// this is 1x1 green jg image, with exif:
+  /// this is 1x1 green jpg image, with exif:
   /// DateTime Original: 2022:12:16 16:06:47
   const greenImgBase64 = """
 /9j/4AAQSkZJRgABAQAAAQABAAD/4QC4RXhpZgAATU0AKgAAAAgABQEaAAUAAAABAAAASgEbAAUA
@@ -62,8 +62,7 @@ AQACEQMRAD8AIcgXf//Z""";
     Media({null: imgFile6_1}, dateTaken: DateTime(2015), dateTakenAccuracy: 1),
   ];
 
-  /// Set up test stuff - create test shitty files in wherever pwd is
-  /// We don't worry because we'll delete them later
+  /// Set up test stuff - create test files in the current directory
   setUpAll(() {
     albumDir.createSync(recursive: true);
     imgFileGreen.createSync();
@@ -88,6 +87,15 @@ AQACEQMRAD8AIcgXf//Z""";
     writeJson(jsonFile4, 1683074444);
     writeJson(jsonFile5, 1680289442);
     writeJson(jsonFile6, 1422183600);
+  });
+
+  test('EXIF date extraction', () {
+    final testFile = File('test_data/image_with_exif.jpg');
+    expect(extractDateFromExif(testFile), DateTime(2023, 1, 1));
+  });
+
+  test('Filename date guessing', () {
+    expect(guessDateFromFilename('IMG_20230101_123456.jpg'), DateTime(2023, 1, 1, 12, 34, 56));
   });
 
   group('DateTime extractors', () {
@@ -367,7 +375,7 @@ AQACEQMRAD8AIcgXf//Z""";
     tearDown(() async => await output.delete(recursive: true));
   });
 
-  /// Delete all shitty files as we promised
+  /// Delete all test files as we promised
   tearDownAll(() {
     albumDir.deleteSync(recursive: true);
     imgFileGreen.deleteSync();

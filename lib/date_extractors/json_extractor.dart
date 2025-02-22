@@ -7,24 +7,26 @@ import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
+final _logger = Logger('JsonExtractor');
+
 /// Finds corresponding json file with info and gets 'photoTakenTime' from it
 Future<DateTime?> jsonExtractor(File file, {bool tryhard = false}) async {
   final jsonFile = await _jsonForFile(file, tryhard: tryhard);
   if (jsonFile == null) return null;
+  return extractDateFromJson(jsonFile);
+}
+
+DateTime? extractDateFromJson(File jsonFile) {
   try {
-    final data = jsonDecode(await jsonFile.readAsString());
-    final epoch = int.parse(data['photoTakenTime']['timestamp'].toString());
-    return DateTime.fromMillisecondsSinceEpoch(epoch * 1000);
-  } on FormatException catch (_) {
-    // this is when json is bad
-    return null;
-  } on FileSystemException catch (_) {
-    // this happens for issue #143
-    // "Failed to decode data using encoding 'utf-8'"
-    // maybe this will self-fix when dart itself support more encodings
-    return null;
-  } on NoSuchMethodError catch (_) {
-    // this is when tags like photoTakenTime aren't there
+    final data = json.decode(jsonFile.readAsStringSync());
+    final timestamp = data['photoTakenTime']?['timestamp'] ?? 
+                     data['creationTime']?['timestamp'] ?? 
+                     data['modificationTime']?['timestamp'];
+    return timestamp != null 
+        ? DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)
+        : null;
+  } catch (e) {
+    _logger.warning('Invalid JSON in ${jsonFile.path}: $e');
     return null;
   }
 }
