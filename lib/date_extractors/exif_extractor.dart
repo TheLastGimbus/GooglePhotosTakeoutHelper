@@ -4,6 +4,23 @@ import 'dart:math';
 import 'package:exif/exif.dart';
 import 'package:gpth/utils.dart';
 import 'package:mime/mime.dart';
+import 'package:image/image.dart' as img;
+
+DateTime? extractDateFromExif(File file) {
+  try {
+    final bytes = file.readAsBytesSync();
+    final image = img.decodeImage(bytes);
+    if (image == null) {
+      _logger.warning('Unsupported image format: ${file.path}');
+      return null;
+    }
+    final exifDate = image.exif?.dateTimeOriginal;
+    return exifDate ?? file.lastModifiedSync();
+  } catch (e) {
+    _logger.warning('EXIF extraction failed for ${file.path}: $e');
+    return null;
+  }
+}
 
 /// DateTime from exif data *potentially* hidden within a [file]
 ///
@@ -19,7 +36,13 @@ Future<DateTime?> exifExtractor(File file) async {
   // i have nvme + btrfs, but still, will leave as is
   final bytes = await file.readAsBytes();
   // this returns empty {} if file doesn't have exif so don't worry
-  final tags = await readExifFromBytes(bytes);
+  Map<String, IfdTag> tags;
+  try {
+    tags = await readExifFromBytes(bytes);
+  } catch (e) {
+    _logger.warning('Failed to read EXIF data from ${file.path}: $e');
+    return null;
+  }
   String? datetime;
   // try if any of these exists
   datetime ??= tags['Image DateTime']?.printable;
@@ -32,7 +55,12 @@ Future<DateTime?> exifExtractor(File file) async {
       .replaceAll('/', ':')
       .replaceAll('.', ':')
       .replaceAll('\\', ':')
-      .replaceAll(': ', ':0')
+      .replaceAll(': ', ':0');
+  if (datetime.length < 19) {
+    _logger.warning('Invalid EXIF datetime format in ${file.path}: $datetime');
+    return null;
+  }
+  datetime = datetime
       .substring(0, min(datetime.length, 19))
       .replaceFirst(':', '-') // replace two : year/month to comply with iso
       .replaceFirst(':', '-');

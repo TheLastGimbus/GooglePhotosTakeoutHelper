@@ -14,10 +14,10 @@ jobs:
         run: echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_OUTPUT
       - name: Get changelog
         run: python scripts/get_changelog.py --version ${{ steps.clean_tag.outputs.tag }} > ./body-file.txt
-      #        Just in case changelogs won't work out
-      #      - name: Get tag message
-      #        id: tag_message
-      #        run: echo "name=message=$(git tag -l --format='%(contents)' ${{ github.ref }})" >> $GITHUB_OUTPUT
+      # Just in case changelogs won't work out
+      # - name: Get tag message
+      #   id: tag_message
+      #   run: echo "name=message=$(git tag -l --format='%(contents)' ${{ github.ref }})" >> $GITHUB_OUTPUT
       - name: Create GH-Release
         uses: softprops/action-gh-release@v1
         with:

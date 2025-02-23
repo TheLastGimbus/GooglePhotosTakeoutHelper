@@ -26,14 +26,13 @@ jobs:
           else
             echo "Unknown OS: $RUNNER_OS"
             exit 69
-          fi
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
       - name: Build exe
         run: dart compile exe bin/gpth.dart -o ./${{ steps.exe_name.outputs.name }}
-      - name: Upload apk as artifact
+      - name: Upload exe as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: gpth-nightly-${{ runner.os }}
+          name: gpth-nightly-${{ matrix.os }}
           path: ./${{ steps.exe_name.outputs.name }}
           if-no-files-found: error
