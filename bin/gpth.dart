@@ -293,7 +293,7 @@ void main(List<String> arguments) async {
 
   // recursive=true makes it find everything nicely even if user id dumb 😋
   await for (final d in input.list(recursive: true).whereType<Directory>()) {
-    if (isYearFolder(d)) {
+    if (await isYearFolder(d)) {
       yearFolders.add(d);
     } else if (await isAlbumFolder(d)) {
       albumFolders.add(d);

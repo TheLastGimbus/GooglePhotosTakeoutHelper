@@ -1,9 +1,25 @@
+"""
+This script extracts the changelog for a specific version from the CHANGELOG.md file.
+"""
+
 import argparse
 import re
 
 def main():
-    p = argparse.ArgumentParser(description='Get changelog for a specific version.')
-    p.add_argument('--version', required=True, help='Version to get changelog for. You can type with or without "v" prefix')
+    """
+    Main function to parse arguments and extract the changelog for the specified version.
+    """
+    p = argparse.ArgumentParser(
+        description='Get changelog for a specific version.'
+    )
+    p.add_argument(
+        '--version',
+        required=True,
+        help=(
+            'Version to get changelog for. '
+            'You can type with or without "v" prefix'
+        )
+    )
     args = p.parse_args()
 
     version = args.version.strip().replace('v', '')
@@ -11,16 +27,18 @@ def main():
         raise ValueError('Invalid version format. Expected format: X.Y.Z')
 
     try:
-        with open("CHANGELOG.md", 'r') as f:
+        with open("CHANGELOG.md", 'r', encoding='utf-8') as f:
             lines = f.read()
-    except FileNotFoundError:
-        raise FileNotFoundError('CHANGELOG.md file not found.')
+    except FileNotFoundError as exc:
+        raise FileNotFoundError('CHANGELOG.md file not found.') from exc
 
     # Get first "##" followed by version
     try:
         start = lines.index(f'## {version}')
-    except ValueError:
-        raise ValueError(f'Version {version} not found in CHANGELOG.md')
+    except ValueError as exc:
+        raise ValueError(
+            f'Version {version} not found in CHANGELOG.md'
+        ) from exc
 
     # Start from newline
     start = lines.index('\n', start) + 1

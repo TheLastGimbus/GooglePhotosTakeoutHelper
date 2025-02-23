@@ -6,6 +6,7 @@ import 'package:gpth/extras.dart' as extras;
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
+import 'package:logging/logging.dart';
 
 final _logger = Logger('JsonExtractor');
 
@@ -19,10 +20,10 @@ Future<DateTime?> jsonExtractor(File file, {bool tryhard = false}) async {
 DateTime? extractDateFromJson(File jsonFile) {
   try {
     final data = json.decode(jsonFile.readAsStringSync());
-    final timestamp = data['photoTakenTime']?['timestamp'] ?? 
-                     data['creationTime']?['timestamp'] ?? 
+    final timestamp = data['photoTakenTime']?['timestamp'] ??
+                     data['creationTime']?['timestamp'] ??
                      data['modificationTime']?['timestamp'];
-    return timestamp != null 
+    return timestamp != null
         ? DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)
         : null;
   } catch (e) {
@@ -57,7 +58,7 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
   return null;
 }
 
-// if the originally file was uploaded without an extension, 
+// if the originally file was uploaded without an extension,
 // (for example, "20030616" (jpg but without ext))
 // it's json won't have the extension ("20030616.json"), but the image
 // itself (after google proccessed it) - will ("20030616.jpg" tadam)

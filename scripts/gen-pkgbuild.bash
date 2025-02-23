@@ -41,7 +41,7 @@ source=(\"\${url}/releases/download/v\${pkgver}/gpth-linux\")
 sha256sums=('${sha256sum}')
 
 package() {
-    install -Dm755 \"gpth-linux\" \"\${pkgdir}/usr/bin/gpth\"
+    install -Dm755 \"\${srcdir}/gpth-linux\" \"\${pkgdir}/usr/bin/gpth\"
 }"
 
 echo "$txt" | tee PKGBUILD

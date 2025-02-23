@@ -12,25 +12,25 @@ final _commonDatetimePatterns = [
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d-\d{6})'),
-    'YYYYMMDD-hhmmss'
+    'yyyyMMdd-HHmmss'
   ],
   // example: IMG_20190509_154733-edited.jpg, MVIMG_20190215_193501.MP4, IMG_20190221_112112042_BURST000_COVER_TOP.MP4
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d_\d{6})'),
-    'YYYYMMDD_hhmmss',
+    'yyyyMMdd_HHmmss',
   ],
   // example: Screenshot_2019-04-16-11-19-37-232_com.google.a.jpg
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{2}-\d{2}-\d{2})'),
-    'YYYY-MM-DD-hh-mm-ss',
+    'yyyy-MM-dd-HH-mm-ss',
   ],
   // example: signal-2020-10-26-163832.jpg
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}-(01|02|03|04|05|06|07|08|09|10|11|12)-[0-3]\d-\d{6})'),
-    'YYYY-MM-DD-hhmmss',
+    'yyyy-MM-dd-HHmmss',
   ],
   // Those two are thanks to @matt-boris <3
   // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/commit/e0d9ee3e71def69d74eba7cf5ec204672924726d
@@ -38,13 +38,13 @@ final _commonDatetimePatterns = [
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}(01|02|03|04|05|06|07|08|09|10|11|12)[0-3]\d{7})'),
-    'YYYYMMDDhhmmss',
+    'yyyyMMddHHmmss',
   ],
   // example: 2016_01_30_11_49_15.mp4
   [
     RegExp(
         r'(?<date>(20|19|18)\d{2}_(01|02|03|04|05|06|07|08|09|10|11|12)_[0-3]\d_\d{2}_\d{2}_\d{2})'),
-    'YYYY_MM_DD_hh_mm_ss',
+    'yyyy_MM_dd_HH_mm_ss',
   ],
 ];
 
@@ -55,7 +55,7 @@ final RegExp _dateRegex = RegExp(
 DateTime? guessDateFromFilename(String filename) {
   final match = _dateRegex.firstMatch(filename);
   if (match == null) return null;
-  
+
   try {
     return DateTime(
       int.parse(match.group(1)!),
