@@ -30,12 +30,14 @@ extension X on Iterable<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
   Iterable<File> wherePhotoVideo() => whereType<File>().where((e) {
         final mime = lookupMimeType(e.path) ?? "";
+        final fileExtension = p.extension(e.path).toLowerCase();
         return mime.startsWith('image/') ||
             mime.startsWith('video/') ||
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts'||
+            _moreExtensions.contains(fileExtension);
       });
 }
 
@@ -43,14 +45,19 @@ extension Y on Stream<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
   Stream<File> wherePhotoVideo() => whereType<File>().where((e) {
         final mime = lookupMimeType(e.path) ?? "";
+        final fileExtension = p.extension(e.path).toLowerCase();
         return mime.startsWith('image/') ||
             mime.startsWith('video/') ||
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts'||
+            _moreExtensions.contains(fileExtension);
       });
 }
+
+//Support raw formats (dng, cr2) and Pixel motion photos (mp, mv)
+const _moreExtensions = ['.mp', '.mv', '.dng', '.cr2'];
 
 extension Util on Stream {
   Stream<T> whereType<T>() => where((e) => e is T).cast<T>();
