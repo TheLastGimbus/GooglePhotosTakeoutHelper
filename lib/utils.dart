@@ -5,6 +5,7 @@ import 'package:gpth/interactive.dart' as interactive;
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'media.dart';
 
@@ -30,12 +31,14 @@ extension X on Iterable<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
   Iterable<File> wherePhotoVideo() => whereType<File>().where((e) {
         final mime = lookupMimeType(e.path) ?? "";
+        final fileExtension = p.extension(e.path).toLowerCase();
         return mime.startsWith('image/') ||
             mime.startsWith('video/') ||
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts'||
+            _moreExtensions.contains(fileExtension);
       });
 }
 
@@ -43,14 +46,19 @@ extension Y on Stream<FileSystemEntity> {
   /// Easy extension allowing you to filter for files that are photo or video
   Stream<File> wherePhotoVideo() => whereType<File>().where((e) {
         final mime = lookupMimeType(e.path) ?? "";
+        final fileExtension = p.extension(e.path).toLowerCase();
         return mime.startsWith('image/') ||
             mime.startsWith('video/') ||
             // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/223
             // https://github.com/dart-lang/mime/issues/102
             // 🙃🙃
-            mime == 'model/vnd.mts';
+            mime == 'model/vnd.mts'||
+            _moreExtensions.contains(fileExtension);
       });
 }
+
+//Support raw formats (dng, cr2) and Pixel motion photos (mp, mv)
+const _moreExtensions = ['.mp', '.mv', '.dng', '.cr2'];
 
 extension Util on Stream {
   Stream<T> whereType<T>() => where((e) => e is T).cast<T>();
@@ -132,4 +140,32 @@ extension Z on String {
     if (lastIndex == -1) return this;
     return replaceRange(lastIndex, lastIndex + from.length, to);
   }
+}
+
+Future<void> changeMPExtensions(List<Media> allMedias, String finalExtension) async {
+  int renamedCount = 0;
+  for (final m in allMedias) {
+    for (final entry in m.files.entries) {
+      final file = entry.value;
+      final ext = p.extension(file.path).toLowerCase();
+      if (ext == '.mv' || ext == '.mp') {
+        final originalName = p.basenameWithoutExtension(file.path);
+        final normalizedName = unorm.nfc(originalName);
+      
+        final newName = '$normalizedName$finalExtension';
+        if (newName != normalizedName) {
+          final newPath = p.join(p.dirname(file.path), newName);
+          // Rename file and update reference in map
+          try {
+            final newFile = await file.rename(newPath);
+            m.files[entry.key] = newFile;
+            renamedCount++;
+          } on FileSystemException catch (e) {
+            print('[Error] Error changing extension to $finalExtension -> ${file.path}: ${e.message}');
+          }
+        } 
+      }
+    }
+  }
+  print('Successfully changed Pixel Motion Photos files extensions (change it to $finalExtension): $renamedCount');
 }

@@ -61,7 +61,10 @@ void main(List<String> arguments) async {
       help: "Copy files instead of moving them.\n"
           "This is usually slower, and uses extra space, "
           "but doesn't break your input folder",
-    );
+    )
+    ..addFlag(
+      'transform-pixel-mp', 
+      help: 'Transform Pixel .MP or .MV extensions to ".mp4"');
   final args = <String, dynamic>{};
   try {
     final res = parser.parse(arguments);
@@ -108,6 +111,8 @@ void main(List<String> arguments) async {
     args['divide-to-dates'] = await interactive.askDivideDates();
     print('');
     args['albums'] = await interactive.askAlbums();
+    print('');
+    args['transform-pixel-mp'] = await interactive.askTransformPixelMP();
     print('');
 
     // @Deprecated('Interactive unzipping is suspended for now!')
@@ -354,6 +359,15 @@ void main(List<String> arguments) async {
 
   print('Finding albums (this may take some time, dont worry :) ...');
   findAlbums(media);
+
+  // Change Pixel Motion Photos extension to .mp4 using a list of Medias.
+  // This is done after the dates of files have been defined, and before
+  // the files are moved to the output folder, to avoid shortcuts/symlinks problems
+  if (args['transform-pixel-mp']) {
+    print('Changing .MP or .MV extensions to .mp4 (this may take some time) ...');
+    await changeMPExtensions(media, ".mp4");
+  }
+  print('');
 
   /// #######################
 

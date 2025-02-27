@@ -230,6 +230,28 @@ Future<bool> askForCleanOutput() async {
   }
 }
 
+Future<bool> askTransformPixelMP() async {
+  print('Pixel Motion Pictures are saved with the .MP or .MV '
+      'extensions. Do you want to change them to .mp4 '
+      'for better compatibility?');
+  print('[1] (default) - no, keep original extension');
+  print('[2] - yes, change extension to .mp4');
+  print('(Type 1 or 2 or press enter for default):');
+  final answer = await askForInt();
+  switch (answer) {
+    case '1':
+    case '':
+      print('Okay, will keep original extension');
+      return false;
+    case '2':
+      print('Okay, will change to mp4!');
+      return true;
+    default:
+      error('Invalid answer - try again');
+      return askTransformPixelMP();
+  }
+}
+
 /// Checks free space on disk and notifies user accordingly
 @Deprecated('Interactive unzipping is suspended for now!')
 Future<void> freeSpaceNotice(int required, Directory dir) async {
