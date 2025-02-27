@@ -357,6 +357,24 @@ void main(List<String> arguments) async {
 
   /// #######################
 
+  // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/261
+  // If a media is not in a year album (there is no null key) it establishes
+  // one from an album as a null key to copy it to ALL_PHOTOS correctly.
+  // This will move the album file to ALL_PHOTOS and create the shortcut to
+  // the output album folder (if shortcut option is selected).
+  // (The inverse will happen if the inverse-shortcut option is selected).
+  // If album mode is set to *duplicate-copy* it will not proceed 
+  // to avoid moving the same file twice (which would throw an exception)
+  if (args['albums'] != 'duplicate-copy'){
+    for (final m in media){
+      final fileWithKey1 = m.files[null];
+      if (fileWithKey1 == null) {
+        m.files[null] = m.files.values.first;
+      }
+    }
+  }
+
+  /// #######################
   /// ##### Copy/move files to actual output folder #####
 
   final barCopy = FillingBar(
