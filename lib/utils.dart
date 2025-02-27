@@ -5,6 +5,7 @@ import 'package:gpth/interactive.dart' as interactive;
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:proper_filesize/proper_filesize.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 import 'media.dart';
 
@@ -139,4 +140,32 @@ extension Z on String {
     if (lastIndex == -1) return this;
     return replaceRange(lastIndex, lastIndex + from.length, to);
   }
+}
+
+Future<void> changeMPExtensions(List<Media> allMedias, String finalExtension) async {
+  int renamedCount = 0;
+  for (final m in allMedias) {
+    for (final entry in m.files.entries) {
+      final file = entry.value;
+      final ext = p.extension(file.path).toLowerCase();
+      if (ext == '.mv' || ext == '.mp') {
+        final originalName = p.basenameWithoutExtension(file.path);
+        final normalizedName = unorm.nfc(originalName);
+      
+        final newName = '$normalizedName$finalExtension';
+        if (newName != normalizedName) {
+          final newPath = p.join(p.dirname(file.path), newName);
+          // Rename file and update reference in map
+          try {
+            final newFile = await file.rename(newPath);
+            m.files[entry.key] = newFile;
+            renamedCount++;
+          } on FileSystemException catch (e) {
+            print('[Error] Error changing extension to $finalExtension -> ${file.path}: ${e.message}');
+          }
+        } 
+      }
+    }
+  }
+  print('Successfully changed Pixel Motion Photos files extensions (change it to $finalExtension): $renamedCount');
 }
