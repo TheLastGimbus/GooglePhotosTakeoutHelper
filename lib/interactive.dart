@@ -1,21 +1,6 @@
-/// This file contains code for interacting with user when launched without
-/// arguments => probably with double-click
-///
-/// Such "interactive mode" was created because people are too dumb to use cmd
-/// And I'm too lazy to create GUI <- this line is by Copilot and is true
-///
-/// Rules for this file functions do...:
-/// - ...use sleep() to make thing live and give time to read text
-/// - ...decide for themselves how much sleep() they want and where
-/// - ...start and end without any extra \n, but can have \n inside
-///    - extra \n are added in main file
-/// - ...detect when something is wrong (f.e. disk space) and quit whole program
-/// - ...are as single-job as it's appropriate - main file calls them one by one
 import 'dart:async';
 import 'dart:io';
 
-// @Deprecated('Interactive unzipping is suspended for now!')
-// import 'package:archive/archive_io.dart';
 import 'package:file_picker_desktop/file_picker_desktop.dart';
 import 'package:gpth/utils.dart';
 import 'package:path/path.dart' as p;
@@ -101,53 +86,6 @@ Future<Directory> getInputDir() async {
   return Directory(dir);
 }
 
-/// Asks user for zip files with ui dialogs
-@Deprecated('Interactive unzipping is suspended for now!')
-Future<List<File>> getZips() async {
-  print('First, select all .zips from Google Takeout '
-      '(use Ctrl to select multiple)');
-  await sleep(2);
-  pressEnterToContinue();
-  final files = await pickFiles(
-    dialogTitle: 'Select all Takeout zips:',
-    type: FileType.custom,
-    allowedExtensions: ['zip', 'tgz'],
-    allowMultiple: true,
-  );
-  await sleep(1);
-  if (files == null) {
-    error('Duh, something went wrong with selecting - try again!');
-    quit(69);
-  }
-  if (files.count == 0) {
-    error('No files selected - try again :/');
-    quit(6969);
-  }
-  if (files.count == 1) {
-    print("You selected only one zip - if that's only one you have, it's cool, "
-        "but if you have multiple, Ctrl-C to exit gpth, and select them "
-        "*all* again (with Ctrl)");
-    await sleep(5);
-    pressEnterToContinue();
-  }
-  if (!files.files.every((e) =>
-      File(e.path!).statSync().type == FileSystemEntityType.file &&
-      RegExp(r'\.(zip|tgz)$').hasMatch(e.path!))) {
-    print('Files: [${files.files.map((e) => p.basename(e.path!)).join(', ')}]');
-    error('Not all files you selected are zips :/ please do this again');
-    quit(6969);
-  }
-  // potentially shows user they selected too little ?
-  print('Cool! Selected ${files.count} zips => '
-      '${filesize(
-    files.files
-        .map((e) => File(e.path!).statSync().size)
-        .reduce((a, b) => a + b),
-  )}');
-  await sleep(1);
-  return files.files.map((e) => File(e.path!)).toList();
-}
-
 /// Asks user for output folder with ui dialogs
 Future<Directory> getOutput() async {
   print('Now, select output folder - all photos will be moved there\n'
@@ -228,66 +166,4 @@ Future<bool> askForCleanOutput() async {
       error('Invalid answer - try again');
       return askForCleanOutput();
   }
-}
-
-/// Checks free space on disk and notifies user accordingly
-@Deprecated('Interactive unzipping is suspended for now!')
-Future<void> freeSpaceNotice(int required, Directory dir) async {
-  final freeSpace = await getDiskFree(dir.path);
-  if (freeSpace == null) {
-    print(
-      'Note: everything will take ~${filesize(required)} of disk space - '
-      'make sure you have that available on ${dir.path} - otherwise, '
-      'Ctrl-C to exit, and make some free space!\n'
-      'Or: unzip manually, remove the zips and use gpth with cmd options',
-    );
-  } else if (freeSpace < required) {
-    print(
-      '!!! WARNING !!!\n'
-      'Whole process requires ${filesize(required)} of space, but you '
-      'only have ${filesize(freeSpace)} available on ${dir.path} - \n'
-      'Go make some free space!\n'
-      '(Or: unzip manually, remove the zips, and use gpth with cmd options)',
-    );
-    quit(69);
-  } else {
-    print(
-      '(Note: everything will take ~${filesize(required)} of disk space - '
-      'you have ${filesize(freeSpace)} free so should be fine :)',
-    );
-  }
-  await sleep(3);
-  pressEnterToContinue();
-}
-
-/// Unzips all zips to given folder (creates it if needed)
-@Deprecated('Interactive unzipping is suspended for now!')
-Future<void> unzip(List<File> zips, Directory dir) async {
-  throw UnimplementedError();
-  // if (await dir.exists()) await dir.delete(recursive: true);
-  // await dir.create(recursive: true);
-  // print('gpth will now unzip all of that, process it and put everything in '
-  //     'the output folder :)');
-  // await sleep(1);
-  // for (final zip in zips) {
-  //   print('Unzipping ${p.basename(zip.path)}...');
-  //   try {
-  //     await extractFileToDisk(zip.path, dir.path, asyncWrite: true);
-  //   } on PathNotFoundException catch (e) {
-  //     error('Error while unzipping $zip :(\n$e');
-  //     error('');
-  //     error('===== This is a known issue ! =====');
-  //     error("Looks like unzipping doesn't want to work :(");
-  //     error(
-  //         "You will have to unzip manually - see 'Running manually' section in README");
-  //     error('');
-  //     error(
-  //         'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper#running-manually-with-cmd');
-  //     error('');
-  //     error('===== Sorry for inconvenience =====');
-  //   } catch (e) {
-  //     error('Error while unzipping $zip :(\n$e');
-  //     quit(69);
-  //   }
-  // }
 }

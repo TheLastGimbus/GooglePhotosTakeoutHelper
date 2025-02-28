@@ -117,3 +117,30 @@ You get **_🔥FOUR🔥_** different options on how you want your albums 😱 - 
 - `--skip-extras-harder` is missing for now
 - `--divide-to-dates` is missing for now
 - End-to-end tests are gone, but they're not as required since we have a lod of Units instead 👍
+
+## Future Improvements and Features
+
+### Planned Features
+
+- Add a troubleshooting section for common issues in the `README.md`.
+- Remove deprecated functions and comments from `lib/interactive.dart`.
+- Fix or remove suspended features in `lib/interactive.dart`.
+- Simplify and optimize the logic for moving files in `lib/moving.dart`.
+- Improve methods for handling JSON files in `lib/date_extractors/json_extractor.dart`.
+- Remove the need for tryhard methods in `lib/date_extractors/json_extractor.dart`.
+
+### Bug Fixes
+
+- Fix issues with file operations in `lib/moving.dart`.
+- Fix deprecated functions and comments in `lib/interactive.dart`.
+- Fix tryhard methods in `lib/date_extractors/json_extractor.dart`.
+
+### Performance Improvements
+
+- Optimize the performance of file operations in `lib/moving.dart`.
+- Improve the methods for handling JSON files in `lib/date_extractors/json_extractor.dart`.
+
+### Code Cleanup
+
+- Remove deprecated functions and comments from `lib/interactive.dart`.
+- Remove tryhard methods from `lib/date_extractors/json_extractor.dart`.
