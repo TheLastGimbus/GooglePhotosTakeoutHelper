@@ -71,8 +71,7 @@ Done! Enjoy your photos!!!
 
 You may still need this mode if:
 - You want to run on Synology where there are no ui programs required for interactive
-  - You can read/discuss in [#157](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/discussions/157) for any help
-- ~~Interactive unzipping crashes for you (known issue in windoza 😢 #178)~~ - disabled for now
+  - You can read/discuss in [#157](://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/discussions/157) for any help
 - Want to use this in other script/automation
 
 In that case:
@@ -101,6 +100,21 @@ In that case:
      ```
 
 You can check all cmd flags by running `gpth --help` - for example, the `--divide-to-dates` flag
+
+### Troubleshooting common issues
+
+#### Issue: "No photos found in the input directory"
+- Ensure that you have unzipped all the Takeout files and merged them into one folder.
+- Make sure the input directory you selected contains the "Takeout" folder with all the photos.
+
+#### Issue: "Output folder is not empty"
+- If the output folder is not empty, you can choose to delete all files inside the output folder and continue, or continue as usual and put output files alongside existing ones.
+
+#### Issue: "Insufficient disk space"
+- Make sure you have enough disk space available for the entire process. If you are running low on disk space, free up some space or choose a different output location.
+
+#### Issue: "PowerShell doesn't work on Windows"
+- If creating shortcuts fails on Windows, try using the "duplicate-copy" album solution instead of "shortcut".
 
 ## If I helped you, you can consider donating me ☕
 I spent **a lot of** time fixing bugs and making this work stable 💖 - would be super thankful for any donations 🥰
