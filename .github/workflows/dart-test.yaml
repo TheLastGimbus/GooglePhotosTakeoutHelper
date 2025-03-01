@@ -3,9 +3,9 @@ name: Dart tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   tests:
@@ -23,4 +23,5 @@ jobs:
       - run: dart pub get
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-      - run: dart analyze --fatal-infos
+      - name: Run analyzer
+        run: dart analyze --fatal-infos --fatal-warnings

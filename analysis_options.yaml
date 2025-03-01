@@ -13,16 +13,141 @@
 
 include: package:lints/recommended.yaml
 
-# Uncomment the following section to specify additional rules.
+linter:
+  rules:
+    - camel_case_types
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - avoid_print
+    - prefer_final_fields
+    - unnecessary_this
+    - prefer_single_quotes
+    - avoid_redundant_argument_values
+    - prefer_typing_uninitialized_variables
+    - avoid_empty_else
+    - avoid_init_to_null
+    - avoid_returning_null_for_future
+    - avoid_unnecessary_containers
+    - avoid_void_async
+    - always_declare_return_types
+    - always_specify_types
+    - annotate_overrides
+    - avoid_annotating_with_dynamic
+    - avoid_as
+    - avoid_catches_without_on_clauses
+    - avoid_returning_this
+    - avoid_types_as_parameter_names
+    - avoid_unused_constructor_parameters
+    - avoid_web_libraries_in_flutter
+    - await_only_futures
+    - camel_case_extensions
+    - cancel_subscriptions
+    - close_sinks
+    - comment_references
+    - control_flow_in_finally
+    - curly_braces_in_flow_control_structures
+    - diagnostic_describe_all_properties
+    - directives_ordering
+    - empty_catches
+    - empty_constructor_bodies
+    - empty_statements
+    - file_names
+    - hash_and_equals
+    - iterable_contains_unrelated_type
+    - join_return_with_assignment
+    - library_names
+    - library_prefixes
+    - list_remove_unrelated_type
+    - literal_only_boolean_expressions
+    - no_adjacent_strings_in_list
+    - no_duplicate_case_values
+    - no_logic_in_create_state
+    - non_constant_identifier_names
+    - null_closures
+    - omit_local_variable_types
+    - one_member_abstracts
+    - only_throw_errors
+    - overridden_fields
+    - package_api_docs
+    - package_names
+    - parameter_assignments
+    - prefer_adjacent_string_concatenation
+    - prefer_asserts_in_initializer_lists
+    - prefer_asserts_with_message
+    - prefer_bool_in_asserts
+    - prefer_collection_literals
+    - prefer_conditional_assignment
+    - prefer_const_constructors_in_immutables
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - prefer_contains
+    - prefer_double_quotes
+    - prefer_equal_for_default_values
+    - prefer_expression_function_bodies
+    - prefer_final_locals
+    - prefer_final_parameters
+    - prefer_foreach
+    - prefer_function_declarations_over_variables
+    - prefer_generic_function_type_aliases
+    - prefer_if_elements_to_conditional_expressions
+    - prefer_initializing_formals
+    - prefer_interpolation_to_compose_strings
+    - prefer_is_empty
+    - prefer_is_not_empty
+    - prefer_iterable_whereType
+    - prefer_mixin
+    - prefer_null_aware_operators
+    - prefer_relative_imports
+    - prefer_single_quotes
+    - prefer_spread_collections
+    - prefer_typing_uninitialized_variables
+    - provide_deprecation_message
+    - public_member_api_docs
+    - recursive_getters
+    - secure_pubspec_urls
+    - slash_for_doc_comments
+    - sort_child_properties_last
+    - sort_constructors_first
+    - sort_unnamed_constructors_first
+    - test_types_in_equals
+    - throw_in_finally
+    - type_annotate_public_apis
+    - type_init_formals
+    - unawaited_futures
+    - unnecessary_await_in_return
+    - unnecessary_brace_in_string_interps
+    - unnecessary_const
+    - unnecessary_lambdas
+    - unnecessary_new
+    - unnecessary_null_aware_assignments
+    - unnecessary_null_in_if_null_operators
+    - unnecessary_overrides
+    - unnecessary_parenthesis
+    - unnecessary_statements
+    - unnecessary_string_escapes
+    - unnecessary_string_interpolations
+    - unnecessary_this
+    - unsafe_html
+    - unrelated_type_equality_checks
+    - use_function_type_syntax_for_parameters
+    - use_key_in_widget_constructors
+    - use_late_for_private_fields_and_variables
+    - use_rethrow_when_possible
+    - use_setters_to_change_properties
+    - use_string_buffers
+    - use_super_parameters
+    - use_test_throws_matchers
+    - use_to_and_as_if_applicable
+    - valid_regexps
 
-# linter:
-#   rules:
-#     - camel_case_types
-
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
-
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+    - "**/build/**"
+    - "**/coverage/**"
+    - "**/test-results/**"
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
 
