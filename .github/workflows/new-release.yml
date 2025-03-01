@@ -2,7 +2,7 @@ name: Build and publish new release on version tag
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   make-release:
@@ -28,7 +28,7 @@ jobs:
     needs: make-release
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +62,7 @@ jobs:
           # because proper certificates cost money (a lot :/ )
           certificate: ${{ secrets.WINDOZA_CERT_BASE64 }}
           password: ${{ secrets.WINDOZA_CERT_PASSWORD }}
-          folder: '.'
+          folder: "."
       - name: Add files to GH-Release
         uses: softprops/action-gh-release@v1
         with:
@@ -79,8 +79,8 @@ jobs:
         with:
           pkgname: gpth-bin
           pkgbuild: ./PKGBUILD
-          commit_username: 'TheLastGimbus'
-          commit_email: 'mateusz.soszynski@tuta.io'
+          commit_username: "TheLastGimbus"
+          commit_email: "mateusz.soszynski@tuta.io"
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
           commit_message: ${{ steps.clean_tag.outputs.tag }}
           test: true

@@ -39,3 +39,6 @@ test-results/
 
 # Ignore Windows specific files
 Thumbs.db
+dartsdk.zip
+test_takeout/
+test_output/

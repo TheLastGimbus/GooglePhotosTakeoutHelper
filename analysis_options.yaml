@@ -142,13 +142,12 @@ linter:
 
 analyzer:
   exclude:
-    - '**/*.g.dart'
-    - '**/*.freezed.dart'
-    - '**/generated/**'
-    - '**/build/**'
-    - '**/coverage/**'
-    - '**/test-results/**'
-
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+    - "**/build/**"
+    - "**/coverage/**"
+    - "**/test-results/**"
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to generate PKGBUILD files for Arch Linux
 
-set -e  # fail if generating sha fails or smth
+set -e # fail if generating sha fails or smth
 
 if [ -z "$1" ]; then
   echo "Usage: $0 <path-to-gpth-linux-binary>"

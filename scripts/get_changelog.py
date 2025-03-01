@@ -5,6 +5,7 @@ This script extracts the changelog for a specific version from the CHANGELOG.md 
 import argparse
 import re
 
+
 def main():
     """
     Main function to parse arguments and extract the changelog for the specified version.
@@ -50,6 +51,7 @@ def main():
         end = len(lines)
 
     print(lines[start:end].strip())
+
 
 if __name__ == '__main__':
     main()
