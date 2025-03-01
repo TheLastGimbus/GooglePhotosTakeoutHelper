@@ -230,6 +230,30 @@ Future<bool> askForCleanOutput() async {
   }
 }
 
+Future<bool> askChangeCreationTime() async {
+  print('This program fixes file "modified times". '
+      'Due to language limitations, creation times remain unchanged. '
+      'Would you like to run a separate script at the end to sync '
+      'creation times with modified times?'
+      '\nNote: ONLY ON WINDOWS');
+  print('[1] (Default) - No, don\'t update creation time');
+  print('[2] - Yes, update creation time to match modified time');
+  print('(Type 1 or 2, or press enter for default):');
+  final answer = await askForInt();
+  switch (answer) {
+    case '1':
+    case '':
+      print('Okay, will not change creation time');
+      return false;
+    case '2':
+      print('Okay, will update creation time at the end of the prorgam!');
+      return true;
+    default:
+      error('Invalid answer - try again');
+      return askChangeCreationTime();
+  }
+}
+
 /// Checks free space on disk and notifies user accordingly
 @Deprecated('Interactive unzipping is suspended for now!')
 Future<void> freeSpaceNotice(int required, Directory dir) async {
