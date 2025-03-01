@@ -133,3 +133,61 @@ extension Z on String {
     return replaceRange(lastIndex, lastIndex + from.length, to);
   }
 }
+
+/// Recursively traverses the output [directory] and updates
+/// the creation time of files in batches.
+/// For each file, attempts to set the creation date to match 
+/// the last modification date.
+/// Only Windows support for now, using PowerShell.
+/// In the future MacOS support is possible if the user has XCode installed
+Future<void> updateCreationTimeRecursively(Directory directory) async {
+  if (!Platform.isWindows) {
+    print("Skipping: Updating creation time is only supported on Windows.");
+    return;
+  }
+  int changedFiles = 0;
+  int maxChunkSize = 32000;  //Avoid 32768 char limit in command line with chunks
+
+  String currentChunk = "";  
+  await for (final entity in directory.list(recursive: true, followLinks: false)) {
+    if (entity is File) {
+      //Command for each file
+      final command ="(Get-Item '${entity.path}').CreationTime = (Get-Item '${entity.path}').LastWriteTime;";
+      //If current command + chunk is larger than 32000, commands in currentChunk is executed and current comand is passed for the next execution
+      if (currentChunk.length + command.length > maxChunkSize) {
+        bool success = await _executePShellCreationTimeCmd(currentChunk);
+        if (success) changedFiles += currentChunk.split(';').length-1; // -1 to ignore last ';'
+        currentChunk = command;
+      } else {
+        currentChunk += command;
+      }
+    }
+  }
+  
+  //Leftover chunk is executed after the for
+  if (currentChunk.isNotEmpty) {
+    bool success = await _executePShellCreationTimeCmd(currentChunk);
+    if (success) changedFiles += currentChunk.split(';').length-1; // -1 to ignore last ';'
+  }
+  print("Successfully updated creation time for $changedFiles files!");
+}
+
+//Execute a chunk of commands in PowerShell related with creation time
+Future<bool> _executePShellCreationTimeCmd(String commandChunk) async {
+  try {
+    final result = await Process.run('powershell', [
+      '-ExecutionPolicy', 'Bypass',
+      '-NonInteractive',
+      '-Command', commandChunk
+    ]);
+
+    if (result.exitCode != 0) {
+      print("Error updateing creation time in batch: ${result.stderr}");
+      return false;
+    }
+    return true;
+  } catch (e) {
+    print("Error updating creation time: $e");
+    return false;
+  }
+}
