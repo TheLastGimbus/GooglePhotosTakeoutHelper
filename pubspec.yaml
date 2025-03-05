@@ -24,6 +24,8 @@ dependencies:
   #      ref: fix-windoza-extract-errors
   proper_filesize: ^0.0.2
   unorm_dart: ^0.2.0
+  win32: ^2.0.0
+  ffi: ^1.1.3
 
 dev_dependencies:
   lints: ^2.1.1
