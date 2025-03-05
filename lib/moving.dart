@@ -32,28 +32,34 @@ Future<File> createShortcut(Directory location, File target) async {
   // this must be relative to not break when user moves whole folder around:
   // https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/232
   final targetRelativePath = p.relative(target.path, from: link.parent.path);
+  final targetPath = target.absolute.path;
   if (Platform.isWindows) {
-    final res = await Process.run(
-      'powershell.exe',
-      [
-        '-ExecutionPolicy',
-        'Bypass',
-        '-NoLogo',
-        '-NonInteractive',
-        '-NoProfile',
-        '-Command',
-        '\$ws = New-Object -ComObject WScript.Shell; '
-            '\$s = \$ws.CreateShortcut(\'${link.path}\'); '
-            '\$s.TargetPath = \'$targetRelativePath\'; '
-            '\$s.Save()',
-      ],
-    );
-    if (res.exitCode != 0) {
-      throw 'PowerShell doesnt work :( - '
-          'report that to @TheLastGimbus on GitHub:\n\n'
-          'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues\n\n'
-          '...or try other album solution\n'
-          'sorry for inconvenience :(';
+    try {
+      createShortcutWin(link.path, targetPath);
+    }catch (e) {
+      final res = await Process.run(
+        'powershell.exe',
+        [
+          '-ExecutionPolicy',
+          'Bypass',
+          '-NoLogo',
+          '-NonInteractive',
+          '-NoProfile',
+          '-Command',
+          '\$ws = New-Object -ComObject WScript.Shell; '
+              '\$s = \$ws.CreateShortcut(\'${link.path}\'); '
+              '\$s.TargetPath = \'$targetPath\'; '
+              '\$s.Save()',
+        ],
+      );
+      if (res.exitCode != 0) {
+        throw 'PowerShell doesnt work :( - '
+            'report that to @TheLastGimbus on GitHub:\n\n'
+            'https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues\n\n'
+            '...or try other album solution\n'
+            'sorry for inconvenience :('
+            '\nshortcut exc -> $e';
+      }
     }
     return File(link.path);
   } else {
