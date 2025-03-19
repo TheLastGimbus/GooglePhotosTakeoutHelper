@@ -61,6 +61,12 @@ void main(List<String> arguments) async {
       help: "Copy files instead of moving them.\n"
           "This is usually slower, and uses extra space, "
           "but doesn't break your input folder",
+    )
+    ..addFlag(
+      'modify-json', 
+      help: 'Delete the "supplemental-metadata" suffix from '
+      '.json files to ensure that script works correctly',
+      defaultsTo: true,
     );
   final args = <String, dynamic>{};
   try {
@@ -106,6 +112,8 @@ void main(List<String> arguments) async {
     final out = await interactive.getOutput();
     print('');
     args['divide-to-dates'] = await interactive.askDivideDates();
+    print('');
+    args['modify-json'] = await interactive.askModifyJson();
     print('');
     args['albums'] = await interactive.askAlbums();
     print('');
@@ -206,6 +214,11 @@ void main(List<String> arguments) async {
     }
   }
   await output.create(recursive: true);
+
+  if (args['modify-json']) {
+    print('Fixing JSON files. Removing suffix (this may take some time)...');
+    await renameIncorrectJsonFiles(input);
+  }
 
   /// ##################################################
 
