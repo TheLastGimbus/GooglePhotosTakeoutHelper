@@ -49,7 +49,34 @@ Future<File?> _jsonForFile(File file, {required bool tryhard}) async {
       _removeDigit, // most files with '(digit)' have jsons, so it's last
     ]
   ]) {
-    final jsonFile = File(p.join(dir.path, '${method(name)}.json'));
+    final transformedName = method(name);
+
+    // 1. Try exact supplemental-metadata match first
+    var jsonFile = File(p.join(dir.path, '$transformedName.supplemental-metadata.json'));
+    if (await jsonFile.exists()) return jsonFile;
+
+    // 2. Try truncated supplemental-metadata patterns
+    // This handles cases where filename is truncated due to length limits
+    // Examples: .s.json, .supple.json, .suppleme.json
+    try {
+      final files = await dir.list().toList();
+      for (final entity in files) {
+        if (entity is File && entity.path.endsWith('.json')) {
+          final basename = p.basename(entity.path);
+          // Match patterns like: filename.s*.json where s* is any truncation of "supplemental-metadata"
+          if ((basename.startsWith('$transformedName.s') ||
+               basename.startsWith('$transformedName.sup')) &&
+              basename.endsWith('.json')) {
+            return entity;
+          }
+        }
+      }
+    } catch (_) {
+      // Directory listing failed, continue with other methods
+    }
+
+    // 3. Fall back to regular .json format (original behavior)
+    jsonFile = File(p.join(dir.path, '$transformedName.json'));
     if (await jsonFile.exists()) return jsonFile;
   }
   return null;
