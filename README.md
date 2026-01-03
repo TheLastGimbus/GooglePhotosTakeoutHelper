@@ -62,7 +62,7 @@ If you want to run it on Synology, have problems with interactive, or just love 
      # run it on your output folder:
      # (the '-r' means "run on all files/in sub-folders" aka recursively)
      # (Make sure you didn't change file modify dates aka didn't do anything with the files after running gpth
-     exiftool -overwrite_original -r -if 'not defined DateTimeOriginal' -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/"
+     exiftool -overwrite_original -r -if 'not defined $DateTimeOriginal' -P "-AllDates<FileModifyDate" "your/output/folder/ALL_PHOTOS/"
      ```
 
 Done! Enjoy your photos!!!
