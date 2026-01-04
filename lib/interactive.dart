@@ -82,6 +82,11 @@ Future<void> nothingFoundMessage() async {
     "    visit https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper\n"
     "    again and request new, correct Takeout",
   );
+  print(
+    "  - The year folders of your takeout are not called \"Photos from (year)\". \n"
+    "    This might be a language issue that is currently being discussed here:\n"
+    "    https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/issues/461 \n",
+  );
   print('After fixing this, go ahead and try again :)');
 }
 
