@@ -30,6 +30,12 @@ If you want to run it on Synology, have problems with interactive, or just love 
    **NOTE:** Keep those original zips, you may need them if anything goes wrong
    
    <img width="75%" alt="Unzip image tutorial" src="https://user-images.githubusercontent.com/40139196/229361367-b9803ab9-2724-4ddf-9af5-4df507e02dfe.png">
+
+   On a mac the built in archive utility will expload into multiple folders Takeout 2, Takeout 3, etc...
+   Use a terminal command to unzip into a single folder like this:
+   ```bash
+mkdir Merged_Takeout && for zip in *.zip; do unzip -o "$zip" -d Merged_Takeout; done
+```
    
 ### 3. Download the executable for your system from [releases tab](https://github.com/TheLastGimbus/GooglePhotosTakeoutHelper/releases) 🛒 ([also available on AUR 😏](https://aur.archlinux.org/packages/gpth-bin))
 
