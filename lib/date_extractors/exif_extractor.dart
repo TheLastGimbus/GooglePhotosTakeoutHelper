@@ -36,6 +36,11 @@ Future<DateTime?> exifExtractor(File file) async {
       .substring(0, min(datetime.length, 19))
       .replaceFirst(':', '-') // replace two : year/month to comply with iso
       .replaceFirst(':', '-');
-  // now date is like: "1999-06-23 23:55"
+  // fix weird cases where midnight is written as 24, which is illegal according to ISO8601
+  if (datetime.contains(" 24:")) {
+    print("\nEXIF Date of file ${file.path} contains hour=24, fixing by setting to 00");
+    datetime = datetime.replaceFirst(" 24:", " 00:");
+  }
+  // now date should be like: "1999-06-23 23:55:15"
   return DateTime.tryParse(datetime);
 }
