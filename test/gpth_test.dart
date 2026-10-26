@@ -227,6 +227,8 @@ AQACEQMRAD8AIcgXf//Z""";
       Directory('./Photos from 1969'),
       Directory('./Photos from vacation'),
       Directory('/tmp/very-random-omg'),
+      Directory('./Photos from\u00A02024'),
+      Directory('./Photos from\u20022023'),
     ];
     setUpAll(() async {
       for (var d in dirs) {
@@ -237,6 +239,8 @@ AQACEQMRAD8AIcgXf//Z""";
       expect(isYearFolder(dirs[0]), true);
       expect(isYearFolder(dirs[1]), true);
       expect(isYearFolder(dirs[2]), false);
+      expect(isYearFolder(dirs[4]), true);
+      expect(isYearFolder(dirs[5]), true);
       expect(await isAlbumFolder(dirs[2]), true);
       expect(await isAlbumFolder(dirs[3]), false);
     });
